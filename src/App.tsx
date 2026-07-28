@@ -333,7 +333,7 @@ export default function App() {
     setIsReportOpen(false);
     setIsStopped(false);
     
-    startStream('gemini-3.5-flash', setRunning, setError, setReportData, setEvents, pushEvent, setTokenCount, setToolRuns, setDurationSecs, setStartTime, abortRef, eventIdRef);
+    startStream('gemini-3.6-flash', setRunning, setError, setReportData, setEvents, pushEvent, setTokenCount, setToolRuns, setDurationSecs, setStartTime, abortRef, eventIdRef);
   };
 
   if (isReportOpen === 'flash' && reportData) {

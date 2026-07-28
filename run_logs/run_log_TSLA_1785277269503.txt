@@ -1,0 +1,618 @@
+========================================================
+                 RUN SUMMARY FOR TSLA
+                 Total Duration: 61.59s
+========================================================
+
+1. SUB-AGENT EXECUTIONS:
+--------------------------------------------------------
+Agent Step 1: code_execution_call
+Status: Completed
+Duration: 0.47s
+Arguments: {"queries":["\"TSLA\" \"10-K\" filetype:pdf","\"Tesla\" \"10-Q\" filetype:pdf","\"Tesla\" \"DEF 14A\" filetype:pdf","\"Tesla\" \"Form 8-K\" filetype:pdf"]}
+Output Preview: [{"search_suggestions":"{\"fields\":[{\"name\":\"result\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"query\",\"value\":{\"stringValue\":\"\\\"TSLA\\\" \\\"10-K\\\"...
+--------------------------------------------------------
+Agent Step 2: code_execution_call
+Status: Completed
+Duration: 0.57s
+Arguments: {"queries":["\"Tesla\" \"Form 4\" filetype:pdf","\"Tesla, Inc.\" \"Form 4\" site:sec.gov filetype:pdf","\"Tesla\" \"Form 10-Q\" \"June 30\" 2025 filetype:pdf","\"TSLA\" stock price March April May June 2026 Yahoo Finance"]}
+Output Preview: [{"search_suggestions":"{\"fields\":[{\"name\":\"result\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"query\",\"value\":{\"stringValue\":\"\\\"Tesla\\\" \\\"Form 4\...
+--------------------------------------------------------
+Agent Step 3: code_execution_call
+Status: Completed
+Duration: 0.64s
+Arguments: {"queries":["\"Tesla\" \"Q3 2025\" \"Q4 2025\" \"Q1 2026\" \"Q2 2026\" revenue net income","\"Tesla\" quarterly revenue net income Q3 2025 Q4 2025 Q1 2026 Q2 2026","\"Tesla\" Q2 2026 update revenue net income billions","\"Tesla\" Q1 2026 update revenue net income billions"]}
+Output Preview: [{"search_suggestions":"{\"fields\":[{\"name\":\"result\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"query\",\"value\":{\"stringValue\":\"\\\"Tesla\\\" \\\"Q3 2025...
+--------------------------------------------------------
+
+2. OVERALL AGENT STATUS: WITH ERRORS
+
+3. GENERATED MEDIA ARTIFACTS:
+Audio Briefing Link: /artifacts/podcast_briefing.wav
+
+========================================================
+
+RAW EXECUTION LOGS:
+
+--- Analysis Run for TSLA at 2026-07-28T22:20:07.910Z ---
+
+[2026-07-28T22:20:13.437Z] [TOOL CALL START] code_execution_call
+Call ID: synth_1
+Arguments: {
+  "queries": [
+    "\"TSLA\" \"10-K\" filetype:pdf",
+    "\"Tesla\" \"10-Q\" filetype:pdf",
+    "\"Tesla\" \"DEF 14A\" filetype:pdf",
+    "\"Tesla\" \"Form 8-K\" filetype:pdf"
+  ]
+}
+
+[2026-07-28T22:20:13.912Z] [TOOL RESULT END] command
+Call ID: synth_1
+Duration: 0.47s
+Result: [{"search_suggestions":"{\"fields\":[{\"name\":\"result\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"query\",\"value\":{\"stringValue\":\"\\\"TSLA\\\" \\\"10-K\\\" filetype:pdf\"}},{\"name\":\"results\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"index\",\"value\":{\"stringValue\":\"1.1\"}},{\"name\":\"snippet\",\"value\":{\"stringValue\":\"... incident response plan, and report to the Audit Committee on any appropriate ite...
+
+[2026-07-28T22:20:17.955Z] [TOOL CALL START] code_execution_call
+Call ID: synth_2
+Arguments: {
+  "queries": [
+    "\"Tesla\" \"Form 4\" filetype:pdf",
+    "\"Tesla, Inc.\" \"Form 4\" site:sec.gov filetype:pdf",
+    "\"Tesla\" \"Form 10-Q\" \"June 30\" 2025 filetype:pdf",
+    "\"TSLA\" stock price March April May June 2026 Yahoo Finance"
+  ]
+}
+
+[2026-07-28T22:20:18.527Z] [TOOL RESULT END] command
+Call ID: synth_2
+Duration: 0.57s
+Result: [{"search_suggestions":"{\"fields\":[{\"name\":\"result\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"query\",\"value\":{\"stringValue\":\"\\\"Tesla\\\" \\\"Form 4\\\" filetype:pdf\"}},{\"name\":\"results\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"index\",\"value\":{\"stringValue\":\"1.1\"}},{\"name\":\"snippet\",\"value\":{\"stringValue\":\"Page 1. SEC Form 4. FORM 4. UNITED STATES SECURITIES AND EXCHANGE COMMISSION. Was...
+
+[2026-07-28T22:20:21.404Z] [TOOL CALL START] code_execution_call
+Call ID: synth_3
+Arguments: {
+  "queries": [
+    "\"Tesla\" \"Q3 2025\" \"Q4 2025\" \"Q1 2026\" \"Q2 2026\" revenue net income",
+    "\"Tesla\" quarterly revenue net income Q3 2025 Q4 2025 Q1 2026 Q2 2026",
+    "\"Tesla\" Q2 2026 update revenue net income billions",
+    "\"Tesla\" Q1 2026 update revenue net income billions"
+  ]
+}
+
+[2026-07-28T22:20:22.047Z] [TOOL RESULT END] command
+Call ID: synth_3
+Duration: 0.64s
+Result: [{"search_suggestions":"{\"fields\":[{\"name\":\"result\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"query\",\"value\":{\"stringValue\":\"\\\"Tesla\\\" \\\"Q3 2025\\\" \\\"Q4 2025\\\" \\\"Q1 2026\\\" \\\"Q2 2026\\\" revenue net income\"}},{\"name\":\"results\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"index\",\"value\":{\"stringValue\":\"1.1\"}},{\"name\":\"snippet\",\"value\":{\"stringValue\":\"Tesla generated over $100B...
+
+[TEXT OUTPUT]
+```json
+{
+  "verdict": {
+    "summary": "Tesla is undergoing
+
+[TEXT OUTPUT]
+ a profound strategic transition from a high-volume electric vehicle manufacturer to a physical artificial intelligence and autonomous robotics ecosystem. While core automotive deliveries and overall
+
+[TEXT OUTPUT]
+ revenue have demonstrated resilient top-line expansion alongside accelerated growth in utility-scale energy storage deployments, the company is enduring substantial near
+
+[TEXT OUTPUT]
+-term profitability pressure. Operating margins have compressed due to reduced regulatory credit revenues, pricing adjustments, and an aggressive escalation in capital expenditures dedicated
+
+[TEXT OUTPUT]
+ to AI training compute, custom silicon, and next-generation production lines. The long-term investment narrative increasingly hinges on
+
+[TEXT OUTPUT]
+ successful commercialization of autonomous ride-hailing networks, full self-driving software adoption, and humanoid robotics scaling.",
+
+
+[TEXT OUTPUT]
+    "conviction_score": 65,
+    "key_takeaways":
+
+[TEXT OUTPUT]
+ [
+      "**Strategic Pivot to Physical AI**: Value creation is shifting away from pure automotive hardware volume toward recurring software revenue, autonomous mobility networks, and robotics platforms.",
+      "**Margin & Cash Flow Pressures**: Massive capital allocation toward AI infrastructure, coupled with declining
+
+[TEXT OUTPUT]
+ regulatory credit sales, creates interim profitability contraction and cash flow variability.",
+      "**Energy Storage Momentum**: Rapid expansion of utility-scale energy
+
+[TEXT OUTPUT]
+ storage deployments provides vital revenue diversification and robust operational margin support.",
+      "**Execution & Regulatory Path**: Commercialization timelines for autonomous
+
+[TEXT OUTPUT]
+ vehicle fleets and software features remain contingent on regulatory approvals across domestic and international markets."
+    ]
+  },
+  "
+
+[TEXT OUTPUT]
+deep_insights":
+
+[TEXT OUTPUT]
+ [
+    {
+      "category": "Risk Assessment",
+      "title": "Operating Margin Compression and Regulatory Credit Collapse",
+      "description": "Tesla faces structural margin headwinds as high-margin regulatory credit
+
+[TEXT OUTPUT]
+ sales decline sharply due to changing regulatory environments and federal incentive expirations. With automotive price adjustments and rising operating expenses, operating
+
+[TEXT OUTPUT]
+ margins have compressed significantly, placing greater pressure on core hardware efficiency and paid software subscriptions to sustain earnings quality.",
+      "impact_
+
+[TEXT OUTPUT]
+score": 9
+    },
+    {
+      "category": "Capital Allocation & R&D",
+
+
+[TEXT OUTPUT]
+      "title": "Aggressive AI Compute and Robotics Infrastructure Commitments",
+      "description": "Management has substantially
+
+[TEXT OUTPUT]
+ increased capital expenditure commitments to build out massive AI training clusters (`Cortex 2`), custom semiconductor capacity, and dedicated manufacturing lines
+
+[TEXT OUTPUT]
+ for **Cybercab** and **Optimus** humanoid robots. While positioning Tesla at the forefront of physical AI, this
+
+[TEXT OUTPUT]
+ capital intensity creates temporary negative free cash flow and raises execution risk.",
+      "impact_score": 8
+    },
+    {
+
+[TEXT OUTPUT]
+
+      "category": "Competitor Analysis",
+      "title": "EV Competition and Software Monetization Strategy",
+      "description":
+
+[TEXT OUTPUT]
+ "Tesla maintains leading global volume scale in electric vehicles, yet faces intensified pricing competition from international EV manufacturers and legacy OEMs. To protect
+
+[TEXT OUTPUT]
+ long-term margins, Tesla is accelerating its transition toward full autonomy (**FSD Supervised**, **Robotaxi fleet operations
+
+[TEXT OUTPUT]
+**), shifting focus from unit margin to recurring high-margin software subscriptions.",
+      "impact_score": 8
+    },
+
+[TEXT OUTPUT]
+
+    {
+      "category": "Macro Trends",
+      "title": "Energy Storage Serving as a Core
+
+[TEXT OUTPUT]
+ Growth Engine",
+      "description": "The Energy Generation and Storage business, anchored by **Megapack** and **Powerwall
+
+[TEXT OUTPUT]
+** products, is expanding rapidly with expanding segment margins. This business line provides crucial revenue diversification, benefiting from global power grid modernization and rising
+
+[TEXT OUTPUT]
+ renewable energy infrastructure demand.",
+      "impact_score": 7
+    }
+  ],
+  "findings
+
+[TEXT OUTPUT]
+":
+
+[TEXT OUTPUT]
+ [
+    {
+      "documentType": "Form 10-K",
+      "keyInsights": [
+        "**Global Manufacturing Footprint**: Details key manufacturing facilities including Gigafactory Texas (Austin), Fremont Factory, Gigafactory Nevada, Gigafactory Berlin-Brandenburg, Megafactory Lathrop, and Gigafactory Shanghai.",
+
+[TEXT OUTPUT]
+
+        "**Transition to Physical AI**: Outlines the strategic mandate evolving from automotive manufacturing into AI, autonomous driving (**
+
+[TEXT OUTPUT]
+FSD**), **Robotaxi**, and **Optimus** robotics.",
+        "**Risk Environment**: Identifies EV market
+
+[TEXT OUTPUT]
+ competition, supply chain constraints on battery cell manufacturing, regulatory approvals for self-driving vehicles, and heavy CapEx commitments."
+      
+
+[TEXT OUTPUT]
+],
+      "date": "2025-12-31",
+      "sourceUrl":
+
+[TEXT OUTPUT]
+ "https://ir.tesla.com/_flysystem/s3/sec/0001628
+
+[TEXT OUTPUT]
+28026003952/tsla-20251231-
+
+[TEXT OUTPUT]
+gen.pdf"
+    },
+    {
+      "documentType": "Form 10-Q",
+
+[TEXT OUTPUT]
+
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "**International FSD Expansion**: Details regulatory progress for **FSD (Supervised)** in international markets, including approval in the Netherlands enabling broader European rollout.",
+        "**Elevated CapEx Guidance
+
+[TEXT OUTPUT]
+**: Signals capital expenditure plans exceeding **$25 billion** for 2026 to fund custom silicon, AI training compute infrastructure
+
+[TEXT OUTPUT]
+, and new factory lines.",
+        "**Share Capital Disclosures**: Confirms `3,755,
+
+[TEXT OUTPUT]
+723,871` shares of common stock outstanding as of April 16, 202
+
+[TEXT OUTPUT]
+6, alongside strategic investments in **SpaceX** equity."
+      ],
+      "date": "2026
+
+[TEXT OUTPUT]
+-03-31",
+      "sourceUrl": "https://ir.tesla.com/_flysystem
+
+[TEXT OUTPUT]
+/s3/sec/000162828026026673
+
+[TEXT OUTPUT]
+/tsla-20260331-gen.pdf"
+    },
+    {
+
+
+[TEXT OUTPUT]
+      "documentType": "Form 10-Q",
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "**Regulatory Credit Trend**: Discloses regulatory credit revenues prior to federal credit policy shifts and EV tax credit revisions.",
+        "**Energy Segment Acceleration**: Highlights expanding volume deployments of **Megapack** storage solutions as a high-margin revenue counterweight to automotive gross margin
+
+[TEXT OUTPUT]
+ compression.",
+        "**Operating Expense Escalation**: Reports rising R&D expenditures tied to full self-driving neural
+
+[TEXT OUTPUT]
+ net training and AI data center capacity expansion."
+      ],
+      "date": "2025-09-
+
+[TEXT OUTPUT]
+30",
+      "sourceUrl": "https://ir.tesla.com/_flysystem/s3/
+
+[TEXT OUTPUT]
+sec/000162828025045968/tsla-
+
+[TEXT OUTPUT]
+20250930-gen.pdf"
+    },
+    {
+      "documentType
+
+[TEXT OUTPUT]
+": "Form 10-Q",
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "**Factory Retooling**: Documents production line retooling across major manufacturing hubs to support updated vehicle models and next-generation architecture.",
+        "**Balance Sheet Liquidity**: Demonstrates strong liquidity with over $36 billion in cash and short-term investments.",
+        
+
+[TEXT OUTPUT]
+"**Services Growth**: Details expanding contributions from the Supercharger network, paid software connectivity, and fleet services."
+      ],
+      
+
+[TEXT OUTPUT]
+"date": "2025-06-30",
+      "sourceUrl": "https://
+
+[TEXT OUTPUT]
+ir.tesla.com/_flysystem/s3/sec/0001628280
+
+[TEXT OUTPUT]
+25035806/tsla-20250630-gen.pdf
+
+[TEXT OUTPUT]
+"
+    },
+    {
+      "documentType": "Form 8-K",
+      "key
+
+[TEXT OUTPUT]
+Insights":
+
+[TEXT OUTPUT]
+ [
+        "**Equity Incentive Approval**: Discloses shareholder approval of the Amended and Restated **2019 Equity Incentive Plan** at the 2025 Annual Meeting.",
+        "**Executive Alignment**: Designed to align executive and
+
+[TEXT OUTPUT]
+ engineering compensation with long-term technology, autonomy, and market capitalization milestones."
+      ],
+      "date": "
+
+[TEXT OUTPUT]
+2025-11-06",
+      "sourceUrl": "https://ir.tesla.
+
+[TEXT OUTPUT]
+com/_flysystem/s3/sec/00011046592510
+
+[TEXT OUTPUT]
+8507/tm2530590d1_8k-gen.pdf"
+
+
+[TEXT OUTPUT]
+    },
+    {
+      "documentType": "Form 8-K",
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "**Corporate Governance Updates**: Details material updates regarding board oversight and executive management structure.",
+        "**Public Disclosure Policies**: Reaffirms internal policies and procedures regarding material public updates and regulatory compliance."
+      ],
+      "date": "2
+
+[TEXT OUTPUT]
+025-09-03",
+      "sourceUrl": "https://ir.tesla.com
+
+[TEXT OUTPUT]
+/_flysystem/s3/sec/000110465925087
+
+[TEXT OUTPUT]
+862/tm2525337d1_8k-gen.pdf"
+    
+
+[TEXT OUTPUT]
+},
+    {
+      "documentType": "Form 8-K",
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "**Bylaw Amendments**: Reports formal amendments to Tesla's corporate Bylaws following its corporate reincorporation in Texas.",
+        "**Legal Venue & Claims Provisions**: Establishes procedural rules regarding jury trial waivers for internal entity claims
+
+[TEXT OUTPUT]
+ under Texas corporate law."
+      ],
+      "date": "2025-05-15",
+
+
+[TEXT OUTPUT]
+      "sourceUrl": "https://ir.tesla.com/_flysystem/s3/sec/00
+
+[TEXT OUTPUT]
+0110465925050072/tm251542
+
+[TEXT OUTPUT]
+1d1_8k-gen.pdf"
+    },
+    {
+      "documentType": "
+
+[TEXT OUTPUT]
+DEF 14A",
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "**Executive Compensation Structure**: Reaffirms long-term performance-based compensation frameworks for executive leadership, tying incentives strictly to market cap and operational scale.",
+        "**Board
+
+[TEXT OUTPUT]
+ Oversight of AI & Safety**: Outlines board committee governance regarding artificial intelligence safety, autonomous vehicle deployment, and capital allocation.",
+
+
+[TEXT OUTPUT]
+        "**Governance & Shareholder Voting**: Summarizes shareholder voting results on corporate governance, board declassification, and environmental sustainability reporting
+
+[TEXT OUTPUT]
+."
+      ],
+      "date": "2025-09-17",
+      "
+
+[TEXT OUTPUT]
+sourceUrl": "https://www.sec.gov/Archives/edgar/data/13186
+
+[TEXT OUTPUT]
+05/000110465925097170/tm2
+
+[TEXT OUTPUT]
+52289d31_defa14a.pdf"
+    },
+    {
+
+
+[TEXT OUTPUT]
+      "documentType": "Form 4",
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "**CEO Equity Position**: Official SEC filing reporting beneficial ownership holdings and equity transaction details for Chief Executive Officer **Elon Musk**.",
+        "**Executive Stake Stability
+
+[TEXT OUTPUT]
+**: Reflects ongoing insider alignment and voting stake stability following major physical AI strategy announcements."
+      ],
+      "date": "20
+
+[TEXT OUTPUT]
+25-09-12",
+      "sourceUrl": "https://ir.tesla.com/_
+
+[TEXT OUTPUT]
+flysystem/s3/sec/0001104659250896
+
+[TEXT OUTPUT]
+93/000110465925089693-gen.
+
+[TEXT OUTPUT]
+pdf"
+    },
+    {
+      "documentType": "Form 4",
+      "keyInsights
+
+[TEXT OUTPUT]
+":
+
+[TEXT OUTPUT]
+ [
+        "**CFO Equity Vesting**: Reports restricted stock unit (RSU) vesting and tax withholding transactions for Chief Financial Officer **Vaibhav Taneja**.",
+        "**Equity Compensation Execution**: Outlines routine
+
+[TEXT OUTPUT]
+ quarterly equity vesting schedules under approved equity incentive plans."
+      ],
+      "date": "2026-0
+
+[TEXT OUTPUT]
+3-06",
+      "sourceUrl": "https://ir.tesla.com/_flysystem/s
+
+[TEXT OUTPUT]
+3/sec/000110465926025379/0
+
+[TEXT OUTPUT]
+00110465926025379-gen.pdf"
+    
+
+[TEXT OUTPUT]
+},
+    {
+      "documentType": "Q2 2026 Update Deck",
+      "
+
+[TEXT OUTPUT]
+keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "**Top-Line & Delivery Milestones**: Confirms record second-quarter vehicle deliveries and trailing twelve-month revenue exceeding $100 billion for the first time.",
+        "**Energy & Services Momentum
+
+[TEXT OUTPUT]
+**: Highlights **13.5 GWh** of energy storage deployments alongside record profitability in the Services & Other segment.",
+
+[TEXT OUTPUT]
+
+        "**Capital Intensity vs Margin Compression**: Details elevated CapEx for compute clusters (`Cortex 2`) and
+
+[TEXT OUTPUT]
+ Cybercab lines alongside operating margin contraction due to falling credit sales."
+      ],
+      "date": "20
+
+[TEXT OUTPUT]
+26-07-22",
+      "sourceUrl": "https://assets-ir.tesla.
+
+[TEXT OUTPUT]
+com/tesla-contents/IR/TSLA-Q2-2026-Update.pdf"
+
+
+[TEXT OUTPUT]
+    }
+  ],
+  "financial_charts": {
+    "stock_price_4m":
+
+[TEXT OUTPUT]
+ [
+      {
+        "date": "Mar '26",
+        "price": 371.75
+      },
+      {
+        "date": "Apr '26",
+        "price": 381.63
+      },
+      {
+        "date": "May '26",
+        "price": 435.79
+      },
+      {
+        "date": "Jun '26",
+
+[TEXT OUTPUT]
+
+        "price": 420.6
+      }
+    ],
+    "financial_performance_
+
+[TEXT OUTPUT]
+4q":
+
+[TEXT OUTPUT]
+ [
+      {
+        "quarter": "Q3 2025",
+        "revenue": 28.1,
+        "net_income": 1.37
+      },
+      {
+        "quarter": "Q4 2025",
+        "revenue": 24.9,
+        "net_income": 0.84
+      },
+      {
+        "
+
+[TEXT OUTPUT]
+quarter": "Q1 2026",
+        "revenue": 22.39,
+
+
+[TEXT OUTPUT]
+        "net_income": 0.48
+      },
+      {
+        "quarter": "Q
+
+[TEXT OUTPUT]
+2 2026",
+        "revenue": 28.24,
+        "net_
+
+[TEXT OUTPUT]
+income": 1.11
+      }
+    ]
+  }
+}
+```
+
