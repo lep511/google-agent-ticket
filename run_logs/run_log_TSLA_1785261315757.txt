@@ -1,0 +1,605 @@
+========================================================
+                 RUN SUMMARY FOR TSLA
+                 Total Duration: 79.19s
+========================================================
+
+1. SUB-AGENT EXECUTIONS:
+--------------------------------------------------------
+Agent Step 1: code_execution_call
+Status: Completed
+Duration: 0.55s
+Arguments: {"queries":["\"Tesla\" OR \"TSLA\" \"Form 10-K\" OR \"10-Q\" OR \"8-K\" OR \"DEF 14A\" filetype:pdf sec.gov","\"Tesla\" \"10-K\" OR \"10-Q\" OR \"8-K\" OR \"DEF 14A\" OR \"Form 4\" filetype:pdf","\"Tesla, Inc.\" filing \"10-K\" OR \"10-Q\" filetype:pdf 2025 OR 2026","\"TSLA\" quarterly financial performance revenue net income Q1 2026 Q4 2025 Q3 2025 Q2 2025"]}
+Output Preview: [{"search_suggestions":"{\"fields\":[{\"name\":\"result\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"query\",\"value\":{\"stringValue\":\"\\\"Tesla\\\" OR \\\"TSLA...
+--------------------------------------------------------
+Agent Step 2: code_execution_call
+Status: Completed
+Duration: 0.52s
+Arguments: {"queries":["\"Tesla\" quarterly revenue net income Q3 2025 Q4 2025 Q1 2026 Q2 2026 billions","\"Tesla\" stock price \"March 31, 2026\" OR \"April 30, 2026\" OR \"May 29, 2026\" OR \"June 30, 2026\" OR \"July 2026\"","\"TSLA\" closing price \"March 2026\" \"April 2026\" \"May 2026\" \"June 2026\" \"July 2026\"","site:sec.gov \"Tesla, Inc.\" filetype:pdf 10-K OR 10-Q OR 8-K OR DEF 14A"]}
+Output Preview: [{"search_suggestions":"{\"fields\":[{\"name\":\"result\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"query\",\"value\":{\"stringValue\":\"\\\"Tesla\\\" quarterly r...
+--------------------------------------------------------
+Agent Step 3: code_execution_call
+Status: Completed
+Duration: 0.55s
+Arguments: "{\"toolSummary\":\"Directory listing\",\"explanation\":\"List directory contents to verify workspace\",\"path\":\".\",\"toolAction\":\"Listing directory contents\"}"
+Output Preview: {"files":[{"size":0,"is_directory":true,"name":".agents"},{"is_directory":true,"size":0,"name":".google"},{"is_directory":true,"name":"app","size":0},{"size":0,"is_directory":true,"name":"bin"},{"name...
+--------------------------------------------------------
+Agent Step 4: code_execution_call
+Status: Completed
+Duration: 0.97s
+Arguments: "{\"toolSummary\":\"File edit\",\"toolAction\":\"Writing validation script\",\"explanation\":\"Write python validation script and save JSON output\",\"content\":\"import json\\nimport os\\n\\nos.makedirs(\\\"./workspace\\\", exist_ok=True)\\n\\ndata = {\\n  \\\"verdict\\\": {\\n    \\\"summary\\\": \\\"Tesla is undergoing a strategic transformation from a traditional electric vehicle hardware manufacturer into a vertically integrated **physical Artificial Intelligence (AI) and autonomous energy ecosystem**. While core automotive production and global delivery expansion remain foundational, growth momentum is increasingly driven by **Full Self-Driving (FSD) software adoption**, **unsupervised Robotaxi commercial rollouts**, **Cybercab production scaling**, and rapid expansion in **utility-scale energy storage deployments**. However, short-term earnings remain constrained by heavy **capital expenditure commitments in AI compute infrastructure**, elevated research and development expenses, and reduced regulatory credit revenues following federal policy shifts.\\\",\\n    \\\"conviction_score\\\": 65,\\n    \\\"key_takeaways\\\": [\\n      \\\"**Strategic AI & Autonomous Pivot**: Accelerated transition toward autonomous mobility platforms, featuring **unsupervised Robotaxi expansion**, **Cybercab manufacturing**, and **humanoid robotics development**.\\\",\\n      \\\"**Energy Storage & Infrastructure Acceleration**: **Megapack and utility-scale battery deployments** continue to deliver robust high-margin growth, offsetting automotive gross margin compression.\\\",\\n      \\\"**Software Monetization & Ecosystem Expansion**: Rising global adoption of **FSD (Supervised)** and pending regulatory approvals across European and Asian markets enhance high-margin recurring software revenues.\\\",\\n      \\\"**Capital Expenditure & Free Cash Flow Pressure**: Massive capital allocation toward **AI supercomputing clusters, gigafactory expansions, and next-generation battery cell manufacturing** creates near-term free cash flow volatility.\\\"\\n    ]\\n  },\\n  \\\"deep_insights\\\": [\\n    {\\n      \\\"category\\\": \\\"Strategic Pivot\\\",\\n      \\\"title\\\": \\\"Transformation into Physical AI and Autonomous Conglomerate\\\",\\n      \\\"description\\\": \\\"Tesla is aggressively reallocating capital from legacy hardware capacity expansion toward **physical AI, autonomous fleet software, and humanoid robotics (`Optimus`)**. The commercial launch of **unsupervised Robotaxi rides** in Texas and the start of **Cybercab production** represent a fundamental pivot from unit volume sales to high-margin mobility-as-a-service recurring revenue.\\\",\\n      \\\"impact_score\\\": 9\\n    },\\n    {\\n      \\\"category\\\": \\\"Competitor Analysis\\\",\\n      \\\"title\\\": \\\"Global EV Competition and Tariff Headwinds\\\",\\n      \\\"description\\\": \\\"Facing fierce price competition from foreign electric vehicle manufacturers in **Greater China and Europe**, Tesla is relying on its superior **vertical integration, manufacturing cost curves, and proprietary charging network (`Supercharger`)** to defend market share amid regional protectionist tariffs and EV subsidy phase-outs.\\\",\\n      \\\"impact_score\\\": 8\\n    },\\n    {\\n      \\\"category\\\": \\\"Risk Assessment\\\",\\n      \\\"title\\\": \\\"Regulatory Credit Revenue Collapse and Margin Drag\\\",\\n      \\\"description\\\": \\\"Changes in federal fuel economy penalty enforcement and the expiration of purchase tax credits have sharply reduced revenue from high-margin **automotive regulatory credit sales**. This structural decline places full operational pressure on vehicle gross margins and energy storage profitability.\\\",\\n      \\\"impact_score\\\": 8\\n    },\\n    {\\n      \\\"category\\\": \\\"Macro Trends\\\",\\n      \\\"title\\\": \\\"Utility-Scale Energy Storage Expansion\\\",\\n      \\\"description\\\": \\\"Global power grid modernization and AI data center energy demand are accelerating sales of Tesla's **`Megapack` and stationary energy storage systems**, turning energy generation and storage into the company's fastest-growing segment with record gross margins.\\\",\\n      \\\"impact_score\\\": 9\\n    }\\n  ],\\n  \\\"findings\\\": [\\n    {\\n      \\\"documentType\\\": \\\"Form 10-Q\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Achieved **16% YoY revenue growth** driven by automotive sales recovery and strong growth in energy and service divisions.\\\",\\n        \\\"Secured regulatory approval for **FSD (Supervised)** deployment in the Netherlands and expanded **unsupervised Robotaxi testing** in Texas.\\\",\\n        \\\"Demonstrated gross margin resilience at **21.1%** through manufacturing cost efficiencies and supply chain optimization.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-03-31\\\",\\n      \\\"sourceUrl\\\": \\\"https://ir.tesla.com/_flysystem/s3/sec/000162828026026673/tsla-20260331-gen.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 10-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Reported full-year revenue supported by vehicle deliveries of nearly **1.64 million units** globally.\\\",\\n        \\\"Expanded **human capital management initiatives**, including structured talent retention programs and veteran hiring pipelines.\\\",\\n        \\\"Highlighted vertical integration milestones across **Gigafactory Shanghai, Texas, Berlin, and Nevada**.\\\"\\n      ],\\n      \\\"date\\\": \\\"2025-12-31\\\",\\n      \\\"sourceUrl\\\": \\\"https://ir.tesla.com/_flysystem/s3/sec/000162828026003952/tsla-20251231-gen.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 10-K/A\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Updated long-term operational targets under the **2025 CEO Performance Award Agreement**.\\\",\\n        \\\"Established ambitious operational milestones including **20 million cumulative vehicle deliveries**, **10 million active FSD subscriptions**, and **1 million commercial bots/robotaxis**.\\\",\\n        \\\"Structured compensation vesting across sequential, non-overlapping **Adjusted EBITDA targets starting at $50B up to $400B**.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-04-23\\\",\\n      \\\"sourceUrl\\\": \\\"https://ir.tesla.com/_flysystem/s3/sec/000110465926053166/tm2611837d1_10ka-gen.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 8-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Delivered **record quarterly revenue** powered by core vehicle sales and utility energy storage expansion.\\\",\\n        \\\"Initiated early production runs for **Cybercab at Gigafactory Texas** and progressed construction on the **Nevada Semi facility**.\\\",\\n        \\\"Reported record profitability in **Services and Other segment**, backed by expanding Supercharger network utilization.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-07-22\\\",\\n      \\\"sourceUrl\\\": \\\"https://assets-ir.tesla.com/tesla-contents/IR/TSLA-Q2-2026-Update.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 8-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Furnished details regarding the **2025 CEO Interim Award** and board compensation oversight.\\\",\\n        \\\"Incorporated rigorous risk factors regarding **technology execution, regulatory hurdles, and international trade policies**.\\\",\\n        \\\"Reaffirmed commitment to long-term equity incentive structures tied strictly to market cap growth and operating performance.\\\"\\n      ],\\n      \\\"date\\\": \\\"2025-08-03\\\",\\n      \\\"sourceUrl\\\": \\\"https://ir.tesla.com/_flysystem/s3/sec/000110465925073263/tm2522385d1_8k-gen.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"DEFA14A\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Presented comprehensive board arguments in favor of **governance proposals and executive performance award ratification**.\\\",\\n        \\\"Detailed historical growth trajectory from **103k vehicle deliveries in 2017 to over 1.78M in 2024**.\\\",\\n        \\\"Emphasized early pioneer positioning in **autonomous vehicle deployment, AI training clusters, and global EV adoption**.\\\"\\n      ],\\n      \\\"date\\\": \\\"2025-10-06\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.sec.gov/Archives/edgar/data/1318605/000110465925097170/tm252289d31_defa14a.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"DEF 14A\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Outlined the strategic rationale for the **Texas Redomestication proposal** moving incorporation from Delaware to Texas.\\\",\\n        \\\"Provided detailed definitions for **Adjusted EBITDA metrics** and financial statement reconciliation procedures.\\\",\\n        \\\"Reviewed shareholder voting procedures, proxy solicitation mechanisms, and corporate governance guidelines.\\\"\\n      ],\\n      \\\"date\\\": \\\"2024-04-29\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.sec.gov/Archives/edgar/data/1318605/000110465924053333/tm2326076d14_def14a.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 10-Q\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Disclosed operating lease commitments for major facilities in **Buffalo, NY and Shanghai, China**.\\\",\\n        \\\"Provided management certifications confirming compliance with internal control over financial reporting (`SOX 404`).\\\",\\n        \\\"Assessed international foreign exchange risks, raw material supply chain costs, and battery component sourcing constraints.\\\"\\n      ],\\n      \\\"date\\\": \\\"2024-10-24\\\",\\n      \\\"sourceUrl\\\": \\\"https://cdn.kscope.io/a5d37cec5509c4ea75f2458d6269b494.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"ARS\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Issued notice for the **Annual Meeting of Shareholders at Gigafactory Texas**.\\\",\\n        \\\"Incorporated updated risk factor disclosures regarding **autonomous vehicle safety compliance and regulatory approvals**.\\\",\\n        \\\"Highlighted scaling milestones for **Model 3, Model Y, and next-generation vehicle manufacturing platforms**.\\\"\\n      ],\\n      \\\"date\\\": \\\"2025-09-17\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.sec.gov/Archives/edgar/data/1318605/000110465925090875/tm252787d3_ars.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"SEC No-Action Letter\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Evaluated shareholder proposal submissions under **SEC Rule 14a-8(i)(10)** regarding human capital disclosures.\\\",\\n        \\\"Detailed corporate disclosures on **military veteran programs, workforce diversity, and equal opportunity practices**.\\\",\\n        \\\"Confirmed SEC Division of Corporation Finance correspondence and legal compliance standards.\\\"\\n      ],\\n      \\\"date\\\": \\\"2025-01-14\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.sec.gov/files/corpfin/no-action/14a-8/campbelltesla43025-14a8.pdf\\\"\\n    }\\n  ],\\n  \\\"financial_charts\\\": {\\n    \\\"stock_price_4m\\\": [\\n      { \\\"date\\\": \\\"March '26\\\", \\\"price\\\": 371.75 },\\n      { \\\"date\\\": \\\"April '26\\\", \\\"price\\\": 381.63 },\\n      { \\\"date\\\": \\\"May '26\\\", \\\"price\\\": 435.79 },\\n      { \\\"date\\\": \\\"June '26\\\", \\\"price\\\": 420.60 }\\n    ],\\n    \\\"financial_performance_4q\\\": [\\n      { \\\"quarter\\\": \\\"Q3 2025\\\", \\\"revenue\\\": 28.1, \\\"net_income\\\": 1.39 },\\n      { \\\"quarter\\\": \\\"Q4 2025\\\", \\\"revenue\\\": 24.9, \\\"net_income\\\": 0.86 },\\n      { \\\"quarter\\\": \\\"Q1 2026\\\", \\\"revenue\\\": 22.4, \\\"net_income\\\": 0.49 },\\n      { \\\"quarter\\\": \\\"Q2 2026\\\", \\\"revenue\\\": 28.24, \\\"net_income\\\": 1.13 }\\n    ]\\n  }\\n}\\n\\nwith open(\\\"./workspace/result.json\\\", \\\"w\\\") as f:\\n  json.dump(data, f, indent=2)\\n\\nprint(\\\"JSON written successfully. Validating schema...\\\")\\n\\n# Verify keys\\nassert set(data.keys()) == {\\\"verdict\\\", \\\"deep_insights\\\", \\\"findings\\\", \\\"financial_charts\\\"}, f\\\"Invalid root keys: {data.keys()}\\\"\\nassert set(data[\\\"verdict\\\"].keys()) == {\\\"summary\\\", \\\"conviction_score\\\", \\\"key_takeaways\\\"}\\nassert len(data[\\\"findings\\\"]) >= 10, f\\\"Found only {len(data['findings'])} findings\\\"\\n\\nfor f_item in data[\\\"findings\\\"]:\\n  assert set(f_item.keys()) == {\\\"documentType\\\", \\\"keyInsights\\\", \\\"date\\\", \\\"sourceUrl\\\"}, f\\\"Invalid finding keys: {f_item.keys()}\\\"\\n  assert f_item[\\\"sourceUrl\\\"].lower().endswith(\\\".pdf\\\") or \\\".pdf\\\" in f_item[\\\"sourceUrl\\\"].lower(), f\\\"Non-pdf URL: {f_item['sourceUrl']}\\\"\\n\\nfor di in data[\\\"deep_insights\\\"]:\\n  assert set(di.keys()) == {\\\"category\\\", \\\"title\\\", \\\"description\\\", \\\"impact_score\\\"}\\n\\nfor sp in data[\\\"financial_charts\\\"][\\\"stock_price_4m\\\"]:\\n  assert set(sp.keys()) == {\\\"date\\\", \\\"price\\\"}\\n\\nfor fp in data[\\\"financial_charts\\\"][\\\"financial_performance_4q\\\"]:\\n  assert set(fp.keys()) == {\\\"quarter\\\", \\\"revenue\\\", \\\"net_income\\\"}\\n  assert \\\"distributions\\\" not in fp\\n\\nprint(\\\"All assertions passed successfully!\\\")\\n\",\"path\":\"validate.py\"}"
+Output Preview: {"success":true}...
+--------------------------------------------------------
+Agent Step 5: code_execution_call
+Status: Failed/Timeout
+Duration: 0.40s
+Arguments: "{\"toolAction\":\"Reading generated JSON file\",\"explanation\":\"Read generated JSON result file to verify contents\",\"path\":\"./workspace/result.json\",\"toolSummary\":\"File read\"}"
+Output Preview: None
+--------------------------------------------------------
+Agent Step 6: code_execution_call
+Status: Failed/Timeout
+Duration: 0.45s
+Arguments: "{\"toolAction\":\"Reading generated workspace file\",\"explanation\":\"Read generated workspace result file\",\"path\":\"workspace/result.json\",\"toolSummary\":\"File read\"}"
+Output Preview: None
+--------------------------------------------------------
+Agent Step 7: code_execution_call
+Status: Completed
+Duration: 0.88s
+Arguments: "{\"explanation\":\"Save report JSON file to workspace directory\",\"path\":\"workspace/report.json\",\"toolSummary\":\"File edit\",\"content\":\"{\\n  \\\"verdict\\\": {\\n    \\\"summary\\\": \\\"Tesla is undergoing a strategic transformation from a traditional electric vehicle hardware manufacturer into a vertically integrated **physical Artificial Intelligence (AI) and autonomous energy ecosystem**. While core automotive production and global delivery expansion remain foundational, growth momentum is increasingly driven by **Full Self-Driving (FSD) software adoption**, **unsupervised Robotaxi commercial rollouts**, **Cybercab production scaling**, and rapid expansion in **utility-scale energy storage deployments**. However, short-term earnings remain constrained by heavy **capital expenditure commitments in AI compute infrastructure**, elevated research and development expenses, and reduced regulatory credit revenues following federal policy shifts.\\\",\\n    \\\"conviction_score\\\": 65,\\n    \\\"key_takeaways\\\": [\\n      \\\"**Strategic AI & Autonomous Pivot**: Accelerated transition toward autonomous mobility platforms, featuring **unsupervised Robotaxi expansion**, **Cybercab manufacturing**, and **humanoid robotics development**.\\\",\\n      \\\"**Energy Storage & Infrastructure Acceleration**: **Megapack and utility-scale battery deployments** continue to deliver robust high-margin growth, offsetting automotive gross margin compression.\\\",\\n      \\\"**Software Monetization & Ecosystem Expansion**: Rising global adoption of **FSD (Supervised)** and pending regulatory approvals across European and Asian markets enhance high-margin recurring software revenues.\\\",\\n      \\\"**Capital Expenditure & Free Cash Flow Pressure**: Massive capital allocation toward **AI supercomputing clusters, gigafactory expansions, and next-generation battery cell manufacturing** creates near-term free cash flow volatility.\\\"\\n    ]\\n  },\\n  \\\"deep_insights\\\": [\\n    {\\n      \\\"category\\\": \\\"Strategic Pivot\\\",\\n      \\\"title\\\": \\\"Transformation into Physical AI and Autonomous Conglomerate\\\",\\n      \\\"description\\\": \\\"Tesla is aggressively reallocating capital from legacy hardware capacity expansion toward **physical AI, autonomous fleet software, and humanoid robotics (`Optimus`)**. The commercial launch of **unsupervised Robotaxi rides** in Texas and the start of **Cybercab production** represent a fundamental pivot from unit volume sales to high-margin mobility-as-a-service recurring revenue.\\\",\\n      \\\"impact_score\\\": 9\\n    },\\n    {\\n      \\\"category\\\": \\\"Competitor Analysis\\\",\\n      \\\"title\\\": \\\"Global EV Competition and Tariff Headwinds\\\",\\n      \\\"description\\\": \\\"Facing fierce price competition from foreign electric vehicle manufacturers in **Greater China and Europe**, Tesla is relying on its superior **vertical integration, manufacturing cost curves, and proprietary charging network (`Supercharger`)** to defend market share amid regional protectionist tariffs and EV subsidy phase-outs.\\\",\\n      \\\"impact_score\\\": 8\\n    },\\n    {\\n      \\\"category\\\": \\\"Risk Assessment\\\",\\n      \\\"title\\\": \\\"Regulatory Credit Revenue Collapse and Margin Drag\\\",\\n      \\\"description\\\": \\\"Changes in federal fuel economy penalty enforcement and the expiration of purchase tax credits have sharply reduced revenue from high-margin **automotive regulatory credit sales**. This structural decline places full operational pressure on vehicle gross margins and energy storage profitability.\\\",\\n      \\\"impact_score\\\": 8\\n    },\\n    {\\n      \\\"category\\\": \\\"Macro Trends\\\",\\n      \\\"title\\\": \\\"Utility-Scale Energy Storage Expansion\\\",\\n      \\\"description\\\": \\\"Global power grid modernization and AI data center energy demand are accelerating sales of Tesla's **`Megapack` and stationary energy storage systems**, turning energy generation and storage into the company's fastest-growing segment with record gross margins.\\\",\\n      \\\"impact_score\\\": 9\\n    }\\n  ],\\n  \\\"findings\\\": [\\n    {\\n      \\\"documentType\\\": \\\"Form 10-Q\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Achieved **16% YoY revenue growth** driven by automotive sales recovery and strong growth in energy and service divisions.\\\",\\n        \\\"Secured regulatory approval for **FSD (Supervised)** deployment in the Netherlands and expanded **unsupervised Robotaxi testing** in Texas.\\\",\\n        \\\"Demonstrated gross margin resilience at **21.1%** through manufacturing cost efficiencies and supply chain optimization.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-03-31\\\",\\n      \\\"sourceUrl\\\": \\\"https://ir.tesla.com/_flysystem/s3/sec/000162828026026673/tsla-20260331-gen.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 10-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Reported full-year revenue supported by vehicle deliveries of nearly **1.64 million units** globally.\\\",\\n        \\\"Expanded **human capital management initiatives**, including structured talent retention programs and veteran hiring pipelines.\\\",\\n        \\\"Highlighted vertical integration milestones across **Gigafactory Shanghai, Texas, Berlin, and Nevada**.\\\"\\n      ],\\n      \\\"date\\\": \\\"2025-12-31\\\",\\n      \\\"sourceUrl\\\": \\\"https://ir.tesla.com/_flysystem/s3/sec/000162828026003952/tsla-20251231-gen.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 10-K/A\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Updated long-term operational targets under the **2025 CEO Performance Award Agreement**.\\\",\\n        \\\"Established ambitious operational milestones including **20 million cumulative vehicle deliveries**, **10 million active FSD subscriptions**, and **1 million commercial bots/robotaxis**.\\\",\\n        \\\"Structured compensation vesting across sequential, non-overlapping **Adjusted EBITDA targets starting at $50B up to $400B**.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-04-23\\\",\\n      \\\"sourceUrl\\\": \\\"https://ir.tesla.com/_flysystem/s3/sec/000110465926053166/tm2611837d1_10ka-gen.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 8-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Delivered **record quarterly revenue** powered by core vehicle sales and utility energy storage expansion.\\\",\\n        \\\"Initiated early production runs for **Cybercab at Gigafactory Texas** and progressed construction on the **Nevada Semi facility**.\\\",\\n        \\\"Reported record profitability in **Services and Other segment**, backed by expanding Supercharger network utilization.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-07-22\\\",\\n      \\\"sourceUrl\\\": \\\"https://assets-ir.tesla.com/tesla-contents/IR/TSLA-Q2-2026-Update.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 8-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Furnished details regarding the **2025 CEO Interim Award** and board compensation oversight.\\\",\\n        \\\"Incorporated rigorous risk factors regarding **technology execution, regulatory hurdles, and international trade policies**.\\\",\\n        \\\"Reaffirmed commitment to long-term equity incentive structures tied strictly to market cap growth and operating performance.\\\"\\n      ],\\n      \\\"date\\\": \\\"2025-08-03\\\",\\n      \\\"sourceUrl\\\": \\\"https://ir.tesla.com/_flysystem/s3/sec/000110465925073263/tm2522385d1_8k-gen.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"DEFA14A\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Presented comprehensive board arguments in favor of **governance proposals and executive performance award ratification**.\\\",\\n        \\\"Detailed historical growth trajectory from **103k vehicle deliveries in 2017 to over 1.78M in 2024**.\\\",\\n        \\\"Emphasized early pioneer positioning in **autonomous vehicle deployment, AI training clusters, and global EV adoption**.\\\"\\n      ],\\n      \\\"date\\\": \\\"2025-10-06\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.sec.gov/Archives/edgar/data/1318605/000110465925097170/tm252289d31_defa14a.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"DEF 14A\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Outlined the strategic rationale for the **Texas Redomestication proposal** moving incorporation from Delaware to Texas.\\\",\\n        \\\"Provided detailed definitions for **Adjusted EBITDA metrics** and financial statement reconciliation procedures.\\\",\\n        \\\"Reviewed shareholder voting procedures, proxy solicitation mechanisms, and corporate governance guidelines.\\\"\\n      ],\\n      \\\"date\\\": \\\"2024-04-29\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.sec.gov/Archives/edgar/data/1318605/000110465924053333/tm2326076d14_def14a.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 10-Q\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Disclosed operating lease commitments for major facilities in **Buffalo, NY and Shanghai, China**.\\\",\\n        \\\"Provided management certifications confirming compliance with internal control over financial reporting (`SOX 404`).\\\",\\n        \\\"Assessed international foreign exchange risks, raw material supply chain costs, and battery component sourcing constraints.\\\"\\n      ],\\n      \\\"date\\\": \\\"2024-10-24\\\",\\n      \\\"sourceUrl\\\": \\\"https://cdn.kscope.io/a5d37cec5509c4ea75f2458d6269b494.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"ARS\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Issued notice for the **Annual Meeting of Shareholders at Gigafactory Texas**.\\\",\\n        \\\"Incorporated updated risk factor disclosures regarding **autonomous vehicle safety compliance and regulatory approvals**.\\\",\\n        \\\"Highlighted scaling milestones for **Model 3, Model Y, and next-generation vehicle manufacturing platforms**.\\\"\\n      ],\\n      \\\"date\\\": \\\"2025-09-17\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.sec.gov/Archives/edgar/data/1318605/000110465925090875/tm252787d3_ars.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"SEC No-Action Letter\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Evaluated shareholder proposal submissions under **SEC Rule 14a-8(i)(10)** regarding human capital disclosures.\\\",\\n        \\\"Detailed corporate disclosures on **military veteran programs, workforce diversity, and equal opportunity practices**.\\\",\\n        \\\"Confirmed SEC Division of Corporation Finance correspondence and legal compliance standards.\\\"\\n      ],\\n      \\\"date\\\": \\\"2025-01-14\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.sec.gov/files/corpfin/no-action/14a-8/campbelltesla43025-14a8.pdf\\\"\\n    }\\n  ],\\n  \\\"financial_charts\\\": {\\n    \\\"stock_price_4m\\\": [\\n      { \\\"date\\\": \\\"March '26\\\", \\\"price\\\": 371.75 },\\n      { \\\"date\\\": \\\"April '26\\\", \\\"price\\\": 381.63 },\\n      { \\\"date\\\": \\\"May '26\\\", \\\"price\\\": 435.79 },\\n      { \\\"date\\\": \\\"June '26\\\", \\\"price\\\": 420.60 }\\n    ],\\n    \\\"financial_performance_4q\\\": [\\n      { \\\"quarter\\\": \\\"Q3 2025\\\", \\\"revenue\\\": 28.1, \\\"net_income\\\": 1.39 },\\n      { \\\"quarter\\\": \\\"Q4 2025\\\", \\\"revenue\\\": 24.9, \\\"net_income\\\": 0.86 },\\n      { \\\"quarter\\\": \\\"Q1 2026\\\", \\\"revenue\\\": 22.4, \\\"net_income\\\": 0.49 },\\n      { \\\"quarter\\\": \\\"Q2 2026\\\", \\\"revenue\\\": 28.24, \\\"net_income\\\": 1.13 }\\n    ]\\n  }\\n}\\n\",\"toolAction\":\"Writing report JSON file\"}"
+Output Preview: {"success":true}...
+--------------------------------------------------------
+
+2. OVERALL AGENT STATUS: WITH ERRORS
+
+3. GENERATED MEDIA ARTIFACTS:
+Audio Briefing Link: /artifacts/podcast_briefing.wav
+
+========================================================
+
+RAW EXECUTION LOGS:
+
+--- Analysis Run for TSLA at 2026-07-28T17:53:56.562Z ---
+
+[2026-07-28T17:54:02.838Z] [TOOL CALL START] code_execution_call
+Call ID: synth_1
+Arguments: {
+  "queries": [
+    "\"Tesla\" OR \"TSLA\" \"Form 10-K\" OR \"10-Q\" OR \"8-K\" OR \"DEF 14A\" filetype:pdf sec.gov",
+    "\"Tesla\" \"10-K\" OR \"10-Q\" OR \"8-K\" OR \"DEF 14A\" OR \"Form 4\" filetype:pdf",
+    "\"Tesla, Inc.\" filing \"10-K\" OR \"10-Q\" filetype:pdf 2025 OR 2026",
+    "\"TSLA\" quarterly financial performance revenue net income Q1 2026 Q4 2025 Q3 2025 Q2 2025"
+  ]
+}
+
+[2026-07-28T17:54:03.388Z] [TOOL RESULT END] command
+Call ID: synth_1
+Duration: 0.55s
+Result: [{"search_suggestions":"{\"fields\":[{\"name\":\"result\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"query\",\"value\":{\"stringValue\":\"\\\"Tesla\\\" OR \\\"TSLA\\\" \\\"Form 10-K\\\" OR \\\"10-Q\\\" OR \\\"8-K\\\" OR \\\"DEF 14A\\\" filetype:pdf sec.gov\"}},{\"name\":\"results\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"index\",\"value\":{\"stringValue\":\"1.1\"}},{\"name\":\"snippet\",\"value\":{\"stringValue\":\"8 mi...
+
+[2026-07-28T17:54:06.646Z] [TOOL CALL START] code_execution_call
+Call ID: synth_2
+Arguments: {
+  "queries": [
+    "\"Tesla\" quarterly revenue net income Q3 2025 Q4 2025 Q1 2026 Q2 2026 billions",
+    "\"Tesla\" stock price \"March 31, 2026\" OR \"April 30, 2026\" OR \"May 29, 2026\" OR \"June 30, 2026\" OR \"July 2026\"",
+    "\"TSLA\" closing price \"March 2026\" \"April 2026\" \"May 2026\" \"June 2026\" \"July 2026\"",
+    "site:sec.gov \"Tesla, Inc.\" filetype:pdf 10-K OR 10-Q OR 8-K OR DEF 14A"
+  ]
+}
+
+[2026-07-28T17:54:07.166Z] [TOOL RESULT END] command
+Call ID: synth_2
+Duration: 0.52s
+Result: [{"search_suggestions":"{\"fields\":[{\"name\":\"result\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"query\",\"value\":{\"stringValue\":\"\\\"Tesla\\\" quarterly revenue net income Q3 2025 Q4 2025 Q1 2026 Q2 2026 billions\"}},{\"name\":\"results\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"index\",\"value\":{\"stringValue\":\"1.1\"}},{\"name\":\"snippet\",\"value\":{\"stringValue\":\"Page 1. Q2 2026 Update. 1. Page 2. High...
+
+[2026-07-28T17:54:26.144Z] [TOOL CALL START] code_execution_call
+Call ID: synth_3
+Arguments: "{\"toolSummary\":\"Directory listing\",\"explanation\":\"List directory contents to verify workspace\",\"path\":\".\",\"toolAction\":\"Listing directory contents\"}"
+
+[2026-07-28T17:54:26.694Z] [TOOL RESULT END] list_files
+Call ID: synth_3
+Duration: 0.55s
+Result: {"files":[{"size":0,"is_directory":true,"name":".agents"},{"is_directory":true,"size":0,"name":".google"},{"is_directory":true,"name":"app","size":0},{"size":0,"is_directory":true,"name":"bin"},{"name":"bin.usr-is-merged","is_directory":true,"size":0},{"size":0,"is_directory":true,"name":"boot"},{"size":0,"is_directory":true,"name":"dev"},{"name":"etc","is_directory":true,"size":0},{"name":"go","size":0,"is_directory":true},{"size":0,"name":"home","is_directory":true},{"name":"lib","is_directory...
+
+[2026-07-28T17:54:45.363Z] [TOOL CALL START] code_execution_call
+Call ID: synth_4
+Arguments: "{\"toolSummary\":\"File edit\",\"toolAction\":\"Writing validation script\",\"explanation\":\"Write python validation script and save JSON output\",\"content\":\"import json\\nimport os\\n\\nos.makedirs(\\\"./workspace\\\", exist_ok=True)\\n\\ndata = {\\n  \\\"verdict\\\": {\\n    \\\"summary\\\": \\\"Tesla is undergoing a strategic transformation from a traditional electric vehicle hardware manufacturer into a vertically integrated **physical Artificial Intelligence (AI) and autonomous energy ecosystem**. While core automotive production and global delivery expansion remain foundational, growth momentum is increasingly driven by **Full Self-Driving (FSD) software adoption**, **unsupervised Robotaxi commercial rollouts**, **Cybercab production scaling**, and rapid expansion in **utility-scale energy storage deployments**. However, short-term earnings remain constrained by heavy **capital expenditure commitments in AI compute infrastructure**, elevated research and development expenses, and reduced regulatory credit revenues following federal policy shifts.\\\",\\n    \\\"conviction_score\\\": 65,\\n    \\\"key_takeaways\\\": [\\n      \\\"**Strategic AI & Autonomous Pivot**: Accelerated transition toward autonomous mobility platforms, featuring **unsupervised Robotaxi expansion**, **Cybercab manufacturing**, and **humanoid robotics development**.\\\",\\n      \\\"**Energy Storage & Infrastructure Acceleration**: **Megapack and utility-scale battery deployments** continue to deliver robust high-margin growth, offsetting automotive gross margin compression.\\\",\\n      \\\"**Software Monetization & Ecosystem Expansion**: Rising global adoption of **FSD (Supervised)** and pending regulatory approvals across European and Asian markets enhance high-margin recurring software revenues.\\\",\\n      \\\"**Capital Expenditure & Free Cash Flow Pressure**: Massive capital allocation toward **AI supercomputing clusters, gigafactory expansions, and next-generation battery cell manufacturing** creates near-term free cash flow volatility.\\\"\\n    ]\\n  },\\n  \\\"deep_insights\\\": [\\n    {\\n      \\\"category\\\": \\\"Strategic Pivot\\\",\\n      \\\"title\\\": \\\"Transformation into Physical AI and Autonomous Conglomerate\\\",\\n      \\\"description\\\": \\\"Tesla is aggressively reallocating capital from legacy hardware capacity expansion toward **physical AI, autonomous fleet software, and humanoid robotics (`Optimus`)**. The commercial launch of **unsupervised Robotaxi rides** in Texas and the start of **Cybercab production** represent a fundamental pivot from unit volume sales to high-margin mobility-as-a-service recurring revenue.\\\",\\n      \\\"impact_score\\\": 9\\n    },\\n    {\\n      \\\"category\\\": \\\"Competitor Analysis\\\",\\n      \\\"title\\\": \\\"Global EV Competition and Tariff Headwinds\\\",\\n      \\\"description\\\": \\\"Facing fierce price competition from foreign electric vehicle manufacturers in **Greater China and Europe**, Tesla is relying on its superior **vertical integration, manufacturing cost curves, and proprietary charging network (`Supercharger`)** to defend market share amid regional protectionist tariffs and EV subsidy phase-outs.\\\",\\n      \\\"impact_score\\\": 8\\n    },\\n    {\\n      \\\"category\\\": \\\"Risk Assessment\\\",\\n      \\\"title\\\": \\\"Regulatory Credit Revenue Collapse and Margin Drag\\\",\\n      \\\"description\\\": \\\"Changes in federal fuel economy penalty enforcement and the expiration of purchase tax credits have sharply reduced revenue from high-margin **automotive regulatory credit sales**. This structural decline places full operational pressure on vehicle gross margins and energy storage profitability.\\\",\\n      \\\"impact_score\\\": 8\\n    },\\n    {\\n      \\\"category\\\": \\\"Macro Trends\\\",\\n      \\\"title\\\": \\\"Utility-Scale Energy Storage Expansion\\\",\\n      \\\"description\\\": \\\"Global power grid modernization and AI data center energy demand are accelerating sales of Tesla's **`Megapack` and stationary energy storage systems**, turning energy generation and storage into the company's fastest-growing segment with record gross margins.\\\",\\n      \\\"impact_score\\\": 9\\n    }\\n  ],\\n  \\\"findings\\\": [\\n    {\\n      \\\"documentType\\\": \\\"Form 10-Q\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Achieved **16% YoY revenue growth** driven by automotive sales recovery and strong growth in energy and service divisions.\\\",\\n        \\\"Secured regulatory approval for **FSD (Supervised)** deployment in the Netherlands and expanded **unsupervised Robotaxi testing** in Texas.\\\",\\n        \\\"Demonstrated gross margin resilience at **21.1%** through manufacturing cost efficiencies and supply chain optimization.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-03-31\\\",\\n      \\\"sourceUrl\\\": \\\"https://ir.tesla.com/_flysystem/s3/sec/000162828026026673/tsla-20260331-gen.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 10-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Reported full-year revenue supported by vehicle deliveries of nearly **1.64 million units** globally.\\\",\\n        \\\"Expanded **human capital management initiatives**, including structured talent retention programs and veteran hiring pipelines.\\\",\\n        \\\"Highlighted vertical integration milestones across **Gigafactory Shanghai, Texas, Berlin, and Nevada**.\\\"\\n      ],\\n      \\\"date\\\": \\\"2025-12-31\\\",\\n      \\\"sourceUrl\\\": \\\"https://ir.tesla.com/_flysystem/s3/sec/000162828026003952/tsla-20251231-gen.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 10-K/A\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Updated long-term operational targets under the **2025 CEO Performance Award Agreement**.\\\",\\n        \\\"Established ambitious operational milestones including **20 million cumulative vehicle deliveries**, **10 million active FSD subscriptions**, and **1 million commercial bots/robotaxis**.\\\",\\n        \\\"Structured compensation vesting across sequential, non-overlapping **Adjusted EBITDA targets starting at $50B up to $400B**.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-04-23\\\",\\n      \\\"sourceUrl\\\": \\\"https://ir.tesla.com/_flysystem/s3/sec/000110465926053166/tm2611837d1_10ka-gen.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 8-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Delivered **record quarterly revenue** powered by core vehicle sales and utility energy storage expansion.\\\",\\n        \\\"Initiated early production runs for **Cybercab at Gigafactory Texas** and progressed construction on the **Nevada Semi facility**.\\\",\\n        \\\"Reported record profitability in **Services and Other segment**, backed by expanding Supercharger network utilization.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-07-22\\\",\\n      \\\"sourceUrl\\\": \\\"https://assets-ir.tesla.com/tesla-contents/IR/TSLA-Q2-2026-Update.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 8-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Furnished details regarding the **2025 CEO Interim Award** and board compensation oversight.\\\",\\n        \\\"Incorporated rigorous risk factors regarding **technology execution, regulatory hurdles, and international trade policies**.\\\",\\n        \\\"Reaffirmed commitment to long-term equity incentive structures tied strictly to market cap growth and operating performance.\\\"\\n      ],\\n      \\\"date\\\": \\\"2025-08-03\\\",\\n      \\\"sourceUrl\\\": \\\"https://ir.tesla.com/_flysystem/s3/sec/000110465925073263/tm2522385d1_8k-gen.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"DEFA14A\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Presented comprehensive board arguments in favor of **governance proposals and executive performance award ratification**.\\\",\\n        \\\"Detailed historical growth trajectory from **103k vehicle deliveries in 2017 to over 1.78M in 2024**.\\\",\\n        \\\"Emphasized early pioneer positioning in **autonomous vehicle deployment, AI training clusters, and global EV adoption**.\\\"\\n      ],\\n      \\\"date\\\": \\\"2025-10-06\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.sec.gov/Archives/edgar/data/1318605/000110465925097170/tm252289d31_defa14a.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"DEF 14A\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Outlined the strategic rationale for the **Texas Redomestication proposal** moving incorporation from Delaware to Texas.\\\",\\n        \\\"Provided detailed definitions for **Adjusted EBITDA metrics** and financial statement reconciliation procedures.\\\",\\n        \\\"Reviewed shareholder voting procedures, proxy solicitation mechanisms, and corporate governance guidelines.\\\"\\n      ],\\n      \\\"date\\\": \\\"2024-04-29\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.sec.gov/Archives/edgar/data/1318605/000110465924053333/tm2326076d14_def14a.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 10-Q\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Disclosed operating lease commitments for major facilities in **Buffalo, NY and Shanghai, China**.\\\",\\n        \\\"Provided management certifications confirming compliance with internal control over financial reporting (`SOX 404`).\\\",\\n        \\\"Assessed international foreign exchange risks, raw material supply chain costs, and battery component sourcing constraints.\\\"\\n      ],\\n      \\\"date\\\": \\\"2024-10-24\\\",\\n      \\\"sourceUrl\\\": \\\"https://cdn.kscope.io/a5d37cec5509c4ea75f2458d6269b494.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"ARS\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Issued notice for the **Annual Meeting of Shareholders at Gigafactory Texas**.\\\",\\n        \\\"Incorporated updated risk factor disclosures regarding **autonomous vehicle safety compliance and regulatory approvals**.\\\",\\n        \\\"Highlighted scaling milestones for **Model 3, Model Y, and next-generation vehicle manufacturing platforms**.\\\"\\n      ],\\n      \\\"date\\\": \\\"2025-09-17\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.sec.gov/Archives/edgar/data/1318605/000110465925090875/tm252787d3_ars.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"SEC No-Action Letter\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Evaluated shareholder proposal submissions under **SEC Rule 14a-8(i)(10)** regarding human capital disclosures.\\\",\\n        \\\"Detailed corporate disclosures on **military veteran programs, workforce diversity, and equal opportunity practices**.\\\",\\n        \\\"Confirmed SEC Division of Corporation Finance correspondence and legal compliance standards.\\\"\\n      ],\\n      \\\"date\\\": \\\"2025-01-14\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.sec.gov/files/corpfin/no-action/14a-8/campbelltesla43025-14a8.pdf\\\"\\n    }\\n  ],\\n  \\\"financial_charts\\\": {\\n    \\\"stock_price_4m\\\": [\\n      { \\\"date\\\": \\\"March '26\\\", \\\"price\\\": 371.75 },\\n      { \\\"date\\\": \\\"April '26\\\", \\\"price\\\": 381.63 },\\n      { \\\"date\\\": \\\"May '26\\\", \\\"price\\\": 435.79 },\\n      { \\\"date\\\": \\\"June '26\\\", \\\"price\\\": 420.60 }\\n    ],\\n    \\\"financial_performance_4q\\\": [\\n      { \\\"quarter\\\": \\\"Q3 2025\\\", \\\"revenue\\\": 28.1, \\\"net_income\\\": 1.39 },\\n      { \\\"quarter\\\": \\\"Q4 2025\\\", \\\"revenue\\\": 24.9, \\\"net_income\\\": 0.86 },\\n      { \\\"quarter\\\": \\\"Q1 2026\\\", \\\"revenue\\\": 22.4, \\\"net_income\\\": 0.49 },\\n      { \\\"quarter\\\": \\\"Q2 2026\\\", \\\"revenue\\\": 28.24, \\\"net_income\\\": 1.13 }\\n    ]\\n  }\\n}\\n\\nwith open(\\\"./workspace/result.json\\\", \\\"w\\\") as f:\\n  json.dump(data, f, indent=2)\\n\\nprint(\\\"JSON written successfully. Validating schema...\\\")\\n\\n# Verify keys\\nassert set(data.keys()) == {\\\"verdict\\\", \\\"deep_insights\\\", \\\"findings\\\", \\\"financial_charts\\\"}, f\\\"Invalid root keys: {data.keys()}\\\"\\nassert set(data[\\\"verdict\\\"].keys()) == {\\\"summary\\\", \\\"conviction_score\\\", \\\"key_takeaways\\\"}\\nassert len(data[\\\"findings\\\"]) >= 10, f\\\"Found only {len(data['findings'])} findings\\\"\\n\\nfor f_item in data[\\\"findings\\\"]:\\n  assert set(f_item.keys()) == {\\\"documentType\\\", \\\"keyInsights\\\", \\\"date\\\", \\\"sourceUrl\\\"}, f\\\"Invalid finding keys: {f_item.keys()}\\\"\\n  assert f_item[\\\"sourceUrl\\\"].lower().endswith(\\\".pdf\\\") or \\\".pdf\\\" in f_item[\\\"sourceUrl\\\"].lower(), f\\\"Non-pdf URL: {f_item['sourceUrl']}\\\"\\n\\nfor di in data[\\\"deep_insights\\\"]:\\n  assert set(di.keys()) == {\\\"category\\\", \\\"title\\\", \\\"description\\\", \\\"impact_score\\\"}\\n\\nfor sp in data[\\\"financial_charts\\\"][\\\"stock_price_4m\\\"]:\\n  assert set(sp.keys()) == {\\\"date\\\", \\\"price\\\"}\\n\\nfor fp in data[\\\"financial_charts\\\"][\\\"financial_performance_4q\\\"]:\\n  assert set(fp.keys()) == {\\\"quarter\\\", \\\"revenue\\\", \\\"net_income\\\"}\\n  assert \\\"distributions\\\" not in fp\\n\\nprint(\\\"All assertions passed successfully!\\\")\\n\",\"path\":\"validate.py\"}"
+
+[2026-07-28T17:54:46.329Z] [TOOL RESULT END] write_file
+Call ID: synth_4
+Duration: 0.97s
+Result: {"success":true}...
+
+[2026-07-28T17:54:47.609Z] [TOOL CALL START] code_execution_call
+Call ID: synth_5
+Arguments: "{\"toolAction\":\"Reading generated JSON file\",\"explanation\":\"Read generated JSON result file to verify contents\",\"path\":\"./workspace/result.json\",\"toolSummary\":\"File read\"}"
+
+[2026-07-28T17:54:48.012Z] [TOOL RESULT END] read_file
+Call ID: synth_5
+Duration: 0.40s
+Result: ...
+
+[2026-07-28T17:54:49.090Z] [TOOL CALL START] code_execution_call
+Call ID: synth_6
+Arguments: "{\"toolAction\":\"Reading generated workspace file\",\"explanation\":\"Read generated workspace result file\",\"path\":\"workspace/result.json\",\"toolSummary\":\"File read\"}"
+
+[2026-07-28T17:54:49.538Z] [TOOL RESULT END] read_file
+Call ID: synth_6
+Duration: 0.45s
+Result: ...
+
+[2026-07-28T17:55:04.040Z] [TOOL CALL START] code_execution_call
+Call ID: synth_7
+Arguments: "{\"explanation\":\"Save report JSON file to workspace directory\",\"path\":\"workspace/report.json\",\"toolSummary\":\"File edit\",\"content\":\"{\\n  \\\"verdict\\\": {\\n    \\\"summary\\\": \\\"Tesla is undergoing a strategic transformation from a traditional electric vehicle hardware manufacturer into a vertically integrated **physical Artificial Intelligence (AI) and autonomous energy ecosystem**. While core automotive production and global delivery expansion remain foundational, growth momentum is increasingly driven by **Full Self-Driving (FSD) software adoption**, **unsupervised Robotaxi commercial rollouts**, **Cybercab production scaling**, and rapid expansion in **utility-scale energy storage deployments**. However, short-term earnings remain constrained by heavy **capital expenditure commitments in AI compute infrastructure**, elevated research and development expenses, and reduced regulatory credit revenues following federal policy shifts.\\\",\\n    \\\"conviction_score\\\": 65,\\n    \\\"key_takeaways\\\": [\\n      \\\"**Strategic AI & Autonomous Pivot**: Accelerated transition toward autonomous mobility platforms, featuring **unsupervised Robotaxi expansion**, **Cybercab manufacturing**, and **humanoid robotics development**.\\\",\\n      \\\"**Energy Storage & Infrastructure Acceleration**: **Megapack and utility-scale battery deployments** continue to deliver robust high-margin growth, offsetting automotive gross margin compression.\\\",\\n      \\\"**Software Monetization & Ecosystem Expansion**: Rising global adoption of **FSD (Supervised)** and pending regulatory approvals across European and Asian markets enhance high-margin recurring software revenues.\\\",\\n      \\\"**Capital Expenditure & Free Cash Flow Pressure**: Massive capital allocation toward **AI supercomputing clusters, gigafactory expansions, and next-generation battery cell manufacturing** creates near-term free cash flow volatility.\\\"\\n    ]\\n  },\\n  \\\"deep_insights\\\": [\\n    {\\n      \\\"category\\\": \\\"Strategic Pivot\\\",\\n      \\\"title\\\": \\\"Transformation into Physical AI and Autonomous Conglomerate\\\",\\n      \\\"description\\\": \\\"Tesla is aggressively reallocating capital from legacy hardware capacity expansion toward **physical AI, autonomous fleet software, and humanoid robotics (`Optimus`)**. The commercial launch of **unsupervised Robotaxi rides** in Texas and the start of **Cybercab production** represent a fundamental pivot from unit volume sales to high-margin mobility-as-a-service recurring revenue.\\\",\\n      \\\"impact_score\\\": 9\\n    },\\n    {\\n      \\\"category\\\": \\\"Competitor Analysis\\\",\\n      \\\"title\\\": \\\"Global EV Competition and Tariff Headwinds\\\",\\n      \\\"description\\\": \\\"Facing fierce price competition from foreign electric vehicle manufacturers in **Greater China and Europe**, Tesla is relying on its superior **vertical integration, manufacturing cost curves, and proprietary charging network (`Supercharger`)** to defend market share amid regional protectionist tariffs and EV subsidy phase-outs.\\\",\\n      \\\"impact_score\\\": 8\\n    },\\n    {\\n      \\\"category\\\": \\\"Risk Assessment\\\",\\n      \\\"title\\\": \\\"Regulatory Credit Revenue Collapse and Margin Drag\\\",\\n      \\\"description\\\": \\\"Changes in federal fuel economy penalty enforcement and the expiration of purchase tax credits have sharply reduced revenue from high-margin **automotive regulatory credit sales**. This structural decline places full operational pressure on vehicle gross margins and energy storage profitability.\\\",\\n      \\\"impact_score\\\": 8\\n    },\\n    {\\n      \\\"category\\\": \\\"Macro Trends\\\",\\n      \\\"title\\\": \\\"Utility-Scale Energy Storage Expansion\\\",\\n      \\\"description\\\": \\\"Global power grid modernization and AI data center energy demand are accelerating sales of Tesla's **`Megapack` and stationary energy storage systems**, turning energy generation and storage into the company's fastest-growing segment with record gross margins.\\\",\\n      \\\"impact_score\\\": 9\\n    }\\n  ],\\n  \\\"findings\\\": [\\n    {\\n      \\\"documentType\\\": \\\"Form 10-Q\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Achieved **16% YoY revenue growth** driven by automotive sales recovery and strong growth in energy and service divisions.\\\",\\n        \\\"Secured regulatory approval for **FSD (Supervised)** deployment in the Netherlands and expanded **unsupervised Robotaxi testing** in Texas.\\\",\\n        \\\"Demonstrated gross margin resilience at **21.1%** through manufacturing cost efficiencies and supply chain optimization.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-03-31\\\",\\n      \\\"sourceUrl\\\": \\\"https://ir.tesla.com/_flysystem/s3/sec/000162828026026673/tsla-20260331-gen.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 10-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Reported full-year revenue supported by vehicle deliveries of nearly **1.64 million units** globally.\\\",\\n        \\\"Expanded **human capital management initiatives**, including structured talent retention programs and veteran hiring pipelines.\\\",\\n        \\\"Highlighted vertical integration milestones across **Gigafactory Shanghai, Texas, Berlin, and Nevada**.\\\"\\n      ],\\n      \\\"date\\\": \\\"2025-12-31\\\",\\n      \\\"sourceUrl\\\": \\\"https://ir.tesla.com/_flysystem/s3/sec/000162828026003952/tsla-20251231-gen.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 10-K/A\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Updated long-term operational targets under the **2025 CEO Performance Award Agreement**.\\\",\\n        \\\"Established ambitious operational milestones including **20 million cumulative vehicle deliveries**, **10 million active FSD subscriptions**, and **1 million commercial bots/robotaxis**.\\\",\\n        \\\"Structured compensation vesting across sequential, non-overlapping **Adjusted EBITDA targets starting at $50B up to $400B**.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-04-23\\\",\\n      \\\"sourceUrl\\\": \\\"https://ir.tesla.com/_flysystem/s3/sec/000110465926053166/tm2611837d1_10ka-gen.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 8-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Delivered **record quarterly revenue** powered by core vehicle sales and utility energy storage expansion.\\\",\\n        \\\"Initiated early production runs for **Cybercab at Gigafactory Texas** and progressed construction on the **Nevada Semi facility**.\\\",\\n        \\\"Reported record profitability in **Services and Other segment**, backed by expanding Supercharger network utilization.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-07-22\\\",\\n      \\\"sourceUrl\\\": \\\"https://assets-ir.tesla.com/tesla-contents/IR/TSLA-Q2-2026-Update.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 8-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Furnished details regarding the **2025 CEO Interim Award** and board compensation oversight.\\\",\\n        \\\"Incorporated rigorous risk factors regarding **technology execution, regulatory hurdles, and international trade policies**.\\\",\\n        \\\"Reaffirmed commitment to long-term equity incentive structures tied strictly to market cap growth and operating performance.\\\"\\n      ],\\n      \\\"date\\\": \\\"2025-08-03\\\",\\n      \\\"sourceUrl\\\": \\\"https://ir.tesla.com/_flysystem/s3/sec/000110465925073263/tm2522385d1_8k-gen.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"DEFA14A\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Presented comprehensive board arguments in favor of **governance proposals and executive performance award ratification**.\\\",\\n        \\\"Detailed historical growth trajectory from **103k vehicle deliveries in 2017 to over 1.78M in 2024**.\\\",\\n        \\\"Emphasized early pioneer positioning in **autonomous vehicle deployment, AI training clusters, and global EV adoption**.\\\"\\n      ],\\n      \\\"date\\\": \\\"2025-10-06\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.sec.gov/Archives/edgar/data/1318605/000110465925097170/tm252289d31_defa14a.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"DEF 14A\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Outlined the strategic rationale for the **Texas Redomestication proposal** moving incorporation from Delaware to Texas.\\\",\\n        \\\"Provided detailed definitions for **Adjusted EBITDA metrics** and financial statement reconciliation procedures.\\\",\\n        \\\"Reviewed shareholder voting procedures, proxy solicitation mechanisms, and corporate governance guidelines.\\\"\\n      ],\\n      \\\"date\\\": \\\"2024-04-29\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.sec.gov/Archives/edgar/data/1318605/000110465924053333/tm2326076d14_def14a.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 10-Q\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Disclosed operating lease commitments for major facilities in **Buffalo, NY and Shanghai, China**.\\\",\\n        \\\"Provided management certifications confirming compliance with internal control over financial reporting (`SOX 404`).\\\",\\n        \\\"Assessed international foreign exchange risks, raw material supply chain costs, and battery component sourcing constraints.\\\"\\n      ],\\n      \\\"date\\\": \\\"2024-10-24\\\",\\n      \\\"sourceUrl\\\": \\\"https://cdn.kscope.io/a5d37cec5509c4ea75f2458d6269b494.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"ARS\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Issued notice for the **Annual Meeting of Shareholders at Gigafactory Texas**.\\\",\\n        \\\"Incorporated updated risk factor disclosures regarding **autonomous vehicle safety compliance and regulatory approvals**.\\\",\\n        \\\"Highlighted scaling milestones for **Model 3, Model Y, and next-generation vehicle manufacturing platforms**.\\\"\\n      ],\\n      \\\"date\\\": \\\"2025-09-17\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.sec.gov/Archives/edgar/data/1318605/000110465925090875/tm252787d3_ars.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"SEC No-Action Letter\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Evaluated shareholder proposal submissions under **SEC Rule 14a-8(i)(10)** regarding human capital disclosures.\\\",\\n        \\\"Detailed corporate disclosures on **military veteran programs, workforce diversity, and equal opportunity practices**.\\\",\\n        \\\"Confirmed SEC Division of Corporation Finance correspondence and legal compliance standards.\\\"\\n      ],\\n      \\\"date\\\": \\\"2025-01-14\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.sec.gov/files/corpfin/no-action/14a-8/campbelltesla43025-14a8.pdf\\\"\\n    }\\n  ],\\n  \\\"financial_charts\\\": {\\n    \\\"stock_price_4m\\\": [\\n      { \\\"date\\\": \\\"March '26\\\", \\\"price\\\": 371.75 },\\n      { \\\"date\\\": \\\"April '26\\\", \\\"price\\\": 381.63 },\\n      { \\\"date\\\": \\\"May '26\\\", \\\"price\\\": 435.79 },\\n      { \\\"date\\\": \\\"June '26\\\", \\\"price\\\": 420.60 }\\n    ],\\n    \\\"financial_performance_4q\\\": [\\n      { \\\"quarter\\\": \\\"Q3 2025\\\", \\\"revenue\\\": 28.1, \\\"net_income\\\": 1.39 },\\n      { \\\"quarter\\\": \\\"Q4 2025\\\", \\\"revenue\\\": 24.9, \\\"net_income\\\": 0.86 },\\n      { \\\"quarter\\\": \\\"Q1 2026\\\", \\\"revenue\\\": 22.4, \\\"net_income\\\": 0.49 },\\n      { \\\"quarter\\\": \\\"Q2 2026\\\", \\\"revenue\\\": 28.24, \\\"net_income\\\": 1.13 }\\n    ]\\n  }\\n}\\n\",\"toolAction\":\"Writing report JSON file\"}"
+
+[2026-07-28T17:55:04.919Z] [TOOL RESULT END] write_file
+Call ID: synth_7
+Duration: 0.88s
+Result: {"success":true}...
+
+[TEXT OUTPUT]
+```json
+{
+  
+
+[TEXT OUTPUT]
+"verdict": {
+    "summary": "Tesla is undergoing a strategic transformation from a traditional electric vehicle hardware manufacturer
+
+[TEXT OUTPUT]
+ into a vertically integrated **physical Artificial Intelligence (AI) and autonomous energy ecosystem**. While core automotive production and global delivery expansion
+
+[TEXT OUTPUT]
+ remain foundational, growth momentum is increasingly driven by **Full Self-Driving (FSD) software adoption**, **unsupervised
+
+[TEXT OUTPUT]
+ Robotaxi commercial rollouts**, **Cybercab production scaling**, and rapid expansion in **utility-scale energy storage deployments**.
+
+[TEXT OUTPUT]
+ However, short-term earnings remain constrained by heavy **capital expenditure commitments in AI compute infrastructure**, elevated research and development expenses
+
+[TEXT OUTPUT]
+, and reduced regulatory credit revenues following federal policy shifts.",
+    "conviction_score": 65,
+
+
+[TEXT OUTPUT]
+    "key_takeaways":
+
+[TEXT OUTPUT]
+ [
+      "**Strategic AI & Autonomous Pivot**: Accelerated transition toward autonomous mobility platforms, featuring **unsupervised Robotaxi expansion**, **Cybercab manufacturing**, and **humanoid robotics development**.",
+      
+
+[TEXT OUTPUT]
+"**Energy Storage & Infrastructure Acceleration**: **Megapack and utility-scale battery deployments** continue to deliver robust high
+
+[TEXT OUTPUT]
+-margin growth, offsetting automotive gross margin compression.",
+      "**Software Monetization & Ecosystem Expansion**: Rising global adoption
+
+[TEXT OUTPUT]
+ of **FSD (Supervised)** and pending regulatory approvals across European and Asian markets enhance high-margin recurring software revenues
+
+[TEXT OUTPUT]
+.",
+      "**Capital Expenditure & Free Cash Flow Pressure**: Massive capital allocation toward **AI supercomputing clusters, gig
+
+[TEXT OUTPUT]
+afactory expansions, and next-generation battery cell manufacturing** creates near-term free cash flow volatility."
+    ]
+
+[TEXT OUTPUT]
+
+  },
+  "deep_insights":
+
+[TEXT OUTPUT]
+ [
+    {
+      "category": "Strategic Pivot",
+      "title": "Transformation into Physical AI and Autonomous Conglomerate",
+      "description": "Tesla is aggressively reallocating capital from legacy hardware capacity expansion toward **physical AI, autonomous fleet software, and humanoid robotics (`Optimus
+
+[TEXT OUTPUT]
+`)**. The commercial launch of **unsupervised Robotaxi rides** in Texas and the start of **Cybercab production**
+
+[TEXT OUTPUT]
+ represent a fundamental pivot from unit volume sales to high-margin mobility-as-a-service recurring revenue.",
+      
+
+[TEXT OUTPUT]
+"impact_score": 9
+    },
+    {
+      "category": "Competitor Analysis",
+
+
+[TEXT OUTPUT]
+      "title": "Global EV Competition and Tariff Headwinds",
+      "description": "Facing fierce price competition from
+
+[TEXT OUTPUT]
+ foreign electric vehicle manufacturers in **Greater China and Europe**, Tesla is relying on its superior **vertical integration, manufacturing cost curves
+
+[TEXT OUTPUT]
+, and proprietary charging network (`Supercharger`)** to defend market share amid regional protectionist tariffs and EV subsidy phase-
+
+[TEXT OUTPUT]
+outs.",
+      "impact_score": 8
+    },
+    {
+      "category": "Risk
+
+[TEXT OUTPUT]
+ Assessment",
+      "title": "Regulatory Credit Revenue Collapse and Margin Drag",
+      "description": "Changes in
+
+[TEXT OUTPUT]
+ federal fuel economy penalty enforcement and the expiration of purchase tax credits have sharply reduced revenue from high-margin **automotive regulatory
+
+[TEXT OUTPUT]
+ credit sales**. This structural decline places full operational pressure on vehicle gross margins and energy storage profitability.",
+      "impact_
+
+[TEXT OUTPUT]
+score": 8
+    },
+    {
+      "category": "Macro Trends",
+      "title":
+
+[TEXT OUTPUT]
+ "Utility-Scale Energy Storage Expansion",
+      "description": "Global power grid modernization and AI data center energy demand
+
+[TEXT OUTPUT]
+ are accelerating sales of Tesla's **`Megapack` and stationary energy storage systems**, turning energy generation and storage
+
+[TEXT OUTPUT]
+ into the company's fastest-growing segment with record gross margins.",
+      "impact_score": 9
+
+
+[TEXT OUTPUT]
+    }
+  ],
+  "findings":
+
+[TEXT OUTPUT]
+ [
+    {
+      "documentType": "Form 10-Q",
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "Achieved **16% YoY revenue growth** driven by automotive sales recovery and strong growth in energy and service divisions.",
+        "Secured regulatory approval for **FSD (Supervised)** deployment in the Netherlands and expanded **unsupervised Robotaxi testing** in Texas.",
+        "
+
+[TEXT OUTPUT]
+Demonstrated gross margin resilience at **21.1%** through manufacturing cost efficiencies and supply chain optimization."
+      
+
+[TEXT OUTPUT]
+],
+      "date": "2026-03-31",
+      "sourceUrl":
+
+[TEXT OUTPUT]
+ "https://ir.tesla.com/_flysystem/s3/sec/0001628
+
+[TEXT OUTPUT]
+28026026673/tsla-20260331-
+
+[TEXT OUTPUT]
+gen.pdf"
+    },
+    {
+      "documentType": "Form 10-K",
+
+[TEXT OUTPUT]
+
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "Reported full-year revenue supported by vehicle deliveries of nearly **1.64 million units** globally.",
+        "Expanded **human capital management initiatives**, including structured talent retention programs and
+
+[TEXT OUTPUT]
+ veteran hiring pipelines.",
+        "Highlighted vertical integration milestones across **Gigafactory Shanghai, Texas, Berlin, and Nevada
+
+[TEXT OUTPUT]
+**."
+      ],
+      "date": "2025-12-31",
+      
+
+[TEXT OUTPUT]
+"sourceUrl": "https://ir.tesla.com/_flysystem/s3/sec/000
+
+[TEXT OUTPUT]
+162828026003952/tsla-20251
+
+[TEXT OUTPUT]
+231-gen.pdf"
+    },
+    {
+      "documentType": "Form 1
+
+[TEXT OUTPUT]
+0-K/A",
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "Updated long-term operational targets under the **2025 CEO Performance Award Agreement**.",
+        "Established ambitious operational milestones including **20 million cumulative vehicle deliveries**, **10 million active FSD subscriptions**, and **1 million commercial bots/robotaxis**.",
+
+
+[TEXT OUTPUT]
+        "Structured compensation vesting across sequential, non-overlapping **Adjusted EBITDA targets starting at $50B up to
+
+[TEXT OUTPUT]
+ $400B**."
+      ],
+      "date": "2026-04-
+
+[TEXT OUTPUT]
+23",
+      "sourceUrl": "https://ir.tesla.com/_flysystem/s3/
+
+[TEXT OUTPUT]
+sec/000110465926053166/tm26
+
+[TEXT OUTPUT]
+11837d1_10ka-gen.pdf"
+    },
+    {
+      
+
+[TEXT OUTPUT]
+"documentType": "Form 8-K",
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "Delivered **record quarterly revenue** powered by core vehicle sales and utility energy storage expansion.",
+        "Initiated early production runs for **Cybercab at Gigafactory Texas** and progressed construction on the **Nevada Semi facility**.",
+        "
+
+[TEXT OUTPUT]
+Reported record profitability in **Services and Other segment**, backed by expanding Supercharger network utilization."
+      ],
+      
+
+[TEXT OUTPUT]
+"date": "2026-07-22",
+      "sourceUrl": "https://
+
+[TEXT OUTPUT]
+assets-ir.tesla.com/tesla-contents/IR/TSLA-Q2-2026
+
+[TEXT OUTPUT]
+-Update.pdf"
+    },
+    {
+      "documentType": "Form 8-K",
+
+[TEXT OUTPUT]
+
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "Furnished details regarding the **2025 CEO Interim Award** and board compensation oversight.",
+        "Incorporated rigorous risk factors regarding **technology execution, regulatory hurdles, and international trade
+
+[TEXT OUTPUT]
+ policies**.",
+        "Reaffirmed commitment to long-term equity incentive structures tied strictly to market cap growth and
+
+[TEXT OUTPUT]
+ operating performance."
+      ],
+      "date": "2025-08-03",
+
+
+[TEXT OUTPUT]
+      "sourceUrl": "https://ir.tesla.com/_flysystem/s3/sec/00
+
+[TEXT OUTPUT]
+0110465925073263/tm252238
+
+[TEXT OUTPUT]
+5d1_8k-gen.pdf"
+    },
+    {
+      "documentType": "
+
+[TEXT OUTPUT]
+DEFA14A",
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "Presented comprehensive board arguments in favor of **governance proposals and executive performance award ratification**.",
+        "Detailed historical growth trajectory from **103k vehicle
+
+[TEXT OUTPUT]
+ deliveries in 2017 to over 1.78M in 2024**.",
+
+
+[TEXT OUTPUT]
+        "Emphasized early pioneer positioning in **autonomous vehicle deployment, AI training clusters, and global EV adoption**."
+
+[TEXT OUTPUT]
+
+      ],
+      "date": "2025-10-06",
+      "source
+
+[TEXT OUTPUT]
+Url": "https://www.sec.gov/Archives/edgar/data/131860
+
+[TEXT OUTPUT]
+5/000110465925097170/tm25
+
+[TEXT OUTPUT]
+2289d31_defa14a.pdf"
+    },
+    {
+      
+
+[TEXT OUTPUT]
+"documentType": "DEF 14A",
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "Outlined the strategic rationale for the **Texas Redomestication proposal** moving incorporation from Delaware to Texas.",
+        "Provided detailed definitions for **Adjusted EBITDA metrics** and financial statement reconciliation procedures.",
+        "Reviewed shareholder voting procedures, proxy solicitation
+
+[TEXT OUTPUT]
+ mechanisms, and corporate governance guidelines."
+      ],
+      "date": "2024-04-
+
+[TEXT OUTPUT]
+29",
+      "sourceUrl": "https://www.sec.gov/Archives/edgar/data
+
+[TEXT OUTPUT]
+/1318605/000110465924053
+
+[TEXT OUTPUT]
+333/tm2326076d14_def14a.pdf"
+
+
+[TEXT OUTPUT]
+    },
+    {
+      "documentType": "Form 10-Q",
+      "keyInsights
+
+[TEXT OUTPUT]
+":
+
+[TEXT OUTPUT]
+ [
+        "Disclosed operating lease commitments for major facilities in **Buffalo, NY and Shanghai, China**.",
+        "Provided management certifications confirming compliance with internal control over financial reporting (`SOX 404`).",
+
+
+[TEXT OUTPUT]
+        "Assessed international foreign exchange risks, raw material supply chain costs, and battery component sourcing constraints."
+      ],
+
+[TEXT OUTPUT]
+
+      "date": "2024-10-24",
+      "sourceUrl": "
+
+[TEXT OUTPUT]
+https://cdn.kscope.io/a5d37cec5509c4ea75
+
+[TEXT OUTPUT]
+f2458d6269b494.pdf"
+    },
+    {
+
+
+[TEXT OUTPUT]
+      "documentType": "ARS",
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "Issued notice for the **Annual Meeting of Shareholders at Gigafactory Texas**.",
+        "Incorporated updated risk factor disclosures regarding **autonomous vehicle safety compliance and regulatory approvals**.",
+        "Highlighted scaling milestones for **Model 3, Model Y, and next-
+
+[TEXT OUTPUT]
+generation vehicle manufacturing platforms**."
+      ],
+      "date": "2025-09-1
+
+[TEXT OUTPUT]
+7",
+      "sourceUrl": "https://www.sec.gov/Archives/edgar/data/
+
+[TEXT OUTPUT]
+1318605/0001104659250908
+
+[TEXT OUTPUT]
+75/tm252787d3_ars.pdf"
+    },
+    {
+
+
+[TEXT OUTPUT]
+      "documentType": "SEC No-Action Letter",
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "Evaluated shareholder proposal submissions under **SEC Rule 14a-8(i)(10)** regarding human capital disclosures.",
+        "Detailed corporate disclosures on **military veteran programs, workforce diversity, and equal opportunity practices**.",
+        "
+
+[TEXT OUTPUT]
+Confirmed SEC Division of Corporation Finance correspondence and legal compliance standards."
+      ],
+      "date": "202
+
+[TEXT OUTPUT]
+5-01-14",
+      "sourceUrl": "https://www.sec.gov/files
+
+[TEXT OUTPUT]
+/corpfin/no-action/14a-8/campbelltesla43025-1
+
+[TEXT OUTPUT]
+4a8.pdf"
+    }
+  ],
+  "financial_charts": {
+    "stock
+
+[TEXT OUTPUT]
+_price_4m":
+
+[TEXT OUTPUT]
+ [
+      { "date": "March '26", "price": 371.75 },
+      { "date": "April '26", "price": 381.63 },
+      { "date": "May '26", "price": 435.79 },
+      { "date": "June '26", "price": 420.60 }
+    ],
+    "financial_performance_4q":
+
+[TEXT OUTPUT]
+ [
+      { "quarter": "Q3 2025", "revenue": 28.1, "net_income": 1.39 },
+      { "quarter": "Q4 2025", "revenue": 24.9, "net_income": 0.86 },
+      { "quarter": "Q1 2026", "revenue": 22.4, "net_income": 0.4
+
+[TEXT OUTPUT]
+9 },
+      { "quarter": "Q2 2026", "revenue": 28.
+
+[TEXT OUTPUT]
+24, "net_income": 1.13 }
+    ]
+  }
+}
+
+
+[TEXT OUTPUT]
+```
+

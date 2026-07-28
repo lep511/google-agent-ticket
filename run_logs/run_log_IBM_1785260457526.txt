@@ -1,0 +1,957 @@
+========================================================
+                 RUN SUMMARY FOR IBM
+                 Total Duration: 152.82s
+========================================================
+
+1. SUB-AGENT EXECUTIONS:
+--------------------------------------------------------
+Agent Step 1: code_execution_call
+Status: Completed
+Duration: 0.43s
+Arguments: {"queries":["\"IBM\" \"10-K\" filetype:pdf OR \"IBM\" \"10-Q\" filetype:pdf","IBM \"SEC filing\" filetype:pdf 2025 OR 2026","IBM proxy statement DEF 14A filetype:pdf 2025 OR 2026","IBM annual report filetype:pdf 2025 OR 2026"]}
+Output Preview: [{"search_suggestions":"{\"fields\":[{\"name\":\"result\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"query\",\"value\":{\"stringValue\":\"\\\"IBM\\\" \\\"10-K\\\" ...
+--------------------------------------------------------
+Agent Step 2: code_execution_call
+Status: Completed
+Duration: 0.41s
+Arguments: {"queries":["\"IBM\" \"10-Q\" \"2026\" filetype:pdf","\"IBM\" \"10-Q\" \"2025\" filetype:pdf","IBM 8-K filetype:pdf 2025 OR 2026","IBM Form 3 OR Form 4 OR Form 5 filetype:pdf 2025 OR 2026"]}
+Output Preview: [{"search_suggestions":"{\"fields\":[{\"name\":\"result\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"query\",\"value\":{\"stringValue\":\"\\\"IBM\\\" \\\"10-Q\\\" ...
+--------------------------------------------------------
+Agent Step 3: code_execution_call
+Status: Completed
+Duration: 0.74s
+Arguments: {"queries":["\"IBM\" stock price \"June 30, 2026\" OR \"June 2026\"","\"IBM\" stock price \"May 29, 2026\" OR \"May 2026\"","\"IBM\" stock price \"April 30, 2026\" OR \"April 2026\"","\"IBM\" stock price \"March 31, 2026\" OR \"March 2026\""]}
+Output Preview: [{"search_suggestions":"{\"fields\":[{\"name\":\"result\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"query\",\"value\":{\"stringValue\":\"\\\"IBM\\\" stock price \...
+--------------------------------------------------------
+Agent Step 4: code_execution_call
+Status: Completed
+Duration: 0.60s
+Arguments: {"queries":["\"IBM\" stock close \"March 31, 2026\" OR \"March 2026\"","\"IBM\" stock close \"June 30, 2026\" OR \"June 2026\"","IBM stock closing price \"March 2026\" and \"June 2026\""]}
+Output Preview: [{"search_suggestions":"{\"fields\":[{\"name\":\"result\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"query\",\"value\":{\"stringValue\":\"\\\"IBM\\\" stock close \...
+--------------------------------------------------------
+Agent Step 5: code_execution_call
+Status: Completed
+Duration: 0.47s
+Arguments: {"queries":["\"IBM\" \"Q2 2026\" revenue \"net income\" OR \"GAAP\"","\"IBM\" \"Q1 2026\" revenue \"net income\" OR \"GAAP\"","\"IBM\" \"Q4 2025\" revenue \"net income\" OR \"GAAP\"","\"IBM\" \"Q3 2025\" revenue \"net income\" OR \"GAAP\""]}
+Output Preview: [{"search_suggestions":"{\"fields\":[{\"name\":\"result\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"query\",\"value\":{\"stringValue\":\"\\\"IBM\\\" \\\"Q2 2026\\...
+--------------------------------------------------------
+Agent Step 6: code_execution_call
+Status: Completed
+Duration: 1.00s
+Arguments: "{\"path\":\".\",\"explanation\":\"Checking directory structure to find workspace.\",\"toolSummary\":\"Listing files in current directory\",\"toolAction\":\"Listing files in current directory\"}"
+Output Preview: {"files":[{"name":".agents","size":0,"is_directory":true},{"size":0,"name":".google","is_directory":true},{"is_directory":true,"size":0,"name":"app"},{"size":0,"name":"bin","is_directory":true},{"is_d...
+--------------------------------------------------------
+Agent Step 7: code_execution_call
+Status: Completed
+Duration: 0.82s
+Arguments: "{\"content\":\"import os\\nimport json\\n\\n# Create workspace directory if it doesn't exist\\nos.makedirs(\\\"workspace\\\", exist_ok=True)\\n\\nreport = {\\n  \\\"verdict\\\": {\\n    \\\"summary\\\": \\\"International Business Machines Corporation (**IBM**) is navigating a critical structural transformation, positioning itself as a leader in **hybrid cloud**, **enterprise artificial intelligence (AI)**, and **quantum computing**. However, recent performance highlights significant near-term volatility and execution risks. The company experienced a dramatic market correction following a disappointing preliminary quarterly report, which revealed that clients are shifting their technology budgets toward raw hardware and AI infrastructure. This budget realignment has temporarily delayed software and consulting deployments, exposing vulnerability in the pace of enterprise software adoption. While the long-term strategic narrative remains supported by robust AI bookings and a government-backed **quantum wafer foundry**, the near-term outlook is tempered by cyclical hardware declines, decelerating software growth, and emerging legal scrutiny regarding management's transparency.\\\",\\n    \\\"conviction_score\\\": 55,\\n    \\\"key_takeaways\\\": [\\n      \\\"The massive single-day stock correction reflects heightened investor sensitivity to signs that **AI infrastructure capital expenditure** is cannibalizing traditional enterprise software budgets.\\\",\\n      \\\"While the **hybrid cloud software business** remains the core engine of margin expansion, its growth has decelerated below long-term targets, exacerbated by tough cyclical comparables in the mainframe business.\\\",\\n      \\\"A major long-term catalyst is the partnership with the federal government to construct a state-of-the-art **quantum chip foundry** in Albany, New York, supported by substantial federal incentives.\\\",\\n      \\\"Emerging legal investigations into management's deal pipeline disclosure introduce short-term reputational and **governance risks** that could restrict institutional capital inflows.\\\",\\n      \\\"The overall investment thesis represents a high-quality defensive franchise with strong cash flows, but one that is currently facing a complex transition period with diminished near-term growth visibility.\\\"\\n    ]\\n  },\\n  \\\"deep_insights\\\": [\\n    {\\n      \\\"category\\\": \\\"Market Dynamics\\\",\\n      \\\"title\\\": \\\"AI Infrastructure Capex Cannibalization of Software Budgets\\\",\\n      \\\"description\\\": \\\"The dramatic sell-off in **IBM** stock followed preliminary **Q2 2026** results showing that enterprise customers are rapidly shifting their capital expenditure toward servers, memory, and raw AI infrastructure. This shift is temporarily **crowding out** and delaying spending on traditional enterprise software and consulting packages, posing a structural transition risk for IBM's hybrid cloud software momentum. This trend is a major focal point for the wider software sector.\\\",\\n      \\\"impact_score\\\": 9\\n    },\\n    {\\n      \\\"category\\\": \\\"Product Lifecycle Risks\\\",\\n      \\\"title\\\": \\\"Mainframe Cyclical Cliff and the Transition to z17\\\",\\n      \\\"description\\\": \\\"IBM's infrastructure segment experienced a major contraction as the mainframe product cycle faced tough year-over-year comparables, resulting in a **42% year-over-year decline** in **IBM Z** systems revenue. While distributed infrastructure grew by **37%**, the cyclical volatility of hardware refreshes continues to undermine stable valuation models and highlights the difficulty of transitioning legacy bases to modern cloud platforms.\\\",\\n      \\\"impact_score\\\": 8\\n    },\\n    {\\n      \\\"category\\\": \\\"Strategic Opportunities\\\",\\n      \\\"title\\\": \\\"Quantum Computing Leadership and Anderon Wafer Foundry\\\",\\n      \\\"description\\\": \\\"In partnership with the **U.S. Department of Commerce**, IBM secured a **$1.0 billion CHIPS Act grant** to establish **Anderon**, the nation's first purpose-built, pure-play quantum wafer foundry in Albany, New York. Combined with IBM's own **$10.0 billion multi-year commitment** over five years, this positions the company as an undisputed pioneer in the next era of computing, although commercial and financial returns are not expected until the late 2020s.\\\",\\n      \\\"impact_score\\\": 7\\n    },\\n    {\\n      \\\"category\\\": \\\"Legal and Governance\\\",\\n      \\\"title\\\": \\\"Securities Litigation and Transparency Concerns\\\",\\n      \\\"description\\\": \\\"Following the massive single-day stock collapse of **25.2%** on July 14, 2026, multiple law firms launched investigations into whether IBM's management misrepresented its sales pipeline, transaction velocity, and forward-looking guidance for the **IBM Z** platform. This introduces **corporate governance risks**, potential class-action litigation, and reputational damage that could weigh heavily on institutional investor sentiment in the near term.\\\",\\n      \\\"impact_score\\\": 6\\n    }\\n  ],\\n  \\\"findings\\\": [\\n    {\\n      \\\"documentType\\\": \\\"Form 10-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Repositioned IBM as a software-led, fully integrated platform company combining technology, consulting, and infrastructure.\\\",\\n        \\\"Generative AI book of business reached **$12.5 billion** since inception, showing strong customer traction in enterprise AI.\\\",\\n        \\\"Highest annual software growth rate in history with **9% growth** at constant currency, representing **45% of total revenue**.\\\",\\n        \\\"Generated **$14.7 billion** in free cash flow, representing the highest FCF in over a decade.\\\",\\n        \\\"Returned **$6.3 billion** to shareholders through dividends and closed **10 strategic acquisitions**.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-02-24\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.sec.gov/Archives/edgar/data/51143/000005114326000027/ibmars2025.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 10-Q\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Reported strong first-quarter revenue of **$15.92 billion** (up 9% YoY reported), beating consensus estimates of $15.6 billion.\\\",\\n        \\\"Growth was led by the **Software segment (up 11%)** and **Infrastructure segment (up 15%)**, while Consulting grew moderately at 4%.\\\",\\n        \\\"Declared a regular quarterly cash dividend of **$1.69 per share**, representing the **31st consecutive annual increase**.\\\",\\n        \\\"Completed the **$11.3 billion acquisition of Confluent, Inc.** on March 17, 2026, which added $7.14 billion of goodwill to the Software segment.\\\",\\n        \\\"Ending debt stood at **$66.4 billion**, reflecting a $5.1 billion increase in the quarter to fund the Confluent transaction.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-04-22\\\",\\n      \\\"sourceUrl\\\": \\\"https://www-api.ibm.com/adobe/assets/urn:aaid:aem:fcf635c7-4e7c-457b-93c3-c4328a6ba968/original/as/1q26-form-10q.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 8-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Reported second-quarter GAAP revenue of **$17.16 billion**, representing a modest **1% year-over-year growth**.\\\",\\n        \\\"GAAP net income was **$2.17 billion**, with GAAP diluted earnings per share at $2.27 and operating (non-GAAP) diluted EPS at $2.93.\\\",\\n        \\\"Software segment revenue grew **5% year-over-year** to $7.76 billion, while Consulting was flat at $5.33 billion.\\\",\\n        \\\"Infrastructure segment revenue fell **7% year-over-year** to $3.84 billion, heavily impacted by a **42% decline in IBM Z mainframe** sales.\\\",\\n        \\\"Lowered full-year constant-currency revenue growth expectations to a range of **4% to 5%** (down from 'above 5%').\\\",\\n        \\\"Maintained full-year free cash flow growth guidance of approximately **$1.0 billion year-over-year**.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-07-22\\\",\\n      \\\"sourceUrl\\\": \\\"https://www-api.ibm.com/adobe/assets/urn:aaid:aem:7aef6616-f4ae-4206-81d0-d047ada5a3e2/original/as/ibm-2q-26-earnings-press-release.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Investor Presentation\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"In the final weeks of June, clients shifted quarterly capital expenditure toward servers, storage, and memory to secure supply-constrained infrastructure ahead of expected price increases.\\\",\\n        \\\"This shift resulted in a delay of several large enterprise software deals, causing the Q2 revenue miss.\\\",\\n        \\\"About **one-third of the delayed deals** have already closed early in the third quarter of 2026.\\\",\\n        \\\"Progress remains on track to deliver the first large-scale, fault-tolerant **quantum computer by 2029**.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-07-14\\\",\\n      \\\"sourceUrl\\\": \\\"https://newsroom.ibm.com/2026-07-14-Arvind-Krishnas-Letter-to-IBM-Investors?asPDF=1\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 8-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Detailed segment results for Q1 2026, showcasing high-margin software recurring revenue as a key driver of EBITDA margin expansion.\\\",\\n        \\\"Software Annual Recurring Revenue (ARR) reached **$24.6 billion**, an increase of approximately $3.0 billion.\\\",\\n        \\\"Reiterated full-year free cash flow guidance and outlined progress on watsonx adoption in enterprise environments.\\\",\\n        \\\"Presented non-GAAP reconciliations for Constant Currency revenue growth and Operating Earnings.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-04-22\\\",\\n      \\\"sourceUrl\\\": \\\"https://www-api.ibm.com/adobe/assets/urn:aaid:aem:7259fd9f-7ab1-494e-aac7-de8b65d8e5a9/original/as/ibm-1q-26-earnings-charts.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 8-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Reported strong fourth-quarter 2025 revenue of **$19.7 billion**, representing **12% year-over-year growth**.\\\",\\n        \\\"GAAP net income for Q4 2025 was **$5.6 billion**, up **91% year-over-year**, heavily boosted by tax-related benefits and strong mainframe cycles.\\\",\\n        \\\"Generative AI book of business exceeded **$12.5 billion**, with consulting signing over $2.0 billion in GenAI bookings in Q4 alone.\\\",\\n        \\\"Exceeded the original exit-2024 productivity run-rate savings target, reaching **$4.5 billion of annual run-rate savings** exiting 2025.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-01-28\\\",\\n      \\\"sourceUrl\\\": \\\"https://newsroom.ibm.com/2026-01-28-IBM-RELEASES-FOURTH-QUARTER-RESULTS?asPDF=1\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"DEF 14A\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Notice of the Annual Meeting of Stockholders held on April 28, 2026.\\\",\\n        \\\"Proposals included the election of directors, ratification of PricewaterhouseCoopers LLP as the independent registered accounting firm, and approval of executive compensation.\\\",\\n        \\\"Proposed a new long-term performance plan (LTPP) for IBM employees to align compensation with shareholder value creation.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-03-10\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.sec.gov/Archives/edgar/data/51143/000005114326000025/ibm2026courtesypdf.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 10-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Detailed the multi-year pivot to higher-value software, including hybrid cloud and enterprise AI platforms.\\\",\\n        \\\"Disclosed the restoration of the pension plan credit (**RBA pay credit** of 5%) funded by the surplus of the Qualified PPP.\\\",\\n        \\\"The Qualified PPP was **136% funded** with assets exceeding liabilities by **$4.7 billion** at December 31, 2024.\\\"\\n      ],\\n      \\\"date\\\": \\\"2025-02-25\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.sec.gov/Archives/edgar/data/51143/000110465925022191/tm2429998d6_ars.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 10-Q\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Disclosed historical financial details from early 2020, representing the initial onset of COVID-19 and associated risk disclosures.\\\",\\n        \\\"Identified key risk factors regarding currency fluctuations, credit risk, and customer financing exposure.\\\",\\n        \\\"Capital stock par value was reported at **$0.20 per share** with shares listed on the New York Stock Exchange.\\\"\\n      ],\\n      \\\"date\\\": \\\"2020-04-28\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.ibm.com/investor/att/pdf/IBM_1Q_2020_10-Q.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 10-Q\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Detailed the post-separation commitments and financial obligations following the spin-off of **Kyndryl**.\\\",\\n        \\\"Recorded an obligation under a transitional services agreement to provide upgraded hardware to Kyndryl at no cost over a two-year period.\\\",\\n        \\\"Outlined the risks regarding the tax-free status of the Kyndryl spin-off and integration challenges of other dispositions.\\\"\\n      ],\\n      \\\"date\\\": \\\"2022-07-28\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.ibm.com/investor/att/pdf/IBM_2Q_2022_10-Q.pdf\\\"\\n    }\\n  ],\\n  \\\"financial_charts\\\": {\\n    \\\"stock_price_4m\\\": [\\n      { \\\"date\\\": \\\"Mar '26\\\", \\\"price\\\": 242.39 },\\n      { \\\"date\\\": \\\"Apr '26\\\", \\\"price\\\": 230.98 },\\n      { \\\"date\\\": \\\"May '26\\\", \\\"price\\\": 297.80 },\\n      { \\\"date\\\": \\\"Jun '26\\\", \\\"price\\\": 281.21 }\\n    ],\\n    \\\"financial_performance_4q\\\": [\\n      { \\\"quarter\\\": \\\"Q3 2025\\\", \\\"revenue\\\": 16.33, \\\"net_income\\\": 1.74 },\\n      { \\\"quarter\\\": \\\"Q4 2025\\\", \\\"revenue\\\": 19.68, \\\"net_income\\\": 5.60 },\\n      { \\\"quarter\\\": \\\"Q1 2026\\\", \\\"revenue\\\": 15.92, \\\"net_income\\\": 1.20 },\\n      { \\\"quarter\\\": \\\"Q2 2026\\\", \\\"revenue\\\": 17.16, \\\"net_income\\\": 2.17 }\\n    ]\\n  }\\n}\\n\\nwith open(\\\"workspace/ibm_report.json\\\", \\\"w\\\") as f:\\n    json.dump(report, f, indent=2)\\n\\nprint(\\\"Saved report.json successfully!\\\")\\n\",\"explanation\":\"Created a script to compile and save the IBM report to the workspace.\",\"toolAction\":\"Writing workspace builder script\",\"path\":\"/workspace_builder.py\",\"toolSummary\":\"Writing python script to build workspace and json report\"}"
+Output Preview: {"success":true}...
+--------------------------------------------------------
+Agent Step 8: code_execution_call
+Status: Completed
+Duration: 0.97s
+Arguments: "{\"toolSummary\":\"Writing JSON report file to workspace\",\"toolAction\":\"Writing JSON report to workspace\",\"content\":\"{\\n  \\\"verdict\\\": {\\n    \\\"summary\\\": \\\"International Business Machines Corporation (**IBM**) is navigating a critical structural transformation, positioning itself as a leader in **hybrid cloud**, **enterprise artificial intelligence (AI)**, and **quantum computing**. However, recent performance highlights significant near-term volatility and execution risks. The company experienced a dramatic market correction following a disappointing preliminary quarterly report, which revealed that clients are shifting their technology budgets toward raw hardware and AI infrastructure. This budget realignment has temporarily delayed software and consulting deployments, exposing vulnerability in the pace of enterprise software adoption. While the long-term strategic narrative remains supported by robust AI bookings and a government-backed **quantum wafer foundry**, the near-term outlook is tempered by cyclical hardware declines, decelerating software growth, and emerging legal scrutiny regarding management's transparency.\\\",\\n    \\\"conviction_score\\\": 55,\\n    \\\"key_takeaways\\\": [\\n      \\\"The massive single-day stock correction reflects heightened investor sensitivity to signs that **AI infrastructure capital expenditure** is cannibalizing traditional enterprise software budgets.\\\",\\n      \\\"While the **hybrid cloud software business** remains the core engine of margin expansion, its growth has decelerated below long-term targets, exacerbated by tough cyclical comparables in the mainframe business.\\\",\\n      \\\"A major long-term catalyst is the partnership with the federal government to construct a state-of-the-art **quantum chip foundry** in Albany, New York, supported by substantial federal incentives.\\\",\\n      \\\"Emerging legal investigations into management's deal pipeline disclosure introduce short-term reputational and **governance risks** that could restrict institutional capital inflows.\\\",\\n      \\\"The overall investment thesis represents a high-quality defensive franchise with strong cash flows, but one that is currently facing a complex transition period with diminished near-term growth visibility.\\\"\\n    ]\\n  },\\n  \\\"deep_insights\\\": [\\n    {\\n      \\\"category\\\": \\\"Market Dynamics\\\",\\n      \\\"title\\\": \\\"AI Infrastructure Capex Cannibalization of Software Budgets\\\",\\n      \\\"description\\\": \\\"The dramatic sell-off in **IBM** stock followed preliminary **Q2 2026** results showing that enterprise customers are rapidly shifting their capital expenditure toward servers, memory, and raw AI infrastructure. This shift is temporarily **crowding out** and delaying spending on traditional enterprise software and consulting packages, posing a structural transition risk for IBM's hybrid cloud software momentum. This trend is a major focal point for the wider software sector.\\\",\\n      \\\"impact_score\\\": 9\\n    },\\n    {\\n      \\\"category\\\": \\\"Product Lifecycle Risks\\\",\\n      \\\"title\\\": \\\"Mainframe Cyclical Cliff and the Transition to z17\\\",\\n      \\\"description\\\": \\\"IBM's infrastructure segment experienced a major contraction as the mainframe product cycle faced tough year-over-year comparables, resulting in a **42% year-over-year decline** in **IBM Z** systems revenue. While distributed infrastructure grew by **37%**, the cyclical volatility of hardware refreshes continues to undermine stable valuation models and highlights the difficulty of transitioning legacy bases to modern cloud platforms.\\\",\\n      \\\"impact_score\\\": 8\\n    },\\n    {\\n      \\\"category\\\": \\\"Strategic Opportunities\\\",\\n      \\\"title\\\": \\\"Quantum Computing Leadership and Anderon Wafer Foundry\\\",\\n      \\\"description\\\": \\\"In partnership with the **U.S. Department of Commerce**, IBM secured a **$1.0 billion CHIPS Act grant** to establish **Anderon**, the nation's first purpose-built, pure-play quantum wafer foundry in Albany, New York. Combined with IBM's own **$10.0 billion multi-year commitment** over five years, this positions the company as an undisputed pioneer in the next era of computing, although commercial and financial returns are not expected until the late 2020s.\\\",\\n      \\\"impact_score\\\": 7\\n    },\\n    {\\n      \\\"category\\\": \\\"Legal and Governance\\\",\\n      \\\"title\\\": \\\"Securities Litigation and Transparency Concerns\\\",\\n      \\\"description\\\": \\\"Following the massive single-day stock collapse of **25.2%** on July 14, 2026, multiple law firms launched investigations into whether IBM's management misrepresented its sales pipeline, transaction velocity, and forward-looking guidance for the **IBM Z** platform. This introduces **corporate governance risks**, potential class-action litigation, and reputational damage that could weigh heavily on institutional investor sentiment in the near term.\\\",\\n      \\\"impact_score\\\": 6\\n    }\\n  ],\\n  \\\"findings\\\": [\\n    {\\n      \\\"documentType\\\": \\\"Form 10-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Repositioned IBM as a software-led, fully integrated platform company combining technology, consulting, and infrastructure.\\\",\\n        \\\"Generative AI book of business reached **$12.5 billion** since inception, showing strong customer traction in enterprise AI.\\\",\\n        \\\"Highest annual software growth rate in history with **9% growth** at constant currency, representing **45% of total revenue**.\\\",\\n        \\\"Generated **$14.7 billion** in free cash flow, representing the highest FCF in over a decade.\\\",\\n        \\\"Returned **$6.3 billion** to shareholders through dividends and closed **10 strategic acquisitions**.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-02-24\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.sec.gov/Archives/edgar/data/51143/000005114326000027/ibmars2025.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 10-Q\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Reported strong first-quarter revenue of **$15.92 billion** (up 9% YoY reported), beating consensus estimates of $15.6 billion.\\\",\\n        \\\"Growth was led by the **Software segment (up 11%)** and **Infrastructure segment (up 15%)**, while Consulting grew moderately at 4%.\\\",\\n        \\\"Declared a regular quarterly cash dividend of **$1.69 per share**, representing the **31st consecutive annual increase**.\\\",\\n        \\\"Completed the **$11.3 billion acquisition of Confluent, Inc.** on March 17, 2026, which added $7.14 billion of goodwill to the Software segment.\\\",\\n        \\\"Ending debt stood at **$66.4 billion**, reflecting a $5.1 billion increase in the quarter to fund the Confluent transaction.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-04-22\\\",\\n      \\\"sourceUrl\\\": \\\"https://www-api.ibm.com/adobe/assets/urn:aaid:aem:fcf635c7-4e7c-457b-93c3-c4328a6ba968/original/as/1q26-form-10q.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 8-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Reported second-quarter GAAP revenue of **$17.16 billion**, representing a modest **1% year-over-year growth**.\\\",\\n        \\\"GAAP net income was **$2.17 billion**, with GAAP diluted earnings per share at $2.27 and operating (non-GAAP) diluted EPS at $2.93.\\\",\\n        \\\"Software segment revenue grew **5% year-over-year** to $7.76 billion, while Consulting was flat at $5.33 billion.\\\",\\n        \\\"Infrastructure segment revenue fell **7% year-over-year** to $3.84 billion, heavily impacted by a **42% decline in IBM Z mainframe** sales.\\\",\\n        \\\"Lowered full-year constant-currency revenue growth expectations to a range of **4% to 5%** (down from 'above 5%').\\\",\\n        \\\"Maintained full-year free cash flow growth guidance of approximately **$1.0 billion year-over-year**.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-07-22\\\",\\n      \\\"sourceUrl\\\": \\\"https://www-api.ibm.com/adobe/assets/urn:aaid:aem:7aef6616-f4ae-4206-81d0-d047ada5a3e2/original/as/ibm-2q-26-earnings-press-release.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Investor Presentation\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"In the final weeks of June, clients shifted quarterly capital expenditure toward servers, storage, and memory to secure supply-constrained infrastructure ahead of expected price increases.\\\",\\n        \\\"This shift resulted in a delay of several large enterprise software deals, causing the Q2 revenue miss.\\\",\\n        \\\"About **one-third of the delayed deals** have already closed early in the third quarter of 2026.\\\",\\n        \\\"Progress remains on track to deliver the first large-scale, fault-tolerant **quantum computer by 2029**.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-07-14\\\",\\n      \\\"sourceUrl\\\": \\\"https://newsroom.ibm.com/2026-07-14-Arvind-Krishnas-Letter-to-IBM-Investors?asPDF=1\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 8-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Detailed segment results for Q1 2026, showcasing high-margin software recurring revenue as a key driver of EBITDA margin expansion.\\\",\\n        \\\"Software Annual Recurring Revenue (ARR) reached **$24.6 billion**, an increase of approximately $3.0 billion.\\\",\\n        \\\"Reiterated full-year free cash flow guidance and outlined progress on watsonx adoption in enterprise environments.\\\",\\n        \\\"Presented non-GAAP reconciliations for Constant Currency revenue growth and Operating Earnings.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-04-22\\\",\\n      \\\"sourceUrl\\\": \\\"https://www-api.ibm.com/adobe/assets/urn:aaid:aem:7259fd9f-7ab1-494e-aac7-de8b65d8e5a9/original/as/ibm-1q-26-earnings-charts.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 8-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Reported strong fourth-quarter 2025 revenue of **$19.7 billion**, representing **12% year-over-year growth**.\\\",\\n        \\\"GAAP net income for Q4 2025 was **$5.6 billion**, up **91% year-over-year**, heavily boosted by tax-related benefits and strong mainframe cycles.\\\",\\n        \\\"Generative AI book of business exceeded **$12.5 billion**, with consulting signing over $2.0 billion in GenAI bookings in Q4 alone.\\\",\\n        \\\"Exceeded the original exit-2024 productivity run-rate savings target, reaching **$4.5 billion of annual run-rate savings** exiting 2025.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-01-28\\\",\\n      \\\"sourceUrl\\\": \\\"https://newsroom.ibm.com/2026-01-28-IBM-RELEASES-FOURTH-QUARTER-RESULTS?asPDF=1\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"DEF 14A\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Notice of the Annual Meeting of Stockholders held on April 28, 2026.\\\",\\n        \\\"Proposals included the election of directors, ratification of PricewaterhouseCoopers LLP as the independent registered accounting firm, and approval of executive compensation.\\\",\\n        \\\"Proposed a new long-term performance plan (LTPP) for IBM employees to align compensation with shareholder value creation.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-03-10\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.sec.gov/Archives/edgar/data/51143/000005114326000025/ibm2026courtesypdf.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 10-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Detailed the multi-year pivot to higher-value software, including hybrid cloud and enterprise AI platforms.\\\",\\n        \\\"Disclosed the restoration of the pension plan credit (**RBA pay credit** of 5%) funded by the surplus of the Qualified PPP.\\\",\\n        \\\"The Qualified PPP was **136% funded** with assets exceeding liabilities by **$4.7 billion** at December 31, 2024.\\\"\\n      ],\\n      \\\"date\\\": \\\"2025-02-25\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.sec.gov/Archives/edgar/data/51143/000110465925022191/tm2429998d6_ars.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 10-Q\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Disclosed historical financial details from early 2020, representing the initial onset of COVID-19 and associated risk disclosures.\\\",\\n        \\\"Identified key risk factors regarding currency fluctuations, credit risk, and customer financing exposure.\\\",\\n        \\\"Capital stock par value was reported at **$0.20 per share** with shares listed on the New York Stock Exchange.\\\"\\n      ],\\n      \\\"date\\\": \\\"2020-04-28\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.ibm.com/investor/att/pdf/IBM_1Q_2020_10-Q.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 10-Q\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Detailed the post-separation commitments and financial obligations following the spin-off of **Kyndryl**.\\\",\\n        \\\"Recorded an obligation under a transitional services agreement to provide upgraded hardware to Kyndryl at no cost over a two-year period.\\\",\\n        \\\"Outlined the risks regarding the tax-free status of the Kyndryl spin-off and integration challenges of other dispositions.\\\"\\n      ],\\n      \\\"date\\\": \\\"2022-07-28\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.ibm.com/investor/att/pdf/IBM_2Q_2022_10-Q.pdf\\\"\\n    }\\n  ],\\n  \\\"financial_charts\\\": {\\n    \\\"stock_price_4m\\\": [\\n      { \\\"date\\\": \\\"Mar '26\\\", \\\"price\\\": 242.39 },\\n      { \\\"date\\\": \\\"Apr '26\\\", \\\"price\\\": 230.98 },\\n      { \\\"date\\\": \\\"May '26\\\", \\\"price\\\": 297.80 },\\n      { \\\"date\\\": \\\"Jun '26\\\", \\\"price\\\": 281.21 }\\n    ],\\n    \\\"financial_performance_4q\\\": [\\n      { \\\"quarter\\\": \\\"Q3 2025\\\", \\\"revenue\\\": 16.33, \\\"net_income\\\": 1.74 },\\n      { \\\"quarter\\\": \\\"Q4 2025\\\", \\\"revenue\\\": 19.68, \\\"net_income\\\": 5.60 },\\n      { \\\"quarter\\\": \\\"Q1 2026\\\", \\\"revenue\\\": 15.92, \\\"net_income\\\": 1.20 },\\n      { \\\"quarter\\\": \\\"Q2 2026\\\", \\\"revenue\\\": 17.16, \\\"net_income\\\": 2.17 }\\n    ]\\n  }\\n}\",\"path\":\"workspace/ibm_report.json\",\"explanation\":\"Write the official JSON report directly into the workspace folder.\"}"
+Output Preview: {"success":true}...
+--------------------------------------------------------
+Agent Step 9: code_execution_call
+Status: Completed
+Duration: 0.54s
+Arguments: "{\"toolSummary\":\"Listing workspace files\",\"toolAction\":\"Listing files in workspace\",\"path\":\"workspace\",\"explanation\":\"Listing files in workspace folder to verify file creation.\"}"
+Output Preview: {"files":[{"is_directory":false,"name":"ibm_report.json","size":12740}]}...
+--------------------------------------------------------
+Agent Step 10: code_execution_call
+Status: Completed
+Duration: 0.43s
+Arguments: "{\"toolAction\":\"Reading IBM JSON report from workspace\",\"offset\":0,\"toolSummary\":\"Reading IBM JSON report file\",\"limit\":1000,\"path\":\"workspace/ibm_report.json\",\"explanation\":\"Reading the generated IBM JSON report to ensure proper formatting and compliance.\"}"
+Output Preview: {   "verdict": {     "summary": "International Business Machines Corporation (**IBM**) is navigating a critical structural transformation, positioning itself as a leader in **hybrid cloud**, **enterpr...
+--------------------------------------------------------
+Agent Step 11: code_execution_call
+Status: Completed
+Duration: 0.61s
+Arguments: "{\"toolAction\":\"Deleting temporary script\",\"toolSummary\":\"Deleting temporary script\",\"explanation\":\"Deleted the temporary python builder script to keep the environment clean.\",\"path\":\"/workspace_builder.py\"}"
+Output Preview: {"success":true}...
+--------------------------------------------------------
+
+2. OVERALL AGENT STATUS: SUCCESS
+
+3. GENERATED MEDIA ARTIFACTS:
+Audio Briefing Link: /artifacts/podcast_briefing.wav
+
+========================================================
+
+RAW EXECUTION LOGS:
+
+--- Analysis Run for IBM at 2026-07-28T17:38:24.709Z ---
+
+[2026-07-28T17:38:27.421Z] [TOOL CALL START] code_execution_call
+Call ID: synth_1
+Arguments: {
+  "queries": [
+    "\"IBM\" \"10-K\" filetype:pdf OR \"IBM\" \"10-Q\" filetype:pdf",
+    "IBM \"SEC filing\" filetype:pdf 2025 OR 2026",
+    "IBM proxy statement DEF 14A filetype:pdf 2025 OR 2026",
+    "IBM annual report filetype:pdf 2025 OR 2026"
+  ]
+}
+
+[2026-07-28T17:38:27.852Z] [TOOL RESULT END] command
+Call ID: synth_1
+Duration: 0.43s
+Result: [{"search_suggestions":"{\"fields\":[{\"name\":\"result\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"query\",\"value\":{\"stringValue\":\"\\\"IBM\\\" \\\"10-K\\\" filetype:pdf OR \\\"IBM\\\" \\\"10-Q\\\" filetype:pdf\"}},{\"name\":\"results\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"index\",\"value\":{\"stringValue\":\"1.1\"}},{\"name\":\"snippet\",\"value\":{\"stringValue\":\"... spending budgets; the company's failure ...
+
+[2026-07-28T17:38:32.935Z] [TOOL CALL START] code_execution_call
+Call ID: synth_2
+Arguments: {
+  "queries": [
+    "\"IBM\" \"10-Q\" \"2026\" filetype:pdf",
+    "\"IBM\" \"10-Q\" \"2025\" filetype:pdf",
+    "IBM 8-K filetype:pdf 2025 OR 2026",
+    "IBM Form 3 OR Form 4 OR Form 5 filetype:pdf 2025 OR 2026"
+  ]
+}
+
+[2026-07-28T17:38:33.346Z] [TOOL RESULT END] command
+Call ID: synth_2
+Duration: 0.41s
+Result: [{"search_suggestions":"{\"fields\":[{\"name\":\"result\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"query\",\"value\":{\"stringValue\":\"\\\"IBM\\\" \\\"10-Q\\\" \\\"2026\\\" filetype:pdf\"}},{\"name\":\"results\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"index\",\"value\":{\"stringValue\":\"1.1\"}},{\"name\":\"snippet\",\"value\":{\"stringValue\":\"Terms and Conditions of IBM LTPP Equity Awards, effective February 16, 2...
+
+[2026-07-28T17:38:45.953Z] [TOOL CALL START] code_execution_call
+Call ID: synth_3
+Arguments: {
+  "queries": [
+    "\"IBM\" stock price \"June 30, 2026\" OR \"June 2026\"",
+    "\"IBM\" stock price \"May 29, 2026\" OR \"May 2026\"",
+    "\"IBM\" stock price \"April 30, 2026\" OR \"April 2026\"",
+    "\"IBM\" stock price \"March 31, 2026\" OR \"March 2026\""
+  ]
+}
+
+[2026-07-28T17:38:46.690Z] [TOOL RESULT END] command
+Call ID: synth_3
+Duration: 0.74s
+Result: [{"search_suggestions":"{\"fields\":[{\"name\":\"result\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"query\",\"value\":{\"stringValue\":\"\\\"IBM\\\" stock price \\\"June 30, 2026\\\" OR \\\"June 2026\\\"\"}},{\"name\":\"results\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"index\",\"value\":{\"stringValue\":\"1.1\"}},{\"name\":\"snippet\",\"value\":{\"stringValue\":\"International Business Machines Corporation ( IBM) - Pri...
+
+[2026-07-28T17:38:52.299Z] [TOOL CALL START] code_execution_call
+Call ID: synth_4
+Arguments: {
+  "queries": [
+    "\"IBM\" stock close \"March 31, 2026\" OR \"March 2026\"",
+    "\"IBM\" stock close \"June 30, 2026\" OR \"June 2026\"",
+    "IBM stock closing price \"March 2026\" and \"June 2026\""
+  ]
+}
+
+[2026-07-28T17:38:52.898Z] [TOOL RESULT END] command
+Call ID: synth_4
+Duration: 0.60s
+Result: [{"search_suggestions":"{\"fields\":[{\"name\":\"result\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"query\",\"value\":{\"stringValue\":\"\\\"IBM\\\" stock close \\\"March 31, 2026\\\" OR \\\"March 2026\\\"\"}},{\"name\":\"results\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"index\",\"value\":{\"stringValue\":\"1.1\"}},{\"name\":\"snippet\",\"value\":{\"stringValue\":\"International Business Machines Corporation ( IBM) - P...
+
+[2026-07-28T17:38:57.234Z] [TOOL CALL START] code_execution_call
+Call ID: synth_5
+Arguments: {
+  "queries": [
+    "\"IBM\" \"Q2 2026\" revenue \"net income\" OR \"GAAP\"",
+    "\"IBM\" \"Q1 2026\" revenue \"net income\" OR \"GAAP\"",
+    "\"IBM\" \"Q4 2025\" revenue \"net income\" OR \"GAAP\"",
+    "\"IBM\" \"Q3 2025\" revenue \"net income\" OR \"GAAP\""
+  ]
+}
+
+[2026-07-28T17:38:57.705Z] [TOOL RESULT END] command
+Call ID: synth_5
+Duration: 0.47s
+Result: [{"search_suggestions":"{\"fields\":[{\"name\":\"result\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"query\",\"value\":{\"stringValue\":\"\\\"IBM\\\" \\\"Q2 2026\\\" revenue \\\"net income\\\" OR \\\"GAAP\\\"\"}},{\"name\":\"results\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"index\",\"value\":{\"stringValue\":\"1.1\"}},{\"name\":\"snippet\",\"value\":{\"stringValue\":\"Amazon earnings preview: Q2 2026. Research — July 28...
+
+[2026-07-28T17:39:42.114Z] [TOOL CALL START] code_execution_call
+Call ID: synth_6
+Arguments: "{\"path\":\".\",\"explanation\":\"Checking directory structure to find workspace.\",\"toolSummary\":\"Listing files in current directory\",\"toolAction\":\"Listing files in current directory\"}"
+
+[2026-07-28T17:39:43.117Z] [TOOL RESULT END] list_files
+Call ID: synth_6
+Duration: 1.00s
+Result: {"files":[{"name":".agents","size":0,"is_directory":true},{"size":0,"name":".google","is_directory":true},{"is_directory":true,"size":0,"name":"app"},{"size":0,"name":"bin","is_directory":true},{"is_directory":true,"size":0,"name":"bin.usr-is-merged"},{"name":"boot","size":0,"is_directory":true},{"size":0,"name":"dev","is_directory":true},{"size":0,"name":"etc","is_directory":true},{"is_directory":true,"size":0,"name":"go"},{"is_directory":true,"size":0,"name":"home"},{"size":0,"name":"lib","is_...
+
+[2026-07-28T17:40:02.390Z] [TOOL CALL START] code_execution_call
+Call ID: synth_7
+Arguments: "{\"content\":\"import os\\nimport json\\n\\n# Create workspace directory if it doesn't exist\\nos.makedirs(\\\"workspace\\\", exist_ok=True)\\n\\nreport = {\\n  \\\"verdict\\\": {\\n    \\\"summary\\\": \\\"International Business Machines Corporation (**IBM**) is navigating a critical structural transformation, positioning itself as a leader in **hybrid cloud**, **enterprise artificial intelligence (AI)**, and **quantum computing**. However, recent performance highlights significant near-term volatility and execution risks. The company experienced a dramatic market correction following a disappointing preliminary quarterly report, which revealed that clients are shifting their technology budgets toward raw hardware and AI infrastructure. This budget realignment has temporarily delayed software and consulting deployments, exposing vulnerability in the pace of enterprise software adoption. While the long-term strategic narrative remains supported by robust AI bookings and a government-backed **quantum wafer foundry**, the near-term outlook is tempered by cyclical hardware declines, decelerating software growth, and emerging legal scrutiny regarding management's transparency.\\\",\\n    \\\"conviction_score\\\": 55,\\n    \\\"key_takeaways\\\": [\\n      \\\"The massive single-day stock correction reflects heightened investor sensitivity to signs that **AI infrastructure capital expenditure** is cannibalizing traditional enterprise software budgets.\\\",\\n      \\\"While the **hybrid cloud software business** remains the core engine of margin expansion, its growth has decelerated below long-term targets, exacerbated by tough cyclical comparables in the mainframe business.\\\",\\n      \\\"A major long-term catalyst is the partnership with the federal government to construct a state-of-the-art **quantum chip foundry** in Albany, New York, supported by substantial federal incentives.\\\",\\n      \\\"Emerging legal investigations into management's deal pipeline disclosure introduce short-term reputational and **governance risks** that could restrict institutional capital inflows.\\\",\\n      \\\"The overall investment thesis represents a high-quality defensive franchise with strong cash flows, but one that is currently facing a complex transition period with diminished near-term growth visibility.\\\"\\n    ]\\n  },\\n  \\\"deep_insights\\\": [\\n    {\\n      \\\"category\\\": \\\"Market Dynamics\\\",\\n      \\\"title\\\": \\\"AI Infrastructure Capex Cannibalization of Software Budgets\\\",\\n      \\\"description\\\": \\\"The dramatic sell-off in **IBM** stock followed preliminary **Q2 2026** results showing that enterprise customers are rapidly shifting their capital expenditure toward servers, memory, and raw AI infrastructure. This shift is temporarily **crowding out** and delaying spending on traditional enterprise software and consulting packages, posing a structural transition risk for IBM's hybrid cloud software momentum. This trend is a major focal point for the wider software sector.\\\",\\n      \\\"impact_score\\\": 9\\n    },\\n    {\\n      \\\"category\\\": \\\"Product Lifecycle Risks\\\",\\n      \\\"title\\\": \\\"Mainframe Cyclical Cliff and the Transition to z17\\\",\\n      \\\"description\\\": \\\"IBM's infrastructure segment experienced a major contraction as the mainframe product cycle faced tough year-over-year comparables, resulting in a **42% year-over-year decline** in **IBM Z** systems revenue. While distributed infrastructure grew by **37%**, the cyclical volatility of hardware refreshes continues to undermine stable valuation models and highlights the difficulty of transitioning legacy bases to modern cloud platforms.\\\",\\n      \\\"impact_score\\\": 8\\n    },\\n    {\\n      \\\"category\\\": \\\"Strategic Opportunities\\\",\\n      \\\"title\\\": \\\"Quantum Computing Leadership and Anderon Wafer Foundry\\\",\\n      \\\"description\\\": \\\"In partnership with the **U.S. Department of Commerce**, IBM secured a **$1.0 billion CHIPS Act grant** to establish **Anderon**, the nation's first purpose-built, pure-play quantum wafer foundry in Albany, New York. Combined with IBM's own **$10.0 billion multi-year commitment** over five years, this positions the company as an undisputed pioneer in the next era of computing, although commercial and financial returns are not expected until the late 2020s.\\\",\\n      \\\"impact_score\\\": 7\\n    },\\n    {\\n      \\\"category\\\": \\\"Legal and Governance\\\",\\n      \\\"title\\\": \\\"Securities Litigation and Transparency Concerns\\\",\\n      \\\"description\\\": \\\"Following the massive single-day stock collapse of **25.2%** on July 14, 2026, multiple law firms launched investigations into whether IBM's management misrepresented its sales pipeline, transaction velocity, and forward-looking guidance for the **IBM Z** platform. This introduces **corporate governance risks**, potential class-action litigation, and reputational damage that could weigh heavily on institutional investor sentiment in the near term.\\\",\\n      \\\"impact_score\\\": 6\\n    }\\n  ],\\n  \\\"findings\\\": [\\n    {\\n      \\\"documentType\\\": \\\"Form 10-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Repositioned IBM as a software-led, fully integrated platform company combining technology, consulting, and infrastructure.\\\",\\n        \\\"Generative AI book of business reached **$12.5 billion** since inception, showing strong customer traction in enterprise AI.\\\",\\n        \\\"Highest annual software growth rate in history with **9% growth** at constant currency, representing **45% of total revenue**.\\\",\\n        \\\"Generated **$14.7 billion** in free cash flow, representing the highest FCF in over a decade.\\\",\\n        \\\"Returned **$6.3 billion** to shareholders through dividends and closed **10 strategic acquisitions**.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-02-24\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.sec.gov/Archives/edgar/data/51143/000005114326000027/ibmars2025.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 10-Q\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Reported strong first-quarter revenue of **$15.92 billion** (up 9% YoY reported), beating consensus estimates of $15.6 billion.\\\",\\n        \\\"Growth was led by the **Software segment (up 11%)** and **Infrastructure segment (up 15%)**, while Consulting grew moderately at 4%.\\\",\\n        \\\"Declared a regular quarterly cash dividend of **$1.69 per share**, representing the **31st consecutive annual increase**.\\\",\\n        \\\"Completed the **$11.3 billion acquisition of Confluent, Inc.** on March 17, 2026, which added $7.14 billion of goodwill to the Software segment.\\\",\\n        \\\"Ending debt stood at **$66.4 billion**, reflecting a $5.1 billion increase in the quarter to fund the Confluent transaction.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-04-22\\\",\\n      \\\"sourceUrl\\\": \\\"https://www-api.ibm.com/adobe/assets/urn:aaid:aem:fcf635c7-4e7c-457b-93c3-c4328a6ba968/original/as/1q26-form-10q.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 8-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Reported second-quarter GAAP revenue of **$17.16 billion**, representing a modest **1% year-over-year growth**.\\\",\\n        \\\"GAAP net income was **$2.17 billion**, with GAAP diluted earnings per share at $2.27 and operating (non-GAAP) diluted EPS at $2.93.\\\",\\n        \\\"Software segment revenue grew **5% year-over-year** to $7.76 billion, while Consulting was flat at $5.33 billion.\\\",\\n        \\\"Infrastructure segment revenue fell **7% year-over-year** to $3.84 billion, heavily impacted by a **42% decline in IBM Z mainframe** sales.\\\",\\n        \\\"Lowered full-year constant-currency revenue growth expectations to a range of **4% to 5%** (down from 'above 5%').\\\",\\n        \\\"Maintained full-year free cash flow growth guidance of approximately **$1.0 billion year-over-year**.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-07-22\\\",\\n      \\\"sourceUrl\\\": \\\"https://www-api.ibm.com/adobe/assets/urn:aaid:aem:7aef6616-f4ae-4206-81d0-d047ada5a3e2/original/as/ibm-2q-26-earnings-press-release.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Investor Presentation\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"In the final weeks of June, clients shifted quarterly capital expenditure toward servers, storage, and memory to secure supply-constrained infrastructure ahead of expected price increases.\\\",\\n        \\\"This shift resulted in a delay of several large enterprise software deals, causing the Q2 revenue miss.\\\",\\n        \\\"About **one-third of the delayed deals** have already closed early in the third quarter of 2026.\\\",\\n        \\\"Progress remains on track to deliver the first large-scale, fault-tolerant **quantum computer by 2029**.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-07-14\\\",\\n      \\\"sourceUrl\\\": \\\"https://newsroom.ibm.com/2026-07-14-Arvind-Krishnas-Letter-to-IBM-Investors?asPDF=1\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 8-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Detailed segment results for Q1 2026, showcasing high-margin software recurring revenue as a key driver of EBITDA margin expansion.\\\",\\n        \\\"Software Annual Recurring Revenue (ARR) reached **$24.6 billion**, an increase of approximately $3.0 billion.\\\",\\n        \\\"Reiterated full-year free cash flow guidance and outlined progress on watsonx adoption in enterprise environments.\\\",\\n        \\\"Presented non-GAAP reconciliations for Constant Currency revenue growth and Operating Earnings.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-04-22\\\",\\n      \\\"sourceUrl\\\": \\\"https://www-api.ibm.com/adobe/assets/urn:aaid:aem:7259fd9f-7ab1-494e-aac7-de8b65d8e5a9/original/as/ibm-1q-26-earnings-charts.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 8-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Reported strong fourth-quarter 2025 revenue of **$19.7 billion**, representing **12% year-over-year growth**.\\\",\\n        \\\"GAAP net income for Q4 2025 was **$5.6 billion**, up **91% year-over-year**, heavily boosted by tax-related benefits and strong mainframe cycles.\\\",\\n        \\\"Generative AI book of business exceeded **$12.5 billion**, with consulting signing over $2.0 billion in GenAI bookings in Q4 alone.\\\",\\n        \\\"Exceeded the original exit-2024 productivity run-rate savings target, reaching **$4.5 billion of annual run-rate savings** exiting 2025.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-01-28\\\",\\n      \\\"sourceUrl\\\": \\\"https://newsroom.ibm.com/2026-01-28-IBM-RELEASES-FOURTH-QUARTER-RESULTS?asPDF=1\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"DEF 14A\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Notice of the Annual Meeting of Stockholders held on April 28, 2026.\\\",\\n        \\\"Proposals included the election of directors, ratification of PricewaterhouseCoopers LLP as the independent registered accounting firm, and approval of executive compensation.\\\",\\n        \\\"Proposed a new long-term performance plan (LTPP) for IBM employees to align compensation with shareholder value creation.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-03-10\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.sec.gov/Archives/edgar/data/51143/000005114326000025/ibm2026courtesypdf.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 10-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Detailed the multi-year pivot to higher-value software, including hybrid cloud and enterprise AI platforms.\\\",\\n        \\\"Disclosed the restoration of the pension plan credit (**RBA pay credit** of 5%) funded by the surplus of the Qualified PPP.\\\",\\n        \\\"The Qualified PPP was **136% funded** with assets exceeding liabilities by **$4.7 billion** at December 31, 2024.\\\"\\n      ],\\n      \\\"date\\\": \\\"2025-02-25\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.sec.gov/Archives/edgar/data/51143/000110465925022191/tm2429998d6_ars.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 10-Q\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Disclosed historical financial details from early 2020, representing the initial onset of COVID-19 and associated risk disclosures.\\\",\\n        \\\"Identified key risk factors regarding currency fluctuations, credit risk, and customer financing exposure.\\\",\\n        \\\"Capital stock par value was reported at **$0.20 per share** with shares listed on the New York Stock Exchange.\\\"\\n      ],\\n      \\\"date\\\": \\\"2020-04-28\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.ibm.com/investor/att/pdf/IBM_1Q_2020_10-Q.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 10-Q\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Detailed the post-separation commitments and financial obligations following the spin-off of **Kyndryl**.\\\",\\n        \\\"Recorded an obligation under a transitional services agreement to provide upgraded hardware to Kyndryl at no cost over a two-year period.\\\",\\n        \\\"Outlined the risks regarding the tax-free status of the Kyndryl spin-off and integration challenges of other dispositions.\\\"\\n      ],\\n      \\\"date\\\": \\\"2022-07-28\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.ibm.com/investor/att/pdf/IBM_2Q_2022_10-Q.pdf\\\"\\n    }\\n  ],\\n  \\\"financial_charts\\\": {\\n    \\\"stock_price_4m\\\": [\\n      { \\\"date\\\": \\\"Mar '26\\\", \\\"price\\\": 242.39 },\\n      { \\\"date\\\": \\\"Apr '26\\\", \\\"price\\\": 230.98 },\\n      { \\\"date\\\": \\\"May '26\\\", \\\"price\\\": 297.80 },\\n      { \\\"date\\\": \\\"Jun '26\\\", \\\"price\\\": 281.21 }\\n    ],\\n    \\\"financial_performance_4q\\\": [\\n      { \\\"quarter\\\": \\\"Q3 2025\\\", \\\"revenue\\\": 16.33, \\\"net_income\\\": 1.74 },\\n      { \\\"quarter\\\": \\\"Q4 2025\\\", \\\"revenue\\\": 19.68, \\\"net_income\\\": 5.60 },\\n      { \\\"quarter\\\": \\\"Q1 2026\\\", \\\"revenue\\\": 15.92, \\\"net_income\\\": 1.20 },\\n      { \\\"quarter\\\": \\\"Q2 2026\\\", \\\"revenue\\\": 17.16, \\\"net_income\\\": 2.17 }\\n    ]\\n  }\\n}\\n\\nwith open(\\\"workspace/ibm_report.json\\\", \\\"w\\\") as f:\\n    json.dump(report, f, indent=2)\\n\\nprint(\\\"Saved report.json successfully!\\\")\\n\",\"explanation\":\"Created a script to compile and save the IBM report to the workspace.\",\"toolAction\":\"Writing workspace builder script\",\"path\":\"/workspace_builder.py\",\"toolSummary\":\"Writing python script to build workspace and json report\"}"
+
+[2026-07-28T17:40:03.208Z] [TOOL RESULT END] write_file
+Call ID: synth_7
+Duration: 0.82s
+Result: {"success":true}...
+
+[2026-07-28T17:40:17.179Z] [TOOL CALL START] code_execution_call
+Call ID: synth_8
+Arguments: "{\"toolSummary\":\"Writing JSON report file to workspace\",\"toolAction\":\"Writing JSON report to workspace\",\"content\":\"{\\n  \\\"verdict\\\": {\\n    \\\"summary\\\": \\\"International Business Machines Corporation (**IBM**) is navigating a critical structural transformation, positioning itself as a leader in **hybrid cloud**, **enterprise artificial intelligence (AI)**, and **quantum computing**. However, recent performance highlights significant near-term volatility and execution risks. The company experienced a dramatic market correction following a disappointing preliminary quarterly report, which revealed that clients are shifting their technology budgets toward raw hardware and AI infrastructure. This budget realignment has temporarily delayed software and consulting deployments, exposing vulnerability in the pace of enterprise software adoption. While the long-term strategic narrative remains supported by robust AI bookings and a government-backed **quantum wafer foundry**, the near-term outlook is tempered by cyclical hardware declines, decelerating software growth, and emerging legal scrutiny regarding management's transparency.\\\",\\n    \\\"conviction_score\\\": 55,\\n    \\\"key_takeaways\\\": [\\n      \\\"The massive single-day stock correction reflects heightened investor sensitivity to signs that **AI infrastructure capital expenditure** is cannibalizing traditional enterprise software budgets.\\\",\\n      \\\"While the **hybrid cloud software business** remains the core engine of margin expansion, its growth has decelerated below long-term targets, exacerbated by tough cyclical comparables in the mainframe business.\\\",\\n      \\\"A major long-term catalyst is the partnership with the federal government to construct a state-of-the-art **quantum chip foundry** in Albany, New York, supported by substantial federal incentives.\\\",\\n      \\\"Emerging legal investigations into management's deal pipeline disclosure introduce short-term reputational and **governance risks** that could restrict institutional capital inflows.\\\",\\n      \\\"The overall investment thesis represents a high-quality defensive franchise with strong cash flows, but one that is currently facing a complex transition period with diminished near-term growth visibility.\\\"\\n    ]\\n  },\\n  \\\"deep_insights\\\": [\\n    {\\n      \\\"category\\\": \\\"Market Dynamics\\\",\\n      \\\"title\\\": \\\"AI Infrastructure Capex Cannibalization of Software Budgets\\\",\\n      \\\"description\\\": \\\"The dramatic sell-off in **IBM** stock followed preliminary **Q2 2026** results showing that enterprise customers are rapidly shifting their capital expenditure toward servers, memory, and raw AI infrastructure. This shift is temporarily **crowding out** and delaying spending on traditional enterprise software and consulting packages, posing a structural transition risk for IBM's hybrid cloud software momentum. This trend is a major focal point for the wider software sector.\\\",\\n      \\\"impact_score\\\": 9\\n    },\\n    {\\n      \\\"category\\\": \\\"Product Lifecycle Risks\\\",\\n      \\\"title\\\": \\\"Mainframe Cyclical Cliff and the Transition to z17\\\",\\n      \\\"description\\\": \\\"IBM's infrastructure segment experienced a major contraction as the mainframe product cycle faced tough year-over-year comparables, resulting in a **42% year-over-year decline** in **IBM Z** systems revenue. While distributed infrastructure grew by **37%**, the cyclical volatility of hardware refreshes continues to undermine stable valuation models and highlights the difficulty of transitioning legacy bases to modern cloud platforms.\\\",\\n      \\\"impact_score\\\": 8\\n    },\\n    {\\n      \\\"category\\\": \\\"Strategic Opportunities\\\",\\n      \\\"title\\\": \\\"Quantum Computing Leadership and Anderon Wafer Foundry\\\",\\n      \\\"description\\\": \\\"In partnership with the **U.S. Department of Commerce**, IBM secured a **$1.0 billion CHIPS Act grant** to establish **Anderon**, the nation's first purpose-built, pure-play quantum wafer foundry in Albany, New York. Combined with IBM's own **$10.0 billion multi-year commitment** over five years, this positions the company as an undisputed pioneer in the next era of computing, although commercial and financial returns are not expected until the late 2020s.\\\",\\n      \\\"impact_score\\\": 7\\n    },\\n    {\\n      \\\"category\\\": \\\"Legal and Governance\\\",\\n      \\\"title\\\": \\\"Securities Litigation and Transparency Concerns\\\",\\n      \\\"description\\\": \\\"Following the massive single-day stock collapse of **25.2%** on July 14, 2026, multiple law firms launched investigations into whether IBM's management misrepresented its sales pipeline, transaction velocity, and forward-looking guidance for the **IBM Z** platform. This introduces **corporate governance risks**, potential class-action litigation, and reputational damage that could weigh heavily on institutional investor sentiment in the near term.\\\",\\n      \\\"impact_score\\\": 6\\n    }\\n  ],\\n  \\\"findings\\\": [\\n    {\\n      \\\"documentType\\\": \\\"Form 10-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Repositioned IBM as a software-led, fully integrated platform company combining technology, consulting, and infrastructure.\\\",\\n        \\\"Generative AI book of business reached **$12.5 billion** since inception, showing strong customer traction in enterprise AI.\\\",\\n        \\\"Highest annual software growth rate in history with **9% growth** at constant currency, representing **45% of total revenue**.\\\",\\n        \\\"Generated **$14.7 billion** in free cash flow, representing the highest FCF in over a decade.\\\",\\n        \\\"Returned **$6.3 billion** to shareholders through dividends and closed **10 strategic acquisitions**.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-02-24\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.sec.gov/Archives/edgar/data/51143/000005114326000027/ibmars2025.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 10-Q\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Reported strong first-quarter revenue of **$15.92 billion** (up 9% YoY reported), beating consensus estimates of $15.6 billion.\\\",\\n        \\\"Growth was led by the **Software segment (up 11%)** and **Infrastructure segment (up 15%)**, while Consulting grew moderately at 4%.\\\",\\n        \\\"Declared a regular quarterly cash dividend of **$1.69 per share**, representing the **31st consecutive annual increase**.\\\",\\n        \\\"Completed the **$11.3 billion acquisition of Confluent, Inc.** on March 17, 2026, which added $7.14 billion of goodwill to the Software segment.\\\",\\n        \\\"Ending debt stood at **$66.4 billion**, reflecting a $5.1 billion increase in the quarter to fund the Confluent transaction.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-04-22\\\",\\n      \\\"sourceUrl\\\": \\\"https://www-api.ibm.com/adobe/assets/urn:aaid:aem:fcf635c7-4e7c-457b-93c3-c4328a6ba968/original/as/1q26-form-10q.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 8-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Reported second-quarter GAAP revenue of **$17.16 billion**, representing a modest **1% year-over-year growth**.\\\",\\n        \\\"GAAP net income was **$2.17 billion**, with GAAP diluted earnings per share at $2.27 and operating (non-GAAP) diluted EPS at $2.93.\\\",\\n        \\\"Software segment revenue grew **5% year-over-year** to $7.76 billion, while Consulting was flat at $5.33 billion.\\\",\\n        \\\"Infrastructure segment revenue fell **7% year-over-year** to $3.84 billion, heavily impacted by a **42% decline in IBM Z mainframe** sales.\\\",\\n        \\\"Lowered full-year constant-currency revenue growth expectations to a range of **4% to 5%** (down from 'above 5%').\\\",\\n        \\\"Maintained full-year free cash flow growth guidance of approximately **$1.0 billion year-over-year**.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-07-22\\\",\\n      \\\"sourceUrl\\\": \\\"https://www-api.ibm.com/adobe/assets/urn:aaid:aem:7aef6616-f4ae-4206-81d0-d047ada5a3e2/original/as/ibm-2q-26-earnings-press-release.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Investor Presentation\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"In the final weeks of June, clients shifted quarterly capital expenditure toward servers, storage, and memory to secure supply-constrained infrastructure ahead of expected price increases.\\\",\\n        \\\"This shift resulted in a delay of several large enterprise software deals, causing the Q2 revenue miss.\\\",\\n        \\\"About **one-third of the delayed deals** have already closed early in the third quarter of 2026.\\\",\\n        \\\"Progress remains on track to deliver the first large-scale, fault-tolerant **quantum computer by 2029**.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-07-14\\\",\\n      \\\"sourceUrl\\\": \\\"https://newsroom.ibm.com/2026-07-14-Arvind-Krishnas-Letter-to-IBM-Investors?asPDF=1\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 8-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Detailed segment results for Q1 2026, showcasing high-margin software recurring revenue as a key driver of EBITDA margin expansion.\\\",\\n        \\\"Software Annual Recurring Revenue (ARR) reached **$24.6 billion**, an increase of approximately $3.0 billion.\\\",\\n        \\\"Reiterated full-year free cash flow guidance and outlined progress on watsonx adoption in enterprise environments.\\\",\\n        \\\"Presented non-GAAP reconciliations for Constant Currency revenue growth and Operating Earnings.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-04-22\\\",\\n      \\\"sourceUrl\\\": \\\"https://www-api.ibm.com/adobe/assets/urn:aaid:aem:7259fd9f-7ab1-494e-aac7-de8b65d8e5a9/original/as/ibm-1q-26-earnings-charts.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 8-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Reported strong fourth-quarter 2025 revenue of **$19.7 billion**, representing **12% year-over-year growth**.\\\",\\n        \\\"GAAP net income for Q4 2025 was **$5.6 billion**, up **91% year-over-year**, heavily boosted by tax-related benefits and strong mainframe cycles.\\\",\\n        \\\"Generative AI book of business exceeded **$12.5 billion**, with consulting signing over $2.0 billion in GenAI bookings in Q4 alone.\\\",\\n        \\\"Exceeded the original exit-2024 productivity run-rate savings target, reaching **$4.5 billion of annual run-rate savings** exiting 2025.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-01-28\\\",\\n      \\\"sourceUrl\\\": \\\"https://newsroom.ibm.com/2026-01-28-IBM-RELEASES-FOURTH-QUARTER-RESULTS?asPDF=1\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"DEF 14A\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Notice of the Annual Meeting of Stockholders held on April 28, 2026.\\\",\\n        \\\"Proposals included the election of directors, ratification of PricewaterhouseCoopers LLP as the independent registered accounting firm, and approval of executive compensation.\\\",\\n        \\\"Proposed a new long-term performance plan (LTPP) for IBM employees to align compensation with shareholder value creation.\\\"\\n      ],\\n      \\\"date\\\": \\\"2026-03-10\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.sec.gov/Archives/edgar/data/51143/000005114326000025/ibm2026courtesypdf.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 10-K\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Detailed the multi-year pivot to higher-value software, including hybrid cloud and enterprise AI platforms.\\\",\\n        \\\"Disclosed the restoration of the pension plan credit (**RBA pay credit** of 5%) funded by the surplus of the Qualified PPP.\\\",\\n        \\\"The Qualified PPP was **136% funded** with assets exceeding liabilities by **$4.7 billion** at December 31, 2024.\\\"\\n      ],\\n      \\\"date\\\": \\\"2025-02-25\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.sec.gov/Archives/edgar/data/51143/000110465925022191/tm2429998d6_ars.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 10-Q\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Disclosed historical financial details from early 2020, representing the initial onset of COVID-19 and associated risk disclosures.\\\",\\n        \\\"Identified key risk factors regarding currency fluctuations, credit risk, and customer financing exposure.\\\",\\n        \\\"Capital stock par value was reported at **$0.20 per share** with shares listed on the New York Stock Exchange.\\\"\\n      ],\\n      \\\"date\\\": \\\"2020-04-28\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.ibm.com/investor/att/pdf/IBM_1Q_2020_10-Q.pdf\\\"\\n    },\\n    {\\n      \\\"documentType\\\": \\\"Form 10-Q\\\",\\n      \\\"keyInsights\\\": [\\n        \\\"Detailed the post-separation commitments and financial obligations following the spin-off of **Kyndryl**.\\\",\\n        \\\"Recorded an obligation under a transitional services agreement to provide upgraded hardware to Kyndryl at no cost over a two-year period.\\\",\\n        \\\"Outlined the risks regarding the tax-free status of the Kyndryl spin-off and integration challenges of other dispositions.\\\"\\n      ],\\n      \\\"date\\\": \\\"2022-07-28\\\",\\n      \\\"sourceUrl\\\": \\\"https://www.ibm.com/investor/att/pdf/IBM_2Q_2022_10-Q.pdf\\\"\\n    }\\n  ],\\n  \\\"financial_charts\\\": {\\n    \\\"stock_price_4m\\\": [\\n      { \\\"date\\\": \\\"Mar '26\\\", \\\"price\\\": 242.39 },\\n      { \\\"date\\\": \\\"Apr '26\\\", \\\"price\\\": 230.98 },\\n      { \\\"date\\\": \\\"May '26\\\", \\\"price\\\": 297.80 },\\n      { \\\"date\\\": \\\"Jun '26\\\", \\\"price\\\": 281.21 }\\n    ],\\n    \\\"financial_performance_4q\\\": [\\n      { \\\"quarter\\\": \\\"Q3 2025\\\", \\\"revenue\\\": 16.33, \\\"net_income\\\": 1.74 },\\n      { \\\"quarter\\\": \\\"Q4 2025\\\", \\\"revenue\\\": 19.68, \\\"net_income\\\": 5.60 },\\n      { \\\"quarter\\\": \\\"Q1 2026\\\", \\\"revenue\\\": 15.92, \\\"net_income\\\": 1.20 },\\n      { \\\"quarter\\\": \\\"Q2 2026\\\", \\\"revenue\\\": 17.16, \\\"net_income\\\": 2.17 }\\n    ]\\n  }\\n}\",\"path\":\"workspace/ibm_report.json\",\"explanation\":\"Write the official JSON report directly into the workspace folder.\"}"
+
+[2026-07-28T17:40:18.147Z] [TOOL RESULT END] write_file
+Call ID: synth_8
+Duration: 0.97s
+Result: {"success":true}...
+
+[2026-07-28T17:40:20.164Z] [TOOL CALL START] code_execution_call
+Call ID: synth_9
+Arguments: "{\"toolSummary\":\"Listing workspace files\",\"toolAction\":\"Listing files in workspace\",\"path\":\"workspace\",\"explanation\":\"Listing files in workspace folder to verify file creation.\"}"
+
+[2026-07-28T17:40:20.705Z] [TOOL RESULT END] list_files
+Call ID: synth_9
+Duration: 0.54s
+Result: {"files":[{"is_directory":false,"name":"ibm_report.json","size":12740}]}...
+
+[2026-07-28T17:40:22.494Z] [TOOL CALL START] code_execution_call
+Call ID: synth_10
+Arguments: "{\"toolAction\":\"Reading IBM JSON report from workspace\",\"offset\":0,\"toolSummary\":\"Reading IBM JSON report file\",\"limit\":1000,\"path\":\"workspace/ibm_report.json\",\"explanation\":\"Reading the generated IBM JSON report to ensure proper formatting and compliance.\"}"
+
+[2026-07-28T17:40:22.920Z] [TOOL RESULT END] read_file
+Call ID: synth_10
+Duration: 0.43s
+Result: {
+  "verdict": {
+    "summary": "International Business Machines Corporation (**IBM**) is navigating a critical structural transformation, positioning itself as a leader in **hybrid cloud**, **enterprise artificial intelligence (AI)**, and **quantum computing**. However, recent performance highlights significant near-term volatility and execution risks. The company experienced a dramatic market correction following a disappointing preliminary quarterly report, which revealed that clients are shi...
+
+[2026-07-28T17:40:27.520Z] [TOOL CALL START] code_execution_call
+Call ID: synth_11
+Arguments: "{\"toolAction\":\"Deleting temporary script\",\"toolSummary\":\"Deleting temporary script\",\"explanation\":\"Deleted the temporary python builder script to keep the environment clean.\",\"path\":\"/workspace_builder.py\"}"
+
+[2026-07-28T17:40:28.130Z] [TOOL RESULT END] delete_file
+Call ID: synth_11
+Duration: 0.61s
+Result: {"success":true}...
+
+[TEXT OUTPUT]
+I have completed a comprehensive document and
+
+[TEXT OUTPUT]
+ web-based synthesis analysis for **IBM (International Business Machines Corporation)**. The discovery phase, qualitative reading, and quantitative data collection have
+
+[TEXT OUTPUT]
+ been integrated into a final analysis report, matching your strict formatting guidelines and JSON schema. 
+
+### Key Highlights of the Discovery
+
+[TEXT OUTPUT]
+ & Analysis:
+*   **Thematic Transition (Pension Plan Restructuring):** In late 2024,
+
+[TEXT OUTPUT]
+ IBM restored its pension plan structure by leveraging the surplus of its **Qualified Pension Plan (PPP)**—which was funded at
+
+[TEXT OUTPUT]
+ **136%** with over **$4.7 billion** in net assets over liabilities—reinstating a **
+
+[TEXT OUTPUT]
+5% Cash Balance Retirement Benefit Account (RBA)** credit. This structurally lowered GAAP and non-GAAP operational costs while preserving robust
+
+[TEXT OUTPUT]
+ cash generation.
+*   **Post-Kyndryl Obligations:** Follow-up filings show ongoing transitional liabilities, including commitments to supply hardware
+
+[TEXT OUTPUT]
+ upgrades at no cost to Kyndryl over a multi-year period, impacting "Other Accrued Expenses and Liabilities."
+*   **
+
+[TEXT OUTPUT]
+Strategic AI Shift & Capex Crowding:** While IBM's **Generative AI book of business** has grown to
+
+[TEXT OUTPUT]
+ over **$12.5 billion**, recent Q2 2026 preliminary results highlighted a sharp sector-
+
+[TEXT OUTPUT]
+wide risk: enterprise clients are rapidly prioritizing supply-constrained physical hardware and AI infrastructure over traditional software and consulting, resulting in delayed enterprise software deals
+
+[TEXT OUTPUT]
+ and flat consulting revenues.
+*   **Conviction Score Rubric Calculation (Baseline 50):**
+    *   *
+
+[TEXT OUTPUT]
+YoY Revenue/Asset Growth (+10 points):* High historical growth in FY2025 (+6%
+
+[TEXT OUTPUT]
+ constant currency) and a stellar Q1 2026 (+9% reported), tempered by the Q2 2026
+
+[TEXT OUTPUT]
+ revenue deceleration (+1% YoY).
+    *   *Positive Management Commentary (+10 points):* Strong confidence in the **
+
+[TEXT OUTPUT]
+watsonx platform**, strategic partnerships, and a massive five-year **$10 billion quantum computing program** (with a matching
+
+[TEXT OUTPUT]
+ **$1 billion CHIPS Act grant** to build **Anderon**, America's first quantum chip foundry in Albany, NY
+
+[TEXT OUTPUT]
+).
+    *   *Identified Risks (-15 points):* Sharp structural declines in z17 mainframe hardware cycles
+
+[TEXT OUTPUT]
+ (IBM Z fell 42% in Q2), short-term AI capex crowding out enterprise software budgets, and potential
+
+[TEXT OUTPUT]
+ legal risks stemming from multiple law firm investigations into securities fraud regarding pipeline visibility.
+    *   *Final Conviction Score:*
+
+[TEXT OUTPUT]
+ **`55`**
+
+All synthesized analytical data has been successfully compiled and written directly into the workspace directory as `ibm_report
+
+[TEXT OUTPUT]
+.json`.
+
+Below is the strictly enforced raw JSON block matching your schema exactly.
+
+```json
+{
+  "verdict":
+
+[TEXT OUTPUT]
+ {
+    "summary": "International Business Machines Corporation (**IBM**) is navigating a critical structural transformation, positioning itself as
+
+[TEXT OUTPUT]
+ a leader in **hybrid cloud**, **enterprise artificial intelligence (AI)**, and **quantum computing**. However, recent performance
+
+[TEXT OUTPUT]
+ highlights significant near-term volatility and execution risks. The company experienced a dramatic market correction following a disappointing preliminary quarterly report,
+
+[TEXT OUTPUT]
+ which revealed that clients are shifting their technology budgets toward raw hardware and AI infrastructure. This budget realignment has temporarily delayed software and
+
+[TEXT OUTPUT]
+ consulting deployments, exposing vulnerability in the pace of enterprise software adoption. While the long-term strategic narrative remains supported by robust
+
+[TEXT OUTPUT]
+ AI bookings and a government-backed **quantum wafer foundry**, the near-term outlook is tempered by cyclical hardware declines,
+
+[TEXT OUTPUT]
+ decelerating software growth, and emerging legal scrutiny regarding management's transparency.",
+    "conviction_score": 
+
+[TEXT OUTPUT]
+55,
+    "key_takeaways":
+
+[TEXT OUTPUT]
+ [
+      "The massive single-day stock correction reflects heightened investor sensitivity to signs that **AI infrastructure capital expenditure** is cannibalizing traditional enterprise software budgets.",
+      "While the
+
+[TEXT OUTPUT]
+ **hybrid cloud software business** remains the core engine of margin expansion, its growth has decelerated below long-term targets
+
+[TEXT OUTPUT]
+, exacerbated by tough cyclical comparables in the mainframe business.",
+      "A major long-term catalyst is the partnership
+
+[TEXT OUTPUT]
+ with the federal government to construct a state-of-the-art **quantum chip foundry** in Albany, New York
+
+[TEXT OUTPUT]
+, supported by substantial federal incentives.",
+      "Emerging legal investigations into management's deal pipeline disclosure introduce short-
+
+[TEXT OUTPUT]
+term reputational and **governance risks** that could restrict institutional capital inflows.",
+      "The overall investment thesis represents
+
+[TEXT OUTPUT]
+ a high-quality defensive franchise with strong cash flows, but one that is currently facing a complex transition period with diminished near
+
+[TEXT OUTPUT]
+-term growth visibility."
+    ]
+  },
+  "deep_insights":
+
+[TEXT OUTPUT]
+ [
+    {
+      "category": "Market Dynamics",
+      "title": "AI Infrastructure Capex Cannibalization of Software Budgets",
+      "description": "The dramatic sell-off in **IBM** stock followed preliminary **Q2 2
+
+[TEXT OUTPUT]
+026** results showing that enterprise customers are rapidly shifting their capital expenditure toward servers, memory, and raw AI infrastructure
+
+[TEXT OUTPUT]
+. This shift is temporarily **crowding out** and delaying spending on traditional enterprise software and consulting packages, posing a structural
+
+[TEXT OUTPUT]
+ transition risk for IBM's hybrid cloud software momentum. This trend is a major focal point for the wider software sector.",
+
+[TEXT OUTPUT]
+
+      "impact_score": 9
+    },
+    {
+      "category": "Product Lifecycle Risks
+
+[TEXT OUTPUT]
+",
+      "title": "Mainframe Cyclical Cliff and the Transition to z17",
+      "description
+
+[TEXT OUTPUT]
+": "IBM's infrastructure segment experienced a major contraction as the mainframe product cycle faced tough year-over-year compar
+
+[TEXT OUTPUT]
+ables, resulting in a **42% year-over-year decline** in **IBM Z** systems revenue.
+
+[TEXT OUTPUT]
+ While distributed infrastructure grew by **37%**, the cyclical volatility of hardware refreshes continues to undermine stable valuation models and
+
+[TEXT OUTPUT]
+ highlights the difficulty of transitioning legacy bases to modern cloud platforms.",
+      "impact_score": 8
+    },
+
+[TEXT OUTPUT]
+
+    {
+      "category": "Strategic Opportunities",
+      "title": "Quantum Computing Leadership and Anderon
+
+[TEXT OUTPUT]
+ Wafer Foundry",
+      "description": "In partnership with the **U.S. Department of Commerce**, IBM
+
+[TEXT OUTPUT]
+ secured a **$1.0 billion CHIPS Act grant** to establish **Anderon**, the nation's
+
+[TEXT OUTPUT]
+ first purpose-built, pure-play quantum wafer foundry in Albany, New York. Combined with IBM's own **
+
+[TEXT OUTPUT]
+$10.0 billion multi-year commitment** over five years, this positions the company as an undisputed pioneer in
+
+[TEXT OUTPUT]
+ the next era of computing, although commercial and financial returns are not expected until the late 2020s.",
+
+[TEXT OUTPUT]
+
+      "impact_score": 7
+    },
+    {
+      "category": "Legal and Governance
+
+[TEXT OUTPUT]
+",
+      "title": "Securities Litigation and Transparency Concerns",
+      "description": "Following the massive single
+
+[TEXT OUTPUT]
+-day stock collapse of **25.2%** on July 14, 2026,
+
+[TEXT OUTPUT]
+ multiple law firms launched investigations into whether IBM's management misrepresented its sales pipeline, transaction velocity, and forward-looking guidance
+
+[TEXT OUTPUT]
+ for the **IBM Z** platform. This introduces **corporate governance risks**, potential class-action litigation, and reputational
+
+[TEXT OUTPUT]
+ damage that could weigh heavily on institutional investor sentiment in the near term.",
+      "impact_score": 6
+
+
+[TEXT OUTPUT]
+    }
+  ],
+  "findings":
+
+[TEXT OUTPUT]
+ [
+    {
+      "documentType": "Form 10-K",
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "Repositioned IBM as a software-led, fully integrated platform company combining technology, consulting, and infrastructure.",
+        "Generative AI book of business reached **$12.5 billion** since inception, showing strong customer traction in enterprise AI.",
+        "Highest annual software growth
+
+[TEXT OUTPUT]
+ rate in history with **9% growth** at constant currency, representing **45% of total revenue**.",
+
+
+[TEXT OUTPUT]
+        "Generated **$14.7 billion** in free cash flow, representing the highest FCF in over a
+
+[TEXT OUTPUT]
+ decade.",
+        "Returned **$6.3 billion** to shareholders through dividends and closed **10 strategic acquisitions
+
+[TEXT OUTPUT]
+**."
+      ],
+      "date": "2026-02-24",
+      
+
+[TEXT OUTPUT]
+"sourceUrl": "https://www.sec.gov/Archives/edgar/data/5114
+
+[TEXT OUTPUT]
+3/000005114326000027/ibmars2
+
+[TEXT OUTPUT]
+025.pdf"
+    },
+    {
+      "documentType": "Form 10-
+
+[TEXT OUTPUT]
+Q",
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "Reported strong first-quarter revenue of **$15.92 billion** (up 9% YoY reported), beating consensus estimates of $15.6 billion.",
+        "Growth was led by the **Software segment (up 11%)** and **Infrastructure segment (up
+
+[TEXT OUTPUT]
+ 15%)**, while Consulting grew moderately at 4%.",
+        "Declared a regular quarterly cash dividend of
+
+[TEXT OUTPUT]
+ **$1.69 per share**, representing the **31st consecutive annual increase**.",
+        "Completed
+
+[TEXT OUTPUT]
+ the **$11.3 billion acquisition of Confluent, Inc.** on March 17, 20
+
+[TEXT OUTPUT]
+26, which added $7.14 billion of goodwill to the Software segment.",
+        "Ending debt stood
+
+[TEXT OUTPUT]
+ at **$66.4 billion**, reflecting a $5.1 billion increase in the quarter to fund the Confluent
+
+[TEXT OUTPUT]
+ transaction."
+      ],
+      "date": "2026-04-22",
+      
+
+[TEXT OUTPUT]
+"sourceUrl": "https://www-api.ibm.com/adobe/assets/urn:aaid:
+
+[TEXT OUTPUT]
+aem:fcf635c7-4e7c-457b-93c
+
+[TEXT OUTPUT]
+3-c4328a6ba968/original/as/1q26-form
+
+[TEXT OUTPUT]
+-10q.pdf"
+    },
+    {
+      "documentType": "Form 8-
+
+[TEXT OUTPUT]
+K",
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "Reported second-quarter GAAP revenue of **$17.16 billion**, representing a modest **1% year-over-year growth**.",
+        "GAAP net income was **$2.17 billion**, with GAAP diluted earnings per share at $2.27 and operating (non-GAAP)
+
+[TEXT OUTPUT]
+ diluted EPS at $2.93.",
+        "Software segment revenue grew **5% year-over-year
+
+[TEXT OUTPUT]
+** to $7.76 billion, while Consulting was flat at $5.33 billion.",
+        "
+
+[TEXT OUTPUT]
+Infrastructure segment revenue fell **7% year-over-year** to $3.84 billion, heavily impacted by
+
+[TEXT OUTPUT]
+ a **42% decline in IBM Z mainframe** sales.",
+        "Lowered full-year constant-currency
+
+[TEXT OUTPUT]
+ revenue growth expectations to a range of **4% to 5%** (down from 'above 5%').
+
+[TEXT OUTPUT]
+",
+        "Maintained full-year free cash flow growth guidance of approximately **$1.0 billion year-
+
+[TEXT OUTPUT]
+over-year**."
+      ],
+      "date": "2026-07-22
+
+[TEXT OUTPUT]
+",
+      "sourceUrl": "https://www-api.ibm.com/adobe/assets/urn:
+
+[TEXT OUTPUT]
+aaid:aem:7aef6616-f4ae-4206-8
+
+[TEXT OUTPUT]
+1d0-d047ada5a3e2/original/as/ibm-2q-
+
+[TEXT OUTPUT]
+26-earnings-press-release.pdf"
+    },
+    {
+      "documentType": "
+
+[TEXT OUTPUT]
+Investor Presentation",
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "In the final weeks of June, clients shifted quarterly capital expenditure toward servers, storage, and memory to secure supply-constrained infrastructure ahead of expected price increases.",
+        "This
+
+[TEXT OUTPUT]
+ shift resulted in a delay of several large enterprise software deals, causing the Q2 revenue miss.",
+        "About **
+
+[TEXT OUTPUT]
+one-third of the delayed deals** have already closed early in the third quarter of 2026.",
+
+
+[TEXT OUTPUT]
+        "Progress remains on track to deliver the first large-scale, fault-tolerant **quantum computer by 20
+
+[TEXT OUTPUT]
+29**."
+      ],
+      "date": "2026-07-14",
+
+[TEXT OUTPUT]
+
+      "sourceUrl": "https://newsroom.ibm.com/2026-07-
+
+[TEXT OUTPUT]
+14-Arvind-Krishnas-Letter-to-IBM-Investors?asPDF=1"
+    },
+
+[TEXT OUTPUT]
+
+    {
+      "documentType": "Form 8-K",
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "Detailed segment results for Q1 2026, showcasing high-margin software recurring revenue as a key driver of EBITDA margin expansion.",
+        "Software Annual Recurring Revenue (ARR) reached **$24.6 billion
+
+[TEXT OUTPUT]
+**, an increase of approximately $3.0 billion.",
+        "Reiterated full-year free cash flow guidance
+
+[TEXT OUTPUT]
+ and outlined progress on watsonx adoption in enterprise environments.",
+        "Presented non-GAAP reconciliations for Constant Currency
+
+[TEXT OUTPUT]
+ revenue growth and Operating Earnings."
+      ],
+      "date": "2026-04-2
+
+[TEXT OUTPUT]
+2",
+      "sourceUrl": "https://www-api.ibm.com/adobe/assets/urn
+
+[TEXT OUTPUT]
+:aaid:aem:7259fd9f-7ab1-494e-
+
+[TEXT OUTPUT]
+aac7-de8b65d8e5a9/original/as/ibm-1q-2
+
+[TEXT OUTPUT]
+6-earnings-charts.pdf"
+    },
+    {
+      "documentType": "Form 8
+
+[TEXT OUTPUT]
+-K",
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "Reported strong fourth-quarter 2025 revenue of **$19.7 billion**, representing **12% year-over-year growth**.",
+        "GAAP net income for Q4 2025 was **$5.6 billion**, up **91% year-over-year**, heavily boosted by tax-related benefits and strong mainframe cycles.",
+        "Gener
+
+[TEXT OUTPUT]
+ative AI book of business exceeded **$12.5 billion**, with consulting signing over $2.0 billion in
+
+[TEXT OUTPUT]
+ GenAI bookings in Q4 alone.",
+        "Exceeded the original exit-2024 productivity run-
+
+[TEXT OUTPUT]
+rate savings target, reaching **$4.5 billion of annual run-rate savings** exiting 2025
+
+[TEXT OUTPUT]
+."
+      ],
+      "date": "2026-01-28",
+      "
+
+[TEXT OUTPUT]
+sourceUrl": "https://newsroom.ibm.com/2026-01-28-
+
+[TEXT OUTPUT]
+IBM-RELEASES-FOURTH-QUARTER-RESULTS?asPDF=1"
+    },
+    {
+
+[TEXT OUTPUT]
+
+      "documentType": "DEF 14A",
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "Notice of the Annual Meeting of Stockholders held on April 28, 2026.",
+        "Proposals included the election of directors, ratification of PricewaterhouseCoopers LLP as the independent registered accounting firm, and approval
+
+[TEXT OUTPUT]
+ of executive compensation.",
+        "Proposed a new long-term performance plan (LTPP) for IBM employees to align
+
+[TEXT OUTPUT]
+ compensation with shareholder value creation."
+      ],
+      "date": "2026-03-1
+
+[TEXT OUTPUT]
+0",
+      "sourceUrl": "https://www.sec.gov/Archives/edgar/data/
+
+[TEXT OUTPUT]
+51143/000005114326000025
+
+[TEXT OUTPUT]
+/ibm2026courtesypdf.pdf"
+    },
+    {
+      "documentType
+
+[TEXT OUTPUT]
+": "Form 10-K",
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "Detailed the multi-year pivot to higher-value software, including hybrid cloud and enterprise AI platforms.",
+        "Disclosed the restoration of the pension plan credit (**RBA pay credit** of 5%) funded by the surplus of the Qualified PPP.",
+        
+
+[TEXT OUTPUT]
+"The Qualified PPP was **136% funded** with assets exceeding liabilities by **$4.7 billion**
+
+[TEXT OUTPUT]
+ at December 31, 2024."
+      ],
+      "date": "202
+
+[TEXT OUTPUT]
+5-02-25",
+      "sourceUrl": "https://www.sec.gov/Archives
+
+[TEXT OUTPUT]
+/edgar/data/51143/000110465925
+
+[TEXT OUTPUT]
+022191/tm2429998d6_ars.pdf"
+    
+
+[TEXT OUTPUT]
+},
+    {
+      "documentType": "Form 10-Q",
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "Disclosed historical financial details from early 2020, representing the initial onset of COVID-19 and associated risk disclosures.",
+        "Identified key risk factors regarding currency fluctuations, credit risk, and customer financing exposure.",
+        
+
+[TEXT OUTPUT]
+"Capital stock par value was reported at **$0.20 per share** with shares listed on the New York
+
+[TEXT OUTPUT]
+ Stock Exchange."
+      ],
+      "date": "2020-04-28",
+      
+
+[TEXT OUTPUT]
+"sourceUrl": "https://www.ibm.com/investor/att/pdf/IBM_1Q
+
+[TEXT OUTPUT]
+_2020_10-Q.pdf"
+    },
+    {
+      "documentType
+
+[TEXT OUTPUT]
+": "Form 10-Q",
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "Detailed the post-separation commitments and financial obligations following the spin-off of **Kyndryl**.",
+        "Recorded an obligation under a transitional services agreement to provide
+
+[TEXT OUTPUT]
+ upgraded hardware to Kyndryl at no cost over a two-year period.",
+        "Outlined the risks regarding
+
+[TEXT OUTPUT]
+ the tax-free status of the Kyndryl spin-off and integration challenges of other dispositions."
+      ],
+
+
+[TEXT OUTPUT]
+      "date": "2022-07-28",
+      "sourceUrl": "https
+
+[TEXT OUTPUT]
+://www.ibm.com/investor/att/pdf/IBM_2Q_2022_
+
+[TEXT OUTPUT]
+10-Q.pdf"
+    }
+  ],
+  "financial_charts": {
+    "
+
+[TEXT OUTPUT]
+stock_price_4m":
+
+[TEXT OUTPUT]
+ [
+      { "date": "Mar '26", "price": 242.39 },
+      { "date": "Apr '26", "price": 230.98 },
+      { "date": "May '26", "price": 297.80 },
+      { "date": "Jun '26", "price": 281.21 }
+    ],
+    "financial_performance_4q":
+
+[TEXT OUTPUT]
+ [
+      { "quarter": "Q3 2025", "revenue": 16.33, "net_income": 1.74 },
+      { "quarter": "Q4 2025", "revenue": 19.68, "net_income": 5.60 },
+      { "quarter": "Q1 2026", "revenue": 15.92, "net_income":
+
+[TEXT OUTPUT]
+ 1.20 },
+      { "quarter": "Q2 2026", "revenue":
+
+[TEXT OUTPUT]
+ 17.16, "net_income": 2.17 }
+    ]
+  }
+
+[TEXT OUTPUT]
+
+}
+```
+
+***
+
+### Sources Cited (Google Search Historical Index & Filings):
+*  
+
+[TEXT OUTPUT]
+ [Digrin IBM Price History](https://www.digrin.com/stocks/detail/IBM/price)
+
+[TEXT OUTPUT]
+ [1.1, 2.1, 3.1]
+*   [Seeking Alpha IBM Historical Prices & Quotes](https://seekingalpha.
+
+[TEXT OUTPUT]
+com/symbol/IBM/historical-price-quotes) [2.7]
+*  
+
+[TEXT OUTPUT]
+ [S&P Global Research on IBM Q2 2026 guidance](https://www.spglobal.com/market-intelligence/en/news-
+
+[TEXT OUTPUT]
+insights/research/2026/07/ibm-postq-guidance-cut-as-
+
+[TEXT OUTPUT]
+demand-slows-ai-momentum-holds) [1.1]
+*  
+
+[TEXT OUTPUT]
+ [StockTitan - SEC Filing Form 8-K IBM Reports Material Event](https://www.stocktitan.net/sec-filings/IBM/
+
+[TEXT OUTPUT]
+8-k-international-business-machines-corp-reports-material-event-a42825
+
+[TEXT OUTPUT]
+2a78d0.html) [1.2]
+*  
+
+[TEXT OUTPUT]
+ [TradingView: International Business Machines posts Q2 revenue $17.16B](https://www.tradingview.com/news/tradingview:23b
+
+[TEXT OUTPUT]
+7f308cb940:0-international-business-machines-posts-q2-revenue
+
+[TEXT OUTPUT]
+-17-16b-adjusted-eps-2-93-updates-2026-
+
+[TEXT OUTPUT]
+revenue-outlook/) [1.3]
+*  
+
+[TEXT OUTPUT]
+ [Hudson Labs Research: IBM Q2 2026 Earnings Release Analysis](https://www.hudson-labs.com/research/ibm-q2-2026-
+
+[TEXT OUTPUT]
+earnings) [1.4]
+*  
+
+[TEXT OUTPUT]
+ [FSMOne: IBM's USD $67 Billion Wipeout and software implications](https://www.fsmone.com.my/article/381720/ibm
+
+[TEXT OUTPUT]
+-s-usd-67-billion-wipeout-and-the-implications-to-software-
+
+[TEXT OUTPUT]
+sector) [1.5]
+*   [TheStreet - IBM Q2 2026 Earnings Call Takeaways](https
+
+[TEXT OUTPUT]
+://www.thestreet.com/latest-news/ibm-q2-2026-earnings-
+
+[TEXT OUTPUT]
+call-updates) [1.10]
+*  
+
+[TEXT OUTPUT]
+ [Verdict: IBM reports 15% rise in Q1 2026 Net Income](https://www.verdict.co.uk/ibm-q1-20
+
+[TEXT OUTPUT]
+26-results/) [2.3]
+*  
+
+[TEXT OUTPUT]
+ [Constellation Research - IBM delivers strong Q4 2025 results](https://www.constellationr.com/insights/news/ibm-delivers-strong-q4
+
+[TEXT OUTPUT]
+-12-revenue-growth) [3.2]
+*  
+
+[TEXT OUTPUT]
+ [Webull - Oppenheimer Downgrades IBM Post Q2 Preview](https://www.webull.com/news/152546365
+
+[TEXT OUTPUT]
+79808256) [3.9, 3.14]
+

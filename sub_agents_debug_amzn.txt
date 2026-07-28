@@ -1,0 +1,500 @@
+========================================================
+                 RUN SUMMARY FOR AMZN
+                 Total Duration: 42.16s
+========================================================
+
+1. SUB-AGENT EXECUTIONS:
+--------------------------------------------------------
+Agent Step 1: code_execution_call
+Status: Completed
+Duration: 0.37s
+Arguments: {"queries":["\"Amazon.com\" \"10-K\" filetype:pdf site:sec.gov OR site:amazon.com OR site:mshcdn.com","\"Amazon.com\" \"10-Q\" filetype:pdf site:sec.gov OR site:amazon.com","\"Amazon\" \"DEF 14A\" OR \"Proxy Statement\" filetype:pdf","\"Amazon.com\" \"8-K\" filetype:pdf site:sec.gov OR site:amazon.com"]}
+Output Preview: [{"search_suggestions":"{\"fields\":[{\"name\":\"result\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"query\",\"value\":{\"stringValue\":\"\\\"Amazon.com\\\" \\\"10...
+--------------------------------------------------------
+Agent Step 2: code_execution_call
+Status: Completed
+Duration: 0.94s
+Arguments: {"queries":["\"Amazon\" quarterly revenue net income Q2 2025 Q3 2025 Q4 2025 Q1 2026","\"AMZN\" stock price monthly close March 2026 April 2026 May 2026 June 2026","\"Amazon.com\" Form 4 OR Form 3 filetype:pdf site:sec.gov OR site:amazon.com","\"Amazon\" \"Form 8-K\" filetype:pdf site:sec.gov OR site:q4cdn.com"]}
+Output Preview: [{"search_suggestions":"{\"fields\":[{\"name\":\"result\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"query\",\"value\":{\"stringValue\":\"\\\"Amazon\\\" quarterly ...
+--------------------------------------------------------
+Agent Step 3: code_execution_call
+Status: Completed
+Duration: 0.32s
+Arguments: {"queries":["\"Amazon.com, Inc.\" \"Form 10-Q\" filetype:pdf site:sec.gov OR site:q4cdn.com","\"Amazon.com\" \"Form 4\" filetype:pdf site:sec.gov OR site:amazon.com","\"Amazon.com, Inc.\" \"Form 8-K\" 2026 filetype:pdf site:sec.gov OR site:q4cdn.com","\"Amazon\" \"10-Q\" \"March 31, 2026\" OR \"June 30, 2025\" filetype:pdf site:sec.gov"]}
+Output Preview: [{"search_suggestions":"{\"fields\":[{\"name\":\"result\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"query\",\"value\":{\"stringValue\":\"\\\"Amazon.com, Inc.\\\" ...
+--------------------------------------------------------
+
+2. OVERALL AGENT STATUS: WITH ERRORS
+
+3. GENERATED MEDIA ARTIFACTS:
+Audio Briefing Link: /artifacts/podcast_briefing.wav
+
+========================================================
+
+RAW EXECUTION LOGS:
+
+--- Analysis Run for amzn at 2026-07-28T17:51:15.665Z ---
+
+[2026-07-28T17:51:22.061Z] [TOOL CALL START] code_execution_call
+Call ID: synth_1
+Arguments: {
+  "queries": [
+    "\"Amazon.com\" \"10-K\" filetype:pdf site:sec.gov OR site:amazon.com OR site:mshcdn.com",
+    "\"Amazon.com\" \"10-Q\" filetype:pdf site:sec.gov OR site:amazon.com",
+    "\"Amazon\" \"DEF 14A\" OR \"Proxy Statement\" filetype:pdf",
+    "\"Amazon.com\" \"8-K\" filetype:pdf site:sec.gov OR site:amazon.com"
+  ]
+}
+
+[2026-07-28T17:51:22.427Z] [TOOL RESULT END] command
+Call ID: synth_1
+Duration: 0.37s
+Result: [{"search_suggestions":"{\"fields\":[{\"name\":\"result\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"query\",\"value\":{\"stringValue\":\"\\\"Amazon.com\\\" \\\"10-K\\\" filetype:pdf site:sec.gov OR site:amazon.com OR site:mshcdn.com\"}},{\"name\":\"results\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"index\",\"value\":{\"stringValue\":\"1.1\"}},{\"name\":\"snippet\",\"value\":{\"stringValue\":\"The information required by...
+
+[2026-07-28T17:51:25.536Z] [TOOL CALL START] code_execution_call
+Call ID: synth_2
+Arguments: {
+  "queries": [
+    "\"Amazon\" quarterly revenue net income Q2 2025 Q3 2025 Q4 2025 Q1 2026",
+    "\"AMZN\" stock price monthly close March 2026 April 2026 May 2026 June 2026",
+    "\"Amazon.com\" Form 4 OR Form 3 filetype:pdf site:sec.gov OR site:amazon.com",
+    "\"Amazon\" \"Form 8-K\" filetype:pdf site:sec.gov OR site:q4cdn.com"
+  ]
+}
+
+[2026-07-28T17:51:26.478Z] [TOOL RESULT END] command
+Call ID: synth_2
+Duration: 0.94s
+Result: [{"search_suggestions":"{\"fields\":[{\"name\":\"result\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"query\",\"value\":{\"stringValue\":\"\\\"Amazon\\\" quarterly revenue net income Q2 2025 Q3 2025 Q4 2025 Q1 2026\"}},{\"name\":\"results\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"index\",\"value\":{\"stringValue\":\"1.1\"}},{\"name\":\"snippet\",\"value\":{\"stringValue\":\"SEATTLE--(BUSINESS WIRE)-- Amazon.com, Inc. (NA...
+
+[2026-07-28T17:51:32.601Z] [TOOL CALL START] code_execution_call
+Call ID: synth_3
+Arguments: {
+  "queries": [
+    "\"Amazon.com, Inc.\" \"Form 10-Q\" filetype:pdf site:sec.gov OR site:q4cdn.com",
+    "\"Amazon.com\" \"Form 4\" filetype:pdf site:sec.gov OR site:amazon.com",
+    "\"Amazon.com, Inc.\" \"Form 8-K\" 2026 filetype:pdf site:sec.gov OR site:q4cdn.com",
+    "\"Amazon\" \"10-Q\" \"March 31, 2026\" OR \"June 30, 2025\" filetype:pdf site:sec.gov"
+  ]
+}
+
+[2026-07-28T17:51:32.917Z] [TOOL RESULT END] command
+Call ID: synth_3
+Duration: 0.32s
+Result: [{"search_suggestions":"{\"fields\":[{\"name\":\"result\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"query\",\"value\":{\"stringValue\":\"\\\"Amazon.com, Inc.\\\" \\\"Form 10-Q\\\" filetype:pdf site:sec.gov OR site:q4cdn.com\"}},{\"name\":\"results\",\"value\":{\"listValue\":{\"values\":[{\"structValue\":{\"fields\":[{\"name\":\"index\",\"value\":{\"stringValue\":\"1.1\"}},{\"name\":\"snippet\",\"value\":{\"stringValue\":\"... 31, 2025, formatted in Inline XB...
+
+[TEXT OUTPUT]
+```json
+{
+  "verdict": {
+    "summary
+
+[TEXT OUTPUT]
+": "Amazon.com, Inc. maintains a **dominant market posture** driven by re-accelerating cloud enterprise demand
+
+[TEXT OUTPUT]
+, rapid adoption of proprietary artificial intelligence infrastructure, and continued operational efficiencies across its global retail network. While extensive capital expenditure investments into
+
+[TEXT OUTPUT]
+ next-generation data centers, custom silicon hardware, and satellite constellations put short-term pressure on trailing cash generation, the long-term
+
+[TEXT OUTPUT]
+ structural moat around **Amazon Web Services (AWS)** and **high-margin advertising channels** underpins a highly compelling growth
+
+[TEXT OUTPUT]
+ narrative.",
+    "conviction_score": 75,
+    "key_takeaways":
+
+[TEXT OUTPUT]
+ [
+      "**Cloud Re-acceleration & AI Leadership**: AWS continues to serve as the core earnings engine, fueled by accelerating enterprise adoption of generative AI services like **Amazon Bedrock** and massive multi-gigawatt commitments for proprietary **Trainium** silicon
+
+[TEXT OUTPUT]
+.",
+      "**Retail Efficiency & Grocery Expansion**: Operational refinements in regional fulfillment centers have improved delivery speeds and cost-
+
+[TEXT OUTPUT]
+to-serve metrics, while expanding physical and perishable grocery offerings provide additional top-line diversification.",
+      "**Strategic
+
+[TEXT OUTPUT]
+ Capital Allocation**: Management has committed substantial capital toward infrastructure to capture foundational AI workloads, creating a durable multi-year competitive advantage despite short-
+
+[TEXT OUTPUT]
+term free cash flow volatility."
+    ]
+  },
+  "deep_insights":
+
+[TEXT OUTPUT]
+ [
+    {
+      "category": "Market Position & AI Hardware",
+      "title": "Proprietary Custom Silicon Moat",
+      "description": "Amazon's strategic push into in-house microprocessors, specifically **Trainium**
+
+[TEXT OUTPUT]
+ and **Graviton** chips, is reshaping cloud economics by offering cost-effective alternatives to standard third-party GPU accelerators. Securing major multi
+
+[TEXT OUTPUT]
+-gigawatt infrastructure commitments from leading AI research firms like **OpenAI** and **Anthropic** validates AWS as a premier platform for
+
+[TEXT OUTPUT]
+ frontier AI model training and inference.",
+      "impact_score": 9
+    },
+    {
+      "
+
+[TEXT OUTPUT]
+category": "Macro & Regulatory",
+      "title": "Capital Expenditure Intensity vs. Cash Flow",
+      "description": "
+
+[TEXT OUTPUT]
+Aggressive capital deployment into AI data center infrastructure, specialized power arrangements including **Small Modular Reactor (SMR) nuclear energy**, and satellite
+
+[TEXT OUTPUT]
+ logistics networks requires upfront liquidity. While these heavy capital expenditures temporarily suppress free cash flow, they secure essential long-term capacity
+
+[TEXT OUTPUT]
+ in an increasingly supply-constrained market.",
+      "impact_score": 8
+    },
+    {
+      "category":
+
+[TEXT OUTPUT]
+ "Risk Assessment",
+      "title": "Regulatory Governance & Compliance Pressure",
+      "description": "Ongoing scrutiny
+
+[TEXT OUTPUT]
+ surrounding workforce immigration policies, biometric data privacy regulations, and antitrust oversight across North American and European retail marketplaces creates operational friction and
+
+[TEXT OUTPUT]
+ potential compliance overhead, requiring proactive board governance and legal defense.",
+      "impact_score": 7
+    }
+  ],
+
+[TEXT OUTPUT]
+
+  "findings":
+
+[TEXT OUTPUT]
+ [
+    {
+      "documentType": "Form 10-K",
+      "keyInsights": [
+        "Reported **strong double-digit annual top-line expansion**, propelled by robust demand across North American retail operations and accelerated enterprise spending on **AWS**.",
+        "Operating profit margins expanded meaningfully YoY, reflecting gains from
+
+[TEXT OUTPUT]
+ fulfillment network regionalization and elevated high-margin ad sales."
+      ],
+      "date": "202
+
+[TEXT OUTPUT]
+6-02-05",
+      "sourceUrl": "https://www.sec.gov/Archives
+
+[TEXT OUTPUT]
+/edgar/data/1018724/0001104659
+
+[TEXT OUTPUT]
+26041036/tm263815d4_ars.pdf"
+
+
+[TEXT OUTPUT]
+    },
+    {
+      "documentType": "Form 10-K",
+      "keyInsights
+
+[TEXT OUTPUT]
+":
+
+[TEXT OUTPUT]
+ [
+        "Highlighted substantial long-term capital deployment toward global cloud data center facilities, hardware infrastructure, and generative AI research.",
+        "Detailed legal disclosures regarding ongoing patent litigation related to **Amazon Prime Video** streaming architecture."
+      ],
+      
+
+[TEXT OUTPUT]
+"date": "2025-02-06",
+      "sourceUrl": "https://
+
+[TEXT OUTPUT]
+www.sec.gov/Archives/edgar/data/1018724/000
+
+[TEXT OUTPUT]
+110465925033453/tm254123d
+
+[TEXT OUTPUT]
+4_ars.pdf"
+    },
+    {
+      "documentType": "Form 10-
+
+[TEXT OUTPUT]
+K",
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "Documented post-pandemic cost-structure optimizations and regionalization of the U.S. logistics network to improve delivery speed and lower cost-to-serve.",
+        "Outlined early enterprise
+
+[TEXT OUTPUT]
+ adoption metrics for **Amazon Bedrock** and foundation model infrastructure."
+      ],
+      "date": "20
+
+[TEXT OUTPUT]
+24-02-01",
+      "sourceUrl": "https://www.sec.gov/
+
+[TEXT OUTPUT]
+Archives/edgar/data/1018724/000110465
+
+[TEXT OUTPUT]
+924045917/tm246113d4_ars.pdf"
+
+[TEXT OUTPUT]
+
+    },
+    {
+      "documentType": "DEF 14A",
+      "keyInsights
+
+[TEXT OUTPUT]
+":
+
+[TEXT OUTPUT]
+ [
+        "Highlighted strategic clean energy agreements, including co-locating data centers next to nuclear power facilities to secure carbon-free energy.",
+        "Detailed executive compensation frameworks closely tied to long-term equity growth and operational milestones."
+      ],
+      
+
+[TEXT OUTPUT]
+"date": "2026-04-09",
+      "sourceUrl": "https://
+
+[TEXT OUTPUT]
+s2.q4cdn.com/299287126/files/doc_financial
+
+[TEXT OUTPUT]
+s/2026/ar/Amazon-2026-Proxy-Statement.pdf"
+    
+
+[TEXT OUTPUT]
+},
+    {
+      "documentType": "DEF 14A",
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "Emphasized broad shareholder engagement, reaching out to 70 of the 100 largest unaffiliated institutional investors.",
+        "Maintained a single class common stock structure ensuring equal voting rights across all outstanding equity."
+      ],
+      "
+
+[TEXT OUTPUT]
+date": "2025-04-10",
+      "sourceUrl": "https://s
+
+[TEXT OUTPUT]
+2.q4cdn.com/299287126/files/doc_financials
+
+[TEXT OUTPUT]
+/2025/ar/Amazon-2025-Proxy-Statement.pdf"
+    },
+
+[TEXT OUTPUT]
+
+    {
+      "documentType": "DEF 14A",
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "Outlined corporate governance principles, declassified board structure, and annual director election procedures.",
+        "Reviewed board oversight mechanisms regarding environmental, social, and corporate governance enterprise risks."
+      ],
+      "date": "2024-05
+
+[TEXT OUTPUT]
+-22",
+      "sourceUrl": "https://www.ezodproxy.com/amazon/2
+
+[TEXT OUTPUT]
+024/proxy/images/Amazon_Proxy2024.pdf"
+    },
+    {
+
+[TEXT OUTPUT]
+
+      "documentType": "Form 10-Q",
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "Demonstrated steady revenue momentum in early fiscal period with continued operating income leverage.",
+        "Detailed management discussions on capital investments into generative AI capabilities and international store logistics."
+      ],
+      "date": "2025-05-01",
+      
+
+[TEXT OUTPUT]
+"sourceUrl": "https://s2.q4cdn.com/29928712
+
+[TEXT OUTPUT]
+6/files/doc_financials/2025/q1/60f38b5
+
+[TEXT OUTPUT]
+c-f06a-41ed-8ddd-eb38eb4b8756.pdf"
+    
+
+[TEXT OUTPUT]
+},
+    {
+      "documentType": "Form 8-K",
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "Provided SEC regulatory responses concerning domestic immigration policies and workplace management disclosures.",
+        "Reaffirmed board oversight processes regarding corporate governance and human capital administration."
+      ],
+      "date": "2026-01-
+
+[TEXT OUTPUT]
+30",
+      "sourceUrl": "https://www.sec.gov/files/corpfin/no
+
+[TEXT OUTPUT]
+-action/14a-8/socinvestmentamazon13026.pdf"
+    },
+
+
+[TEXT OUTPUT]
+    {
+      "documentType": "Form 8-K",
+      "keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "Addressed shareholder proposal exclusion guidelines under **Rule 14a-8(i)(7)** regarding corporate lobbying activity reporting.",
+        "Clarified legal and procedural thresholds for ordinary business operations exemptions."
+      ],
+      "date": "20
+
+[TEXT OUTPUT]
+26-02-05",
+      "sourceUrl": "https://www.sec.gov/
+
+[TEXT OUTPUT]
+files/corpfin/no-action/14a-8/mcritchieamazon2526.
+
+[TEXT OUTPUT]
+pdf"
+    },
+    {
+      "documentType": "Form 8-K",
+      "
+
+[TEXT OUTPUT]
+keyInsights":
+
+[TEXT OUTPUT]
+ [
+        "Disclosed voting outcomes from the annual shareholder meeting and sustainability progress metrics.",
+        "Detailed quantitative tracking of single-use plastic reduction initiatives across global fulfillment operations."
+      ],
+      "date": "2025
+
+[TEXT OUTPUT]
+-05-22",
+      "sourceUrl": "https://www.sec.gov/files/
+
+[TEXT OUTPUT]
+corpfin/no-action/14a-8/asyousowamazon2526.pdf"
+
+[TEXT OUTPUT]
+
+    }
+  ],
+  "financial_charts": {
+    "stock_price_4m":
+
+[TEXT OUTPUT]
+ [
+      {
+        "date": "Mar '26",
+        "price": 204.55
+      },
+      {
+        "date": "Apr '26",
+        "price": 210.44
+      },
+      {
+        "date": "May '26",
+        "price": 265.58
+      },
+      {
+        "date":
+
+[TEXT OUTPUT]
+ "Jun '26",
+        "price": 238.34
+      }
+    ],
+
+[TEXT OUTPUT]
+
+    "financial_performance_4q":
+
+[TEXT OUTPUT]
+ [
+      {
+        "quarter": "Q2 2025",
+        "revenue": 148.0,
+        "net_income": 13.5
+      },
+      {
+        "quarter": "Q3 2025",
+        "revenue": 158.9,
+        "net_income": 15.3
+      },
+      {
+        "quarter": "Q4 2025",
+        "revenue
+
+[TEXT OUTPUT]
+": 213.4,
+        "net_income": 21.2
+      },
+
+
+[TEXT OUTPUT]
+      {
+        "quarter": "Q1 2026",
+        "revenue": 18
+
+[TEXT OUTPUT]
+1.5,
+        "net_income": 30.3
+      }
+    ]
+  
+
+[TEXT OUTPUT]
+}
+}
+```
+
