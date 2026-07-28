@@ -1,5 +1,5 @@
 import React from 'react';
-import { Activity, ShieldAlert, FileText, CheckCircle2 } from 'lucide-react';
+import { Scale, ShieldAlert, FileText, CheckCircle2 } from 'lucide-react';
 
 export function LandingView() {
   return (
@@ -8,10 +8,10 @@ export function LandingView() {
         {/* Header */}
         <div className="text-center mb-16 max-w-3xl">
           <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4 font-serif">
-            Tickr, your intelligent <span className="italic font-serif">financial document</span> analyzer
+            Legal Advisor, your intelligent <span className="italic font-serif">legal & compliance</span> assistant
           </h1>
           <p className="text-lg text-[#b3b3b3] font-medium">
-            Automatically finds and synthesizes recent SEC filings and public disclosures.
+            Automatically researches court dockets, statutory regulations, contract clauses, and SEC legal disclosures.
           </p>
         </div>
 
@@ -21,31 +21,31 @@ export function LandingView() {
           {/* Card 1: Documents */}
           <div className="bg-black/20 backdrop-blur-md border border-white/10 rounded-none p-6 shadow-2xl flex flex-col hover:bg-black/30 transition-colors">
             <h3 className="text-xl font-medium text-white mb-6 text-left">
-              Comprehensive SEC document coverage.
+              Comprehensive legal document coverage.
             </h3>
             
             <div className="flex-1 flex flex-col gap-3">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white"><FileText className="w-4 h-4" /></div>
                 <div className="flex-1">
-                  <div className="text-sm font-medium text-white">Form 10-K & 10-Q</div>
-                  <div className="text-xs text-white/60">Annual and Quarterly Reports</div>
+                  <div className="text-sm font-medium text-white">Court Filings & Precedents</div>
+                  <div className="text-xs text-white/60">Judicial dockets, opinions, and motions</div>
                 </div>
               </div>
               <div className="w-full h-px bg-white/10 my-1"></div>
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white"><Activity className="w-4 h-4" /></div>
+                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white"><Scale className="w-4 h-4" /></div>
                 <div className="flex-1">
-                  <div className="text-sm font-medium text-white">Form 8-K</div>
-                  <div className="text-xs text-white/60">Current / Material Events</div>
+                  <div className="text-sm font-medium text-white">Statutory & Regulatory Frameworks</div>
+                  <div className="text-xs text-white/60">GDPR, EU AI Act, Securities & Labor Law</div>
                 </div>
               </div>
               <div className="w-full h-px bg-white/10 my-1"></div>
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white"><ShieldAlert className="w-4 h-4" /></div>
                 <div className="flex-1">
-                  <div className="text-sm font-medium text-white">Forms 3, 4, 5 & 13F</div>
-                  <div className="text-xs text-white/60">Insider & Institutional Holdings</div>
+                  <div className="text-sm font-medium text-white">Contracts & SEC Legal Item 3</div>
+                  <div className="text-xs text-white/60">Liability caps, indemnities & legal proceedings</div>
                 </div>
               </div>
             </div>
@@ -54,23 +54,23 @@ export function LandingView() {
           {/* Card 2: Analysis */}
           <div className="bg-black/20 backdrop-blur-md border border-white/10 rounded-none p-6 shadow-2xl flex flex-col hover:bg-black/30 transition-colors">
             <h3 className="text-xl font-medium text-white mb-6 text-left">
-              Deep insights pulled directly from the source.
+              Deep legal insights pulled directly from sources.
             </h3>
             
             <div className="flex-1 flex flex-col gap-4 justify-center">
               <div className="flex items-center gap-3">
                 <CheckCircle2 className="w-5 h-5 text-[#b3b3b3] shrink-0" />
-                <div className="text-sm text-white/90 font-medium">Identify key takeaways and risks</div>
+                <div className="text-sm text-white/90 font-medium">Audit contract liability and compliance gaps</div>
               </div>
               <div className="w-full h-px bg-white/10"></div>
               <div className="flex items-center gap-3">
                 <CheckCircle2 className="w-5 h-5 text-[#b3b3b3] shrink-0" />
-                <div className="text-sm text-white/90 font-medium">Extract management commentary</div>
+                <div className="text-sm text-white/90 font-medium">Assess litigation exposure & defense strength</div>
               </div>
               <div className="w-full h-px bg-white/10"></div>
               <div className="flex items-center gap-3">
                 <CheckCircle2 className="w-5 h-5 text-[#b3b3b3] shrink-0" />
-                <div className="text-sm text-white/90 font-medium">Synthesize multiple filings into one report</div>
+                <div className="text-sm text-white/90 font-medium">Synthesize case law and regulations into actionable advice</div>
               </div>
             </div>
           </div>
@@ -80,3 +80,4 @@ export function LandingView() {
     </div>
   );
 }
+

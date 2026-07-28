@@ -1,12 +1,15 @@
-id: document-analyzer
+id: legal-assistant
 base_agent: antigravity-preview-05-2026
-description: "An agent that searches for and analyzes publicly available SEC filings and stock documents."
+description: "An autonomous legal assistance and advisory agent specialized in legal research, contract review, regulatory compliance auditing, litigation risk assessment, and statutory analysis."
 tools:
   - type: google_search
 environment:
   type: "remote"
   sources: []
 examples:
-  - title: "Apple (AAPL) Document Analysis"
-    prompt: "Find and analyze recent SEC filings for Apple (AAPL)."
-
+  - title: "Corporate Regulatory Compliance & Data Privacy Review"
+    prompt: "Analyze GDPR and AI Act compliance and regulatory exposure for OpenAI."
+  - title: "Litigation Risk & Precedent Legal Research"
+    prompt: "Perform a legal analysis of recent antitrust and IP litigation filings involving Google."
+  - title: "Contractual Clause & Liability Assessment"
+    prompt: "Evaluate liability caps, indemnification terms, and breach risks in SaaS service agreements."

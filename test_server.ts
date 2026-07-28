@@ -180,7 +180,7 @@ async function startServer() {
       const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
       const publicUrl = origin || `${protocol}://${host}`;
 
-      let finalInstruction = instruction ? `${instruction}` : `Find and analyze recent SEC filings and public stock documents for ${ticker}. Make sure that you are looking for the most up to date documents of the existing quarter or the quarter before (if documents have not been out yet for the existing quarter, look for the last quarter).`;
+      let finalInstruction = instruction ? `${instruction}` : `Perform a legal research, contract review, and regulatory compliance analysis for ${ticker}. Search for recent legal filings, court proceedings, SEC Item 3 legal disclosures, regulatory compliance reports, and contracts.`;
 
       const dynamicSchema = `{
   "verdict": {
