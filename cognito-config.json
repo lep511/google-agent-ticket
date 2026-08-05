@@ -1,0 +1,5 @@
+{
+  "userPoolId": "us-east-1_exampleId",
+  "userPoolClientId": "exampleAppClientId123456",
+  "region": "us-east-1"
+}

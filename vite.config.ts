@@ -5,6 +5,10 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
+    // amazon-cognito-identity-js expects a Node-style `global` in the browser.
+    define: {
+      global: 'window',
+    },
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {

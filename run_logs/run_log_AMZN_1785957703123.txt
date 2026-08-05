@@ -1,0 +1,39 @@
+========================================================
+                 RUN SUMMARY FOR AMZN
+                 Total Duration: 77.08s
+========================================================
+
+1. SUB-AGENT EXECUTIONS:
+--------------------------------------------------------
+Agent Step 1: code_execution_call
+Status: Failed/Timeout
+Duration: unknown
+Arguments: {"queries":["\"Amazon\" \"10-K\" filetype:pdf site:sec.gov OR site:amazon.com OR site:mshcdn.com","\"Amazon\" \"10-Q\" filetype:pdf site:sec.gov OR site:amazon.com","\"Amazon\" \"8-K\" filetype:pdf site:sec.gov OR site:amazon.com","\"Amazon\" \"DEF 14A\" OR \"proxy statement\" filetype:pdf site:sec.gov OR site:amazon.com"]}
+Output Preview: None
+--------------------------------------------------------
+
+2. OVERALL AGENT STATUS: WITH ERRORS
+
+3. GENERATED MEDIA ARTIFACTS:
+Audio Briefing Link: /artifacts/podcast_briefing.wav
+
+========================================================
+
+RAW EXECUTION LOGS:
+
+--- Analysis Run for AMZN at 2026-08-05T19:20:26.038Z ---
+
+[2026-08-05T19:20:32.393Z] [TOOL CALL START] code_execution_call
+Call ID: synth_1
+Arguments: {
+  "queries": [
+    "\"Amazon\" \"10-K\" filetype:pdf site:sec.gov OR site:amazon.com OR site:mshcdn.com",
+    "\"Amazon\" \"10-Q\" filetype:pdf site:sec.gov OR site:amazon.com",
+    "\"Amazon\" \"8-K\" filetype:pdf site:sec.gov OR site:amazon.com",
+    "\"Amazon\" \"DEF 14A\" OR \"proxy statement\" filetype:pdf site:sec.gov OR site:amazon.com"
+  ]
+}
+
+[ERROR]
+Stream read exception: terminated
+

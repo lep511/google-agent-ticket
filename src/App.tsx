@@ -4,8 +4,13 @@ import { PulsatingDotsBackground } from './components/PulsatingDots';
 import { Search, Loader2 } from 'lucide-react';
 import ReportTemplate from "./ReportTemplate";
 import { AgentTimeline, TimelineEvent } from './components/AgentTimeline';
-import { auth, signInWithGoogle, logOut } from './firebase';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import {
+  CognitoUserSession,
+  getCurrentCognitoUser,
+  handleOAuthCallback,
+  signInWithHostedUI,
+  signOutCognito,
+} from './cognito';
 
 export interface DocumentFinding {
   documentType?: string;
@@ -58,16 +63,29 @@ export default function App() {
   const [startTime, setStartTime] = useState<number | null>(null);
 
   const [isReportOpen, setIsReportOpen] = useState<'flash'|false>(false);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<CognitoUserSession | null>(null);
   const [showStopConfirm, setShowStopConfirm] = useState(false);
   const [isStopped, setIsStopped] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (u) => {
-      setUser(u);
-    });
-    return () => unsubscribe();
+    // Resolve the OAuth callback first, then fall back to an existing session.
+    handleOAuthCallback()
+      .then((oauthUser) => {
+        if (oauthUser) {
+          setUser(oauthUser);
+          return;
+        }
+        return getCurrentCognitoUser().then(setUser);
+      })
+      .catch((err) => {
+        console.error('❌ Error in auth flow:', err);
+      });
   }, []);
+
+  const handleSignOut = async () => {
+    await signOutCognito();
+    setUser(null);
+  };
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
@@ -365,12 +383,12 @@ export default function App() {
         <div>
           {user ? (
             <div className="flex items-center gap-3 text-sm">
-              <span className="text-stone-400">{user.email}</span>
-              <button onClick={logOut} className="px-3 py-1 bg-stone-800 hover:bg-stone-700 rounded text-stone-200 transition-colors">Sign Out</button>
+              <span className="text-stone-400">{user.email || user.username}</span>
+              <button onClick={handleSignOut} className="px-3 py-1 bg-stone-800 hover:bg-stone-700 rounded text-stone-200 transition-colors">Sign Out</button>
             </div>
           ) : (
-            <button onClick={signInWithGoogle} className="px-4 py-2 bg-white text-black hover:bg-stone-200 rounded font-medium text-sm transition-colors">
-              Sign In with Google
+            <button onClick={signInWithHostedUI} className="px-4 py-2 bg-white text-black hover:bg-stone-200 rounded font-medium text-sm transition-colors">
+              Sign In
             </button>
           )}
         </div>
