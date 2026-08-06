@@ -1,0 +1,11 @@
+id: company-profile
+base_agent: antigravity-preview-05-2026
+description: "An agent that builds a corporate profile of a company: business model, segments, competitors and structural risks."
+tools:
+  - type: google_search
+environment:
+  type: "remote"
+  sources: []
+examples:
+  - title: "Company Profile of Shopify"
+    prompt: "Build a corporate profile of Shopify: business model, segments, competitors and structural risks."

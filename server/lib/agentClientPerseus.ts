@@ -1,4 +1,4 @@
-import fs from 'fs';
+import { appendDebugFile, DELTA_LOG_FILE_NAME } from './debugFiles';
 /**
  * Gemini Managed Agents client.
  * The server only sends user prompts — no inline system instructions.
@@ -219,7 +219,7 @@ function parseAgentEvent(
         resultStr = String(resultVal);
       }
       const callId = (delta.call_id as string | undefined) || ((delta.call as any)?.id as string | undefined) || (delta.id as string | undefined) || `synth_${syntheticCallIdCounter}`;
-      fs.appendFileSync('debug_delta.log', 'TOOL RESULT DELTA: ' + JSON.stringify(delta) + '\n');
+      appendDebugFile(DELTA_LOG_FILE_NAME, 'TOOL RESULT DELTA: ' + JSON.stringify(delta) + '\n');
       return {
         type: "tool_result",
         name: delta.name as string | undefined,
@@ -236,7 +236,7 @@ function parseAgentEvent(
                      (delta.type === "code_execution_call" ? "code_execution_call" : undefined);
 
     if (callName || argumentsObj) {
-      fs.appendFileSync('debug_delta.log', 'TOOL CALL DELTA: ' + JSON.stringify(delta) + '\n');
+      appendDebugFile(DELTA_LOG_FILE_NAME, 'TOOL CALL DELTA: ' + JSON.stringify(delta) + '\n');
       syntheticCallIdCounter++;
       const callId = (delta.call_id as string | undefined) || ((delta.call as any)?.id as string | undefined) || (delta.id as string | undefined) || `synth_${syntheticCallIdCounter}`;
       return {

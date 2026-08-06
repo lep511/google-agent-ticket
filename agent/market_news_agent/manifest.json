@@ -1,0 +1,58 @@
+{
+  "id": "market_news_agent",
+  "name": "Market News Digest",
+  "tagline": "Summarizes recent news for a ticker and reads the tone of the cycle.",
+  "description": "Searches the recent news cycle for a company or ticker, groups the coverage into themes, separates confirmed facts from speculation and assesses the overall tone of the reporting, returning a short digest with the sources it consulted.",
+  "icon": "Newspaper",
+  "accentColor": "#F59E0B",
+  "order": 20,
+  "isDefault": false,
+  "inputMode": "ticker",
+  "inputPlaceholder": "TICKER",
+  "actionLabel": "Summarize News",
+  "supportsInstruction": true,
+  "outputRenderer": "simple_report",
+  "landing": {
+    "title": "Market News Digest, the recent news cycle in one page",
+    "subtitle": "Summarizes the latest coverage of a ticker and assesses the overall tone of the reporting.",
+    "highlights": [
+      {
+        "title": "Coverage gathered from public reporting.",
+        "items": [
+          {
+            "title": "Company announcements",
+            "subtitle": "Earnings, guidance and material events",
+            "icon": "Newspaper"
+          },
+          {
+            "title": "Analyst and market reaction",
+            "subtitle": "Ratings, price action and commentary",
+            "icon": "TrendingUp"
+          },
+          {
+            "title": "Sector and regulatory context",
+            "subtitle": "Competitors, policy and supply chain",
+            "icon": "Globe"
+          }
+        ]
+      },
+      {
+        "title": "A digest you can read in a minute.",
+        "items": [
+          {
+            "title": "Group the cycle into themes",
+            "icon": "CheckCircle2"
+          },
+          {
+            "title": "Separate confirmed facts from speculation",
+            "icon": "CheckCircle2"
+          },
+          {
+            "title": "Cite every source with its date",
+            "icon": "CheckCircle2"
+          }
+        ]
+      }
+    ]
+  }
+}

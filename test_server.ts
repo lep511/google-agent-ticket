@@ -7,6 +7,7 @@ import { GoogleGenAI } from "@google/genai";
 
 import { createInteraction, streamInteraction } from "./server/lib/agentClient.ts";
 import { createInteraction as createInteractionPerseus, streamInteraction as streamInteractionPerseus } from "./server/lib/agentClientPerseus.ts";
+import { subAgentsDebugFileName, writeDebugFile } from "./server/lib/debugFiles.ts";
 
 function loadAgentFiles(dir: string, basePath: string): Array<{type: string, content: string, target: string}> {
   let files: Array<{type: string, content: string, target: string}> = [];
@@ -346,8 +347,8 @@ async function startServer() {
         const logFileName = `run_log_${ticker}_${Date.now()}.txt`;
         const finalLog = summaryLog + debugLog;
         fs.writeFileSync(path.join(runLogsDir, logFileName), finalLog, 'utf-8');
-        // Maintain backwards compatibility with the old txt file
-        fs.writeFileSync(path.join(process.cwd(), `sub_agents_debug_${ticker}.txt`), finalLog, 'utf-8');
+        // Copia heredada de la última ejecución por entrada, ahora bajo `debug/`.
+        writeDebugFile(subAgentsDebugFileName(ticker), finalLog);
       } catch (e) {
         console.error("Failed to write debug log", e);
       }

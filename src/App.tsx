@@ -1,9 +1,13 @@
 import { LandingView } from './LandingView';
-import React, { useState, useRef, useEffect } from 'react';
-import { PulsatingDotsBackground } from './components/PulsatingDots';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { DottedBackground } from './components/PulsatingDots';
 import { Search, Loader2 } from 'lucide-react';
 import ReportTemplate from "./ReportTemplate";
+import SimpleReportView from './components/SimpleReportView';
 import { AgentTimeline, TimelineEvent } from './components/AgentTimeline';
+import { AgentSelector } from './components/AgentSelector';
+// DEBUG (provisional): borrar este import junto con el bloque <DebugPanel /> del final.
+import { DebugPanel } from './components/DebugPanel';
 import {
   CognitoUserSession,
   getCurrentCognitoUser,
@@ -11,6 +15,26 @@ import {
   signInWithHostedUI,
   signOutCognito,
 } from './cognito';
+import {
+  AgentCatalogEntry,
+  AgentCatalogResponse,
+  OutputRenderer,
+  RawSimpleReport,
+  isOutputRenderer,
+} from './types';
+import {
+  findAgent,
+  readStoredAgentId,
+  resolveActiveAgentId,
+  storeSelectedAgentId,
+} from './agentSelection';
+import {
+  MAX_INSTRUCTION_LENGTH,
+  canRun,
+  inputBarConfig,
+  inputMaxLength,
+} from './agentInput';
+import { FALLBACK_OUTPUT_RENDERER, extractReport } from './resultExtraction';
 
 export interface DocumentFinding {
   documentType?: string;
@@ -46,14 +70,50 @@ export interface ReportData {
 // Toggle this to true if you want the JSON logs to be downloaded automatically after a run.
 const ENABLE_JSON_DOWNLOAD = false;
 
+/** Modelo con el que se ejecutan los agentes desde esta vista. */
+const MODEL_ID = 'gemini-3.6-flash';
+/** Requirement 12.7: nombre del modelo como texto secundario de la cabecera. */
+const MODEL_DISPLAY_NAME = 'Gemini 3.6 Flash';
+
+/** Estado de la petición del catálogo de agentes (Requirements 11.7, 11.8, 11.9). */
+export type CatalogStatus = 'loading' | 'ready' | 'error';
+
+/**
+ * Agente que produjo el resultado en pantalla, junto con su renderizador. Se
+ * congela al iniciar la ejecución para que un cambio de agente posterior no
+ * altere la presentación de ese resultado (Requirement 14.1).
+ */
+export interface RunAgent {
+  agentId: string;
+  agentName: string;
+  outputRenderer: OutputRenderer;
+}
+
 export default function App() {
-  const [ticker, setTicker] = useState('');
+  /** Valor de entrada; su significado depende del `inputMode` del agente activo. */
+  const [inputValue, setInputValue] = useState('');
   const [instruction, setInstruction] = useState('');
+
+  // Catálogo de agentes y agente activo.
+  const [agents, setAgents] = useState<AgentCatalogEntry[]>([]);
+  const [defaultAgentId, setDefaultAgentId] = useState<string | null>(null);
+  const [catalogStatus, setCatalogStatus] = useState<CatalogStatus>('loading');
+  const [catalogError, setCatalogError] = useState<string | null>(null);
+  // Requirement 11.8: el último agente conocido (el almacenado) sigue activo
+  // aunque la petición del catálogo falle.
+  const [activeAgentId, setActiveAgentId] = useState<string | null>(() => readStoredAgentId());
+  // Requirement 14.1: agente y renderizador de la ejecución en curso.
+  const [runAgent, setRunAgent] = useState<RunAgent | null>(null);
   
   // Gemini 3.6 Flash state
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reportData, setReportData] = useState<ReportData | null>(null);
+  /**
+   * Requirement 14.6: el texto final de la ejecución no contenía ningún objeto
+   * válido para su renderizador, así que no se promovió informe alguno.
+   */
+  const [unstructuredReport, setUnstructuredReport] = useState(false);
   const [events, setEvents] = useState<TimelineEvent[]>([]);
   const abortRef = useRef<AbortController | null>(null);
   const eventIdRef = useRef(0);
@@ -85,6 +145,122 @@ export default function App() {
   const handleSignOut = async () => {
     await signOutCognito();
     setUser(null);
+  };
+
+  /** Entrada de catálogo del agente activo; nula mientras no hay catálogo. */
+  const activeAgent = findAgent(agents, activeAgentId);
+  /** Requirement 11.9: sin agentes válidos no hay nada que ejecutar. */
+  const isCatalogEmpty = catalogStatus === 'ready' && agents.length === 0;
+  /**
+   * Requirement 12.7: nombre que encabeza el panel de ejecución. Es el `name`
+   * del agente activo; si el catálogo aún no está disponible se recurre al
+   * nombre informado por la ejecución en curso.
+   */
+  const executionPanelAgentName = activeAgent?.name ?? runAgent?.agentName ?? 'Agente';
+
+  /**
+   * Presentación de la barra de entrada declarada por el agente activo:
+   * `inputMode`, `inputPlaceholder`, `actionLabel` y `supportsInstruction`
+   * (Requirements 13.3, 13.4, 13.5, 13.6, 13.7).
+   */
+  const { inputMode, inputPlaceholder, actionLabel, supportsInstruction } =
+    inputBarConfig(activeAgent);
+  /**
+   * Requirements 8.7, 8.8: el botón solo se habilita cuando la entrada cumple
+   * las reglas de longitud y conjunto de caracteres del `inputMode` activo.
+   */
+  const canRunAnalysis = canRun({
+    value: inputValue,
+    instruction,
+    config: { inputMode, inputPlaceholder, actionLabel, supportsInstruction },
+    isCatalogEmpty,
+  });
+
+  /**
+   * Pide el catálogo y fija el agente activo: el agentId almacenado cuando está
+   * en el catálogo (Requirement 12.1), y el `defaultAgentId` sobrescribiendo el
+   * valor almacenado en cualquier otro caso (Requirement 12.2).
+   *
+   * Si la petición falla, el estado pasa a error y el último agente conocido
+   * sigue activo (Requirement 11.8); el selector reintenta con esta función.
+   */
+  const loadCatalog = useCallback(async (signal?: AbortSignal) => {
+    setCatalogStatus('loading');
+    setCatalogError(null);
+    try {
+      const resp = await fetch('/api/agents', { signal });
+      if (!resp.ok) {
+        throw new Error(`Server responded ${resp.status}`);
+      }
+      const catalog = (await resp.json()) as AgentCatalogResponse;
+      if (signal?.aborted) return;
+
+      const entries = Array.isArray(catalog?.agents) ? catalog.agents : [];
+      const resolvedDefaultAgentId =
+        typeof catalog?.defaultAgentId === 'string' ? catalog.defaultAgentId : null;
+
+      setAgents(entries);
+      setDefaultAgentId(resolvedDefaultAgentId);
+
+      const resolution = resolveActiveAgentId(
+        { agents: entries, defaultAgentId: resolvedDefaultAgentId },
+        readStoredAgentId(),
+      );
+      setActiveAgentId(resolution.agentId);
+      if (resolution.shouldPersist && resolution.agentId !== null) {
+        storeSelectedAgentId(resolution.agentId);
+      }
+      setCatalogStatus('ready');
+    } catch (e: any) {
+      if (e?.name === 'AbortError') return;
+      console.error('❌ Failed to load the agent catalog:', e);
+      setCatalogError(e?.message || 'Failed to load the agent catalog');
+      setCatalogStatus('error');
+    }
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    loadCatalog(controller.signal);
+    return () => controller.abort();
+  }, [loadCatalog]);
+
+  /** Vacía informe, línea de tiempo, métricas y error previos. */
+  const resetRunResults = () => {
+    setReportData(null);
+    setUnstructuredReport(false);
+    setEvents([]);
+    setError(null);
+    setTokenCount(0);
+    setToolRuns(0);
+    setDurationSecs(0);
+    setStartTime(null);
+    setRunAgent(null);
+    setIsReportOpen(false);
+    setIsStopped(false);
+    eventIdRef.current = 0;
+  };
+
+  /**
+   * Selección de agente del usuario: persiste el agentId (Requirement 12.3) y
+   * vacía el resultado previo cuando el agente activo cambia
+   * (Requirement 12.4). Durante una ejecución la selección no se mueve
+   * (Requirement 11.4).
+   */
+  const selectAgent = (agentId: string) => {
+    if (running) return;
+    storeSelectedAgentId(agentId);
+    if (agentId === activeAgentId) return;
+    setActiveAgentId(agentId);
+    /*
+      La barra se vacía al cambiar de agente: cada agente declara su propio
+      `inputMode`, así que la entrada anterior puede no ser válida para el nuevo
+      (un ticker en un campo de texto libre, por ejemplo). Reseleccionar el
+      agente activo no llega aquí y conserva lo escrito.
+    */
+    setInputValue('');
+    setInstruction('');
+    resetRunResults();
   };
 
   useEffect(() => {
@@ -142,52 +318,17 @@ export default function App() {
     return 'Analyzing...';
   };
 
-  const parseFinalText = (text: string) => {
-            if (!text) return null;
-            try {
-                let foundData = null;
-                const matches = [...text.matchAll(/```(?:json)?\s*([\s\S]*?)\s*```/g)];
-                for (let i = matches.length - 1; i >= 0; i--) {
-                    try {
-                        const parsed = JSON.parse(matches[i][1]);
-                        if (parsed && (parsed.verdict || parsed.findings || parsed.deep_insights)) {
-                            foundData = parsed;
-                            break;
-                        }
-                    } catch (e) {}
-                }
-                
-                if (!foundData) {
-                    const firstBrace = text.indexOf('{');
-                    const lastBrace = text.lastIndexOf('}');
-                    if (firstBrace !== -1 && lastBrace > firstBrace) {
-                        try {
-                            const possibleJson = text.slice(firstBrace, lastBrace + 1);
-                            const parsed = JSON.parse(possibleJson);
-                            if (parsed && (parsed.verdict || parsed.findings || parsed.deep_insights)) {
-                                foundData = parsed;
-                            }
-                        } catch (e) {
-                            const match = text.match(/\{\s*"verdict"[\s\S]*?\}\s*\}/);
-                            if (match) {
-                                try {
-                                    const parsed = JSON.parse(match[0]);
-                                    if (parsed && parsed.verdict) {
-                                        foundData = parsed;
-                                    }
-                                } catch(e2) {}
-                            }
-                        }
-                    }
-                }
-                return foundData;
-            } catch (e) {
-                return null;
-            }
-        };
+  /**
+   * Extractor del texto final parametrizado por el renderizador de la
+   * ejecución: las claves raíz aceptadas son las de ese renderizador
+   * (Requirements 14.4, 14.5).
+   */
+  const parseFinalText = (text: string, renderer: OutputRenderer) =>
+    extractReport(text, renderer);
 
   const startStream = async (
     model: string,
+    requestedAgentId: string | null,
     setRun: any,
     setErr: any,
     setRep: any,
@@ -203,6 +344,7 @@ export default function App() {
     setRun(true);
     setErr(null);
     setRep(null);
+    setUnstructuredReport(false);
     setEvts([]);
     setTok(0);
     setTRuns(0);
@@ -210,18 +352,62 @@ export default function App() {
     setStart(Date.now());
     eIdRef.current = 0;
 
+    // Requirement 14.1: la ejecución arranca etiquetada con el agente activo y
+    // su renderizador; el evento `agent_info` confirma o corrige esos valores.
+    const requestedAgent = findAgent(agents, requestedAgentId);
+    setRunAgent(
+      requestedAgent
+        ? {
+            agentId: requestedAgent.id,
+            agentName: requestedAgent.name,
+            outputRenderer: requestedAgent.outputRenderer,
+          }
+        : null,
+    );
+
     const controller = new AbortController();
     aRef.current = controller;
     const startTimestamp = Date.now();
     let currentToolRuns = 0;
+    /**
+     * Renderizador con el que se interpreta el texto final de esta ejecución.
+     * Arranca con el del agente enviado y lo confirma o corrige `agent_info`
+     * (Requirements 14.1, 14.5).
+     */
+    let runRenderer: OutputRenderer = requestedAgent?.outputRenderer ?? FALLBACK_OUTPUT_RENDERER;
+    /** Requirement 14.6: solo se avisa cuando no se promovió ningún informe. */
+    let reportPromoted = false;
+    /**
+     * Mensaje del evento `error` del flujo, cuando el servidor informó un fallo
+     * del agente remoto. Sin esto la ejecución terminaba en silencio.
+     */
+    let streamErrorMessage: string | null = null;
+    /**
+     * Eventos que esta ejecución dejó en la línea de tiempo. La vista principal
+     * deriva la pantalla de `running`, `reportData` y `events.length`, así que
+     * terminar con los tres vacíos devuelve al usuario a la vista de aterrizaje
+     * sin explicación. Este contador permite garantizar siempre una traza.
+     */
+    let eventsPushed = 0;
+    const emit = (...args: Parameters<ReturnType<typeof createPushEvent>>) => {
+      eventsPushed += 1;
+      pushEvt(...args);
+    };
 
     try {
       const resp = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ticker: ticker.trim(),
-          instruction: instruction.trim() || undefined,
+          // Requirement 12.6: el agentId del agente activo viaja en el cuerpo.
+          agentId: requestedAgentId ?? undefined,
+          // `input` es el campo principal; `ticker` se mantiene como alias
+          // heredado para no romper el contrato anterior (Requirement 9.2).
+          input: inputValue.trim(),
+          ticker: inputValue.trim(),
+          // Requirement 13.6: solo los agentes que declaran `supportsInstruction`
+          // muestran el campo, y solo entonces se envía su valor.
+          instruction: supportsInstruction ? instruction.trim() || undefined : undefined,
           origin: window.location.origin,
           model: model
         }),
@@ -254,7 +440,27 @@ export default function App() {
             if (dataStr === '[DONE]') continue;
             try {
               const evt = JSON.parse(dataStr);
-              if (evt.type === 'text' && evt.text) {
+              if (evt.type === 'agent_info') {
+                  // Requirement 14.1: el renderizador de esta ejecución queda
+                  // fijado por el agente que la sirvió.
+                  const informedAgentId = typeof evt.agentId === 'string' ? evt.agentId : null;
+                  if (informedAgentId) {
+                    runRenderer = isOutputRenderer(evt.outputRenderer)
+                      ? evt.outputRenderer
+                      : FALLBACK_OUTPUT_RENDERER;
+                    setRunAgent({
+                      agentId: informedAgentId,
+                      agentName: typeof evt.agentName === 'string' ? evt.agentName : informedAgentId,
+                      outputRenderer: runRenderer,
+                    });
+                    // Requirements 12.5, 12.6: si el agente ejecutado no es el
+                    // enviado, el informado pasa a ser el activo y se almacena.
+                    if (informedAgentId !== requestedAgentId) {
+                      setActiveAgentId(informedAgentId);
+                      storeSelectedAgentId(informedAgentId);
+                    }
+                  }
+              } else if (evt.type === 'text' && evt.text) {
                   accumulatedText += evt.text;
               } else if (evt.type === 'tool_call') {
                   currentToolRuns += 1;
@@ -265,12 +471,26 @@ export default function App() {
                   } else if (evt.name) {
                     label = `Using tool: ${evt.name}`;
                   }
-                  pushEvt('tool_call', label, JSON.stringify(evt.arguments, null, 2), evt.name, evt.callId);
+                  emit('tool_call', label, JSON.stringify(evt.arguments, null, 2), evt.name, evt.callId);
               } else if (evt.type === 'tool_result') {
-                  pushEvt('tool_result', `Analysis retrieved`, evt.result, undefined, evt.callId);
+                  emit('tool_result', `Analysis retrieved`, evt.result, undefined, evt.callId);
               } else if (evt.type === 'thinking') {
                   const label = extractThinkingTitle(evt.text);
-                  pushEvt('thinking', label, evt.text);
+                  emit('thinking', label, evt.text);
+              } else if (evt.type === 'error') {
+                  /*
+                    El servidor cierra el flujo con `error` + `done` cuando el
+                    agente remoto falla. Sin esta rama el fallo se descartaba:
+                    ni error visible ni evento en la línea de tiempo, así que la
+                    vista volvía a la pantalla inicial sin rastro alguno.
+                  */
+                  streamErrorMessage =
+                    typeof evt.message === 'string' && evt.message.trim()
+                      ? evt.message
+                      : 'El agente informó un error sin detalle.';
+                  console.error('[stream] Evento de error del agente:', streamErrorMessage);
+                  emit('error', 'La ejecución falló', streamErrorMessage);
+                  setErr(streamErrorMessage);
               } else if (evt.type === 'complete') {
                   if (evt.interaction) {
                       const interaction = evt.interaction;
@@ -301,13 +521,20 @@ export default function App() {
                         .catch(err => console.error('Failed to download log:', err));
                   }
               }
-            } catch { /* skip malformed */ }
+            } catch (parseError) {
+              // Un evento ilegible ya no desaparece sin dejar rastro: queda en
+              // consola con su carga para poder diagnosticarlo.
+              console.warn('[stream] Evento SSE descartado por ilegible:', dataStr, parseError);
+            }
           }
         }
         
         if (accumulatedText) {
-            const foundData = parseFinalText(accumulatedText);
-            if (foundData) setRep(foundData);
+            const foundData = parseFinalText(accumulatedText, runRenderer);
+            if (foundData) {
+                setRep(foundData);
+                reportPromoted = true;
+            }
         }
       }
       
@@ -324,22 +551,63 @@ export default function App() {
                       }
                   }
               }
-          } catch(e) {}
+          } catch (tailError) {
+              console.warn('[stream] Cola del buffer descartada por ilegible:', buffer, tailError);
+          }
       }
       
       if (accumulatedText) {
-          const finalData = parseFinalText(accumulatedText);
-          if (finalData) setRep(finalData);
+          const finalData = parseFinalText(accumulatedText, runRenderer);
+          if (finalData) {
+              setRep(finalData);
+              reportPromoted = true;
+          }
       }
-      
+
+      /*
+        Requirement 14.6: sin objeto válido para el renderizador de la ejecución
+        no se promueve informe; el texto crudo queda en la línea de tiempo y el
+        aviso explica que no pudo estructurarse.
+      */
+      if (!reportPromoted && accumulatedText.trim()) {
+          emit('text', 'Respuesta sin estructurar', accumulatedText);
+          setUnstructuredReport(true);
+      }
+
+      /*
+        Una ejecución que acaba sin informe, sin texto y sin ningún evento deja
+        las tres condiciones de la vista de aterrizaje satisfechas, y el usuario
+        vuelve a la pantalla inicial como si nunca hubiera ejecutado nada. Aquí
+        se garantiza siempre una traza en la línea de tiempo y un error visible.
+      */
+      if (!reportPromoted && !accumulatedText.trim() && eventsPushed === 0) {
+          const message =
+            streamErrorMessage ??
+            'El agente terminó sin devolver ninguna respuesta.';
+          console.error('[stream] Ejecución terminada sin resultado:', message);
+          emit('error', 'Ejecución sin resultado', message);
+          setErr(message);
+      }
+
       setDur(Math.round((Date.now() - startTimestamp) / 1000));
       setRun(false);
       
     } catch (e: any) {
       if (e.name === 'AbortError') {
          console.log('Aborted');
+         /*
+           Detener antes del primer evento también dejaba la pantalla vacía: se
+           registra el corte para que la ejecución siga siendo visible.
+         */
+         if (eventsPushed === 0) {
+            emit('info', 'Ejecución detenida', 'La ejecución se detuvo antes de producir resultados.');
+         }
       } else {
+         console.error('[stream] Ejecución interrumpida:', e);
          setErr(e.message || 'Unknown error');
+         if (eventsPushed === 0) {
+            emit('error', 'La ejecución falló', e.message || 'Unknown error');
+         }
       }
       setDur(Math.round((Date.now() - startTimestamp) / 1000));
       setRun(false);
@@ -347,25 +615,52 @@ export default function App() {
   };
 
   const runAnalysis = () => {
-    if (!ticker.trim() || running) return;
+    if (running) return;
+    // Requirements 8.7, 11.9: sin entrada válida o sin agentes no hay ejecución.
+    if (!canRunAnalysis) return;
     setIsReportOpen(false);
     setIsStopped(false);
-    
-    startStream('gemini-3.6-flash', setRunning, setError, setReportData, setEvents, pushEvent, setTokenCount, setToolRuns, setDurationSecs, setStartTime, abortRef, eventIdRef);
+
+    startStream(MODEL_ID, activeAgentId, setRunning, setError, setReportData, setEvents, pushEvent, setTokenCount, setToolRuns, setDurationSecs, setStartTime, abortRef, eventIdRef);
   };
 
   if (isReportOpen === 'flash' && reportData) {
+    /*
+      Requirement 14.1: el renderizador es el de la ejecución que produjo este
+      informe, guardado en `runAgent` al recibir su `agent_info`. Un cambio de
+      agente activo posterior no lo altera.
+    */
+    const reportRenderer = runAgent?.outputRenderer ?? FALLBACK_OUTPUT_RENDERER;
+
     return (
       <div className="w-full h-screen print:h-auto print:overflow-visible">
-         <ReportTemplate 
-           data={reportData} 
-           ticker={ticker} 
-           onClose={() => setIsReportOpen(false)}
-           durationSecs={durationSecs}
-           toolRuns={toolRuns}
-           tokenCount={tokenCount}
-           documentCount={reportData.findings?.length || 0}
-         />
+         {reportRenderer === 'simple_report' ? (
+           /* Requirement 14.3: informe simple con `SimpleReportView`. */
+           <SimpleReportView
+             /*
+               El informe llega recién extraído del texto del modelo, con la
+               forma del contrato `simple_report`; la vista normaliza cada campo.
+             */
+             data={reportData as unknown as RawSimpleReport}
+             title={runAgent?.agentName ?? 'Report'}
+             subtitle={inputValue}
+             onClose={() => setIsReportOpen(false)}
+             durationSecs={durationSecs}
+             toolRuns={toolRuns}
+             tokenCount={tokenCount}
+           />
+         ) : (
+           /* Requirement 14.2: informe financiero con el contrato de props intacto. */
+           <ReportTemplate
+             data={reportData}
+             ticker={inputValue}
+             onClose={() => setIsReportOpen(false)}
+             durationSecs={durationSecs}
+             toolRuns={toolRuns}
+             tokenCount={tokenCount}
+             documentCount={reportData.findings?.length || 0}
+           />
+         )}
       </div>
     );
   }
@@ -373,12 +668,27 @@ export default function App() {
 
   return (
     <div className="relative h-screen bg-stone-900 overflow-hidden font-sans text-stone-100 flex flex-col">
-      <PulsatingDotsBackground />
+      <DottedBackground />
       
       {/* Header */}
       <header className="relative z-20 flex items-center justify-between px-6 py-4 border-b border-white/10 bg-black/20 backdrop-blur-md">
-        <div className="flex items-center gap-2">
+        <div className="flex items-start gap-4">
           <span className="font-display font-bold text-xl tracking-wider uppercase text-white">Tickr</span>
+          {/*
+            Requirements 11.1, 11.4: selector del agente activo en la cabecera.
+            Con una ejecución en curso queda bloqueado y el propio componente
+            explica el motivo.
+          */}
+          <AgentSelector
+            agents={agents}
+            activeAgentId={activeAgentId}
+            defaultAgentId={defaultAgentId}
+            status={catalogStatus}
+            errorMessage={catalogError}
+            running={running}
+            onSelect={selectAgent}
+            onRetry={() => loadCatalog()}
+          />
         </div>
         <div>
           {user ? (
@@ -396,14 +706,20 @@ export default function App() {
 
       <main className="relative z-10 flex-1 flex flex-col pt-8 min-h-0">
         {!running && !reportData && events.length === 0 ? (
-           <LandingView />
+           /* Requirements 13.1, 13.2: la vista de aterrizaje describe al agente activo. */
+           <LandingView agent={activeAgent} />
         ) : (
            <div className="flex-1 flex flex-row overflow-hidden pb-32 w-full px-6">
              <div className="flex-1 flex flex-col bg-stone-900 rounded-xl border border-stone-800 overflow-hidden min-h-0 max-w-4xl mx-auto w-full">
                 <div className="p-3 bg-stone-800 border-b border-stone-700 font-bold text-stone-200 text-sm flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <img src="https://www.gstatic.com/lamda/images/gemini_sparkle_aurora_33f86dc0c0257da337c63.svg" alt="Gemini Sparkle" className="w-5 h-5" />
-                    <span>Gemini 3.6 Flash</span>
+                  {/*
+                    Requirement 12.7: el `name` del agente activo encabeza el
+                    panel y el nombre del modelo queda como texto secundario.
+                  */}
+                  <div className="flex items-center gap-2 min-w-0">
+                    <img src="https://www.gstatic.com/lamda/images/gemini_sparkle_aurora_33f86dc0c0257da337c63.svg" alt="Gemini Sparkle" className="w-5 h-5 shrink-0" />
+                    <span className="truncate">{executionPanelAgentName}</span>
+                    <span className="text-xs font-normal text-stone-400 shrink-0">{MODEL_DISPLAY_NAME}</span>
                   </div>
                   {running && <Loader2 className="w-4 h-4 animate-spin text-stone-400" />}
                 </div>
@@ -429,29 +745,85 @@ export default function App() {
                 {error}
               </div>
             )}
+
+            {/*
+              Requirement 14.6: aviso de informe no estructurado. El texto crudo
+              del agente sigue disponible en la línea de tiempo.
+            */}
+            {unstructuredReport && (
+              <div
+                role="status"
+                className="mb-4 bg-amber-500/10 border border-amber-500/50 text-amber-100 px-4 py-3 rounded text-sm"
+              >
+                El informe no pudo estructurarse. La respuesta del agente se conserva sin
+                formatear en la línea de tiempo.
+              </div>
+            )}
             
 
             <div className="bg-stone-800 border border-stone-700 rounded-xl shadow-2xl p-2 w-full flex items-center gap-2 relative z-30 transition-all focus-within:border-stone-500 focus-within:ring-1 focus-within:ring-stone-500">
-              <div className="pl-3 py-2 flex items-center gap-2 text-stone-400 border-r border-stone-700 pr-3">
-                 <Search className="w-5 h-5" />
-                 <input 
-                   type="text" 
-                   value={ticker}
-                   onChange={(e) => setTicker(e.target.value)}
-                   placeholder="TICKER" 
-                   disabled={running}
-                   className="bg-transparent border-none outline-none w-20 text-white font-mono uppercase placeholder-stone-600"
-                   onKeyDown={(e) => e.key === 'Enter' && runAnalysis()}
-                 />
-              </div>
-              <input 
-                type="text" 
-                value={instruction}
-                onChange={(e) => setInstruction(e.target.value)}
-                disabled
-                className="bg-transparent border-none outline-none flex-1 px-3 py-2 text-stone-200 placeholder-stone-500"
-                onKeyDown={(e) => e.key === 'Enter' && runAnalysis()}
-              />
+              {inputMode === 'ticker' ? (
+                /*
+                  Requirement 13.3: en modo `ticker`, campo corto en mayúsculas
+                  con tipografía monoespaciada e icono de búsqueda.
+                */
+                <div
+                  className={`pl-3 py-2 flex items-center gap-2 transition-colors ${
+                    running ? 'text-stone-600' : 'text-stone-400'
+                  } ${supportsInstruction ? 'border-r border-stone-700 pr-3' : 'flex-1 pr-3'}`}
+                >
+                  <Search className="w-5 h-5 shrink-0" aria-hidden="true" />
+                  <input
+                    type="text"
+                    aria-label="Entrada del agente"
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value.toUpperCase())}
+                    /* Requirement 13.5: el `inputPlaceholder` del manifiesto. */
+                    placeholder={inputPlaceholder}
+                    maxLength={inputMaxLength('ticker')}
+                    disabled={running}
+                    /*
+                      El texto introducido se atenúa mientras hay una ejecución
+                      en curso: el campo está deshabilitado justo en ese caso.
+                    */
+                    className={`bg-transparent border-none outline-none text-white font-mono uppercase placeholder-stone-600 transition-colors disabled:text-stone-500 disabled:placeholder-stone-700 ${
+                      supportsInstruction ? 'w-28' : 'flex-1'
+                    }`}
+                    onKeyDown={(e) => e.key === 'Enter' && runAnalysis()}
+                  />
+                </div>
+              ) : (
+                /* Requirement 13.4: en modo `text`, campo ancho de texto libre. */
+                <input
+                  type="text"
+                  aria-label="Entrada del agente"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  placeholder={inputPlaceholder}
+                  maxLength={inputMaxLength('text')}
+                  disabled={running}
+                  className="bg-transparent border-none outline-none flex-1 px-3 py-2 text-stone-100 placeholder-stone-500 transition-colors disabled:text-stone-500 disabled:placeholder-stone-700"
+                  onKeyDown={(e) => e.key === 'Enter' && runAnalysis()}
+                />
+              )}
+              {/*
+                Requirement 13.6: el campo de instrucción existe solo cuando el
+                agente declara `supportsInstruction` verdadero, y entonces está
+                habilitado.
+              */}
+              {supportsInstruction && (
+                <input
+                  type="text"
+                  aria-label="Instrucción adicional"
+                  value={instruction}
+                  onChange={(e) => setInstruction(e.target.value)}
+                  placeholder="Instrucción opcional para el agente"
+                  maxLength={MAX_INSTRUCTION_LENGTH}
+                  disabled={running}
+                  className="bg-transparent border-none outline-none flex-1 px-3 py-2 text-stone-200 placeholder-stone-500 transition-colors disabled:text-stone-500 disabled:placeholder-stone-700"
+                  onKeyDown={(e) => e.key === 'Enter' && runAnalysis()}
+                />
+              )}
               {running ? (
                 <button 
                   onClick={() => setShowStopConfirm(true)}
@@ -462,14 +834,21 @@ export default function App() {
               ) : (
                 <button 
                   onClick={runAnalysis}
-                  disabled={!ticker.trim()}
-                  className="bg-white text-black hover:bg-stone-200 disabled:bg-stone-700 disabled:text-stone-500 disabled:cursor-not-allowed px-6 py-2 rounded-lg font-medium transition-colors ml-2 tracking-wide text-sm"
+                  /*
+                    Requirements 8.7, 8.8, 11.9: deshabilitado mientras la
+                    entrada no cumple las reglas del `inputMode` activo o el
+                    catálogo está vacío.
+                  */
+                  disabled={!canRunAnalysis}
+                  className="bg-white text-black hover:bg-stone-200 disabled:bg-stone-700 disabled:text-stone-500 disabled:cursor-not-allowed px-6 py-2 rounded-lg font-medium transition-colors ml-2 tracking-wide text-sm whitespace-nowrap"
                 >
-                  Analyze
+                  {/* Requirement 13.7: etiqueta declarada por el agente. */}
+                  {actionLabel}
                 </button>
               )}
             </div>
-            
+
+            {/* Requirement 13.8: el aviso legal sigue visible bajo la barra. */}
             <div className="text-center mt-4">
               <span className="text-xs text-stone-500 font-mono tracking-wider">Gemini can make mistakes, don’t rely on it for financial advice.</span>
             </div>
@@ -502,6 +881,45 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* ---------------------------------------------------------------- */}
+      {/* DEBUG (provisional): bloque autocontenido. Para desactivarlo pon  */}
+      {/* DEBUG_PANEL_ENABLED en false en components/DebugPanel.tsx, o abre */}
+      {/* la app con ?nodebug. Para borrarlo, elimina este bloque, el       */}
+      {/* import de DebugPanel y el archivo del componente.                */}
+      {/* ---------------------------------------------------------------- */}
+      <DebugPanel
+        state={{
+          running,
+          isStopped,
+          error,
+          catalogStatus,
+          catalogError,
+          agents: agents.length,
+          activeAgentId,
+          defaultAgentId,
+          activeAgentName: activeAgent?.name,
+          outputRenderer: activeAgent?.outputRenderer,
+          runAgentId: runAgent?.agentId,
+          runRenderer: runAgent?.outputRenderer,
+          inputMode,
+          inputValue,
+          instruction,
+          canRunAnalysis,
+          model: MODEL_ID,
+          events: events.length,
+          hasReport: !!reportData,
+          unstructuredReport,
+          reportOpen: isReportOpen,
+          durationSecs,
+          tokenCount,
+          toolRuns,
+          startTime,
+          user: user?.email ?? user?.username ?? null,
+        }}
+        events={events}
+      />
+      {/* ------------------------- FIN DEBUG ---------------------------- */}
     </div>
   );
 }

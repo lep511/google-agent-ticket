@@ -1,4 +1,8 @@
 old_version/*
+run_logs/*
+
+debug/*
+!debug/info.txt
 
 .env
 .env.local
@@ -18,7 +22,6 @@ dist
 dist-ssr
 *.local
 
-# Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea

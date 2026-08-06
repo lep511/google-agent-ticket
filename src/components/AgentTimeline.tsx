@@ -36,11 +36,21 @@ function TimelineItem({ event, running }: { event: TimelineEvent; running: boole
 
   const hasDetail = Boolean(event.detail && event.detail.trim());
 
+  // `endTime` sólo se rellena cuando el siguiente evento entra, así que el
+  // único evento sin cierre durante una ejecución es el que corre ahora mismo.
+  const isActive = running && !event.endTime;
+  // Los pasos ya ejecutados se atenúan, salvo si el usuario los abre para leer.
+  const isDimmed = !isActive && !expanded;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 16, scale: 0.98 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      className="bg-black/20 backdrop-blur-md border border-white/10 rounded-xl w-full flex flex-col overflow-hidden shadow-2xl"
+      animate={{ opacity: isDimmed ? 0.55 : 1, y: 0, scale: 1 }}
+      whileHover={isDimmed ? { opacity: 0.95 } : undefined}
+      transition={{ opacity: { duration: 0.45 } }}
+      className={`backdrop-blur-md border rounded-xl w-full flex flex-col overflow-hidden shadow-2xl transition-colors duration-500 ${
+        isActive ? 'bg-black/45 border-white/30' : 'bg-black/20 border-white/10'
+      }`}
     >
       <div 
         className={`p-5 flex flex-col gap-3 ${hasDetail ? 'cursor-pointer select-none' : ''}`}

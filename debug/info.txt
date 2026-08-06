@@ -1,0 +1,10 @@
+This folder holds debug output written by the server while an agent runs.
+
+Everything here exists only to help diagnose problems. Nothing in this folder is
+read back by the application, and no feature depends on it. The contents are
+regenerated on the next run, so the folder can be emptied or deleted at any time
+without affecting how the app behaves.
+
+Whatever the server writes here is ignored by git and stays out of commits. This
+note is the exception: it is versioned so the folder keeps its explanation even
+when empty.

@@ -10,27 +10,36 @@ import { GoogleGenAI } from "@google/genai";
 
 import { createInteraction, streamInteraction } from "./server/lib/agentClient.ts";
 import { createInteraction as createInteractionPerseus, streamInteraction as streamInteractionPerseus } from "./server/lib/agentClientPerseus.ts";
+import { buildAgentCatalogHttpResult } from "./server/lib/agentCatalog.ts";
+import { subAgentsDebugFileName, writeDebugFile } from "./server/lib/debugFiles.ts";
+import { agentRegistry } from "./server/lib/agentRegistry.ts";
+import {
+  buildAgentInfoEvent,
+  buildStreamFailureEvents,
+  describeStreamFailure,
+  isPerseusModel,
+  toRemoteInlineSources,
+} from "./server/lib/analyzeExecution.ts";
+import { validateAnalyzeInput } from "./server/lib/analyzeInput.ts";
+import { buildAgentPrompt } from "./server/lib/promptBuilder.ts";
+import { resolveRunLogDownload } from "./server/lib/runLogDownload.ts";
+import { buildRunLogNames, toLogFileSlug } from "./server/lib/runLogNaming.ts";
 
-function loadAgentFiles(dir: string, basePath: string): Array<{type: string, content: string, target: string}> {
-  let files: Array<{type: string, content: string, target: string}> = [];
-  if (!fs.existsSync(dir)) return files;
+/**
+ * Mensaje del error de configuración cuando el catálogo no tiene ningún agente
+ * válido: se responde antes de abrir el flujo SSE y sin nombrar rutas del
+ * sistema de archivos (Requirements 5.6, 16.3).
+ */
+const NO_AGENTS_AVAILABLE_ERROR =
+  "No hay agentes disponibles en el servidor para atender la ejecución.";
 
-  const entries = fs.readdirSync(dir, { withFileTypes: true });
-  for (const entry of entries) {
-    const fullPath = path.join(dir, entry.name);
-    const targetPath = path.posix.join(basePath, entry.name);
-    if (entry.isDirectory()) {
-      files = files.concat(loadAgentFiles(fullPath, targetPath));
-    } else {
-      files.push({
-        type: "inline",
-        content: fs.readFileSync(fullPath, "utf-8"),
-        target: targetPath
-      });
-    }
-  }
-  return files;
-}
+/**
+ * Mensaje del error con el que se rechaza una ejecución cuyo agente resuelto no
+ * puede preparar sus fuentes inline, su plantilla o su esquema: se responde
+ * antes de abrir el flujo SSE y sin crear ninguna interacción remota
+ * (Requirements 6.7, 7.4, 7.9).
+ */
+const AGENT_NOT_EXECUTABLE_ERROR = "El agente seleccionado no se puede ejecutar.";
 
 async function startServer() {
   const app = express();
@@ -137,90 +146,124 @@ async function startServer() {
     }
   });
 
+  /**
+   * Catálogo de agentes disponibles.
+   *
+   * La respuesta se construye solo desde el catálogo que el registro mantiene
+   * en memoria: no se lee ningún archivo de ejecución, prompt ni esquema
+   * (Requirement 4.6), y solo se exponen los campos de resumen del agente, sin
+   * rutas del sistema de archivos (Requirements 4.2, 4.5, 16.3). Sigue el mismo
+   * modelo de acceso que el resto de `/api/*`: sin token (Requirement 16.5).
+   */
+  app.get("/api/agents", (_req, res) => {
+    const { status, body } = buildAgentCatalogHttpResult(agentRegistry);
+    res.status(status).json(body);
+  });
+
+  /**
+   * Descarga del `.jsonl` de una ejecución.
+   *
+   * Mantiene el parámetro `ticker` y añade `agent` como opcional: con él se
+   * entrega el log más reciente de esa entrada y ese agentId (Requirement 10.3);
+   * sin él, el más reciente de esa entrada para cualquier agentId
+   * (Requirement 10.4). Se reconocen el patrón nuevo y el heredado, con la
+   * entrada comparada sin distinguir mayúsculas y minúsculas y quedándose con el
+   * `runId` más alto (Requirement 9.6). Un `ticker` inválido se rechaza con 400
+   * antes de enumerar la carpeta (Requirement 9.7) y la falta de coincidencias
+   * responde 404 (Requirement 10.5). El archivo se entrega con su nombre
+   * original, sin renombrarlo (Requirement 9.8).
+   */
   app.get("/api/download_jsonl", (req, res) => {
-    const ticker = req.query.ticker;
-    if (!ticker) {
-      return res.status(400).send("Missing ticker");
-    }
-    
     const runLogsDir = path.join(process.cwd(), 'run_logs');
-    if (!fs.existsSync(runLogsDir)) {
-      return res.status(404).send("No logs found");
+
+    const result = resolveRunLogDownload({
+      query: req.query as { ticker?: unknown; agent?: unknown },
+      // La enumeración es perezosa: solo se lee la carpeta si los parámetros
+      // pasaron la validación (Requirement 9.7).
+      listFileNames: () => (fs.existsSync(runLogsDir) ? fs.readdirSync(runLogsDir) : []),
+    });
+
+    if (result.match === null) {
+      return res.status(result.status).json(result.body);
     }
-    
-    const files = fs.readdirSync(runLogsDir)
-      .filter(f => f.startsWith(`run_log_${ticker}_`) && f.endsWith('.jsonl'))
-      .sort((a, b) => {
-        // extract timestamp
-        const aMatch = a.match(/_(\d+)\.jsonl$/);
-        const bMatch = b.match(/_(\d+)\.jsonl$/);
-        if (aMatch && bMatch) {
-          return parseInt(bMatch[1]) - parseInt(aMatch[1]);
-        }
-        return 0;
-      });
-      
-    if (files.length === 0) {
-      return res.status(404).send("No JSONL log found for ticker");
-    }
-    
-    const latestFile = path.join(runLogsDir, files[0]);
-    res.download(latestFile);
+
+    return res.download(path.join(runLogsDir, result.match.fileName));
   });
 
   app.post("/api/analyze", async (req, res) => {
     try {
-      const { ticker, instruction, origin, model } = req.body;
-      if (!ticker) {
-        return res.status(400).json({ error: "Missing ticker." });
+      const body = (req.body ?? {}) as Record<string, unknown>;
+      const { origin, model } = body as { origin?: string; model?: string };
+
+      // El agente se resuelve antes de validar la entrada porque las reglas
+      // dependen de su `inputMode` y de su `supportsInstruction`
+      // (Requirements 5.1, 5.2, 8.1, 8.2). La ruta de la carpeta sale siempre
+      // de la entrada de catálogo, nunca del valor recibido (Requirement 16.1).
+      const resolution = agentRegistry.resolveAgent(body.agentId);
+      if (resolution.definition === null) {
+        // Requirement 5.6: sin agentes disponibles no se abre el flujo SSE ni
+        // se escribe ningún log de ejecución.
+        return res.status(500).json({ error: NO_AGENTS_AVAILABLE_ERROR });
+      }
+      const agent = resolution.definition;
+
+      // Requirements 8.4, 8.5: la validación ocurre antes de cargar las fuentes
+      // inline, antes de ensamblar el prompt y antes de escribir las cabeceras
+      // SSE, y su rechazo es una única respuesta 400 no SSE, sin logs.
+      const validation = validateAnalyzeInput({
+        body,
+        inputMode: agent.manifest.inputMode,
+        supportsInstruction: agent.manifest.supportsInstruction,
+      });
+      if (validation.rejection !== null) {
+        const { status, body: errorBody } = validation.rejection;
+        console.warn(
+          `[analyze] Petición rechazada por validación (${errorBody.code}, campo "${errorBody.field}").`,
+        );
+        return res.status(status).json(errorBody);
       }
 
-      console.log(`[analyze] Starting analysis for ${ticker} using model ${model || 'default'}`);
-      
-      const agentFiles = loadAgentFiles(path.join(process.cwd(), "agent"), "/.agents");
-      
+      const { input, instruction, rawInput } = validation.value;
+
+      console.log(`[analyze] Starting analysis for ${input} with agent ${agent.agentId} using model ${model || 'default'}`);
+
+      // Requirements 5.5, 5.8: `agentClientPerseus` solo cuando `model` es
+      // exactamente `perseus` tras recortar los espacios.
+      const usePerseus = isPerseusModel(model);
+
+      // Requirements 6.1 a 6.4: las fuentes inline se recorren solo dentro de la
+      // carpeta del agente resuelto y su contenido se lee aquí, al resolver la
+      // ejecución. Requirements 7.1 a 7.9: el prompt sale de la plantilla y del
+      // esquema del agente. Un fallo en cualquiera de los dos pasos se responde
+      // antes de las cabeceras SSE y sin crear ninguna interacción remota
+      // (Requirements 6.7, 7.4, 7.9).
+      let agentFiles;
+      let prompt: string;
+      try {
+        agentFiles = toRemoteInlineSources(agentRegistry.getInlineSources(agent.agentId).sources);
+        prompt = buildAgentPrompt({
+          definition: agent,
+          input,
+          // Requirement 5.7: la instrucción llega al ensamblador solo cuando el
+          // agente la declara; en otro caso se descarta sin rechazar la petición.
+          instruction: agent.manifest.supportsInstruction ? instruction : null,
+        }).prompt;
+      } catch (preparationError: any) {
+        console.error(
+          `[analyze] El agente "${agent.agentId}" no se puede ejecutar: ${preparationError?.message || preparationError}`,
+        );
+        return res.status(500).json({
+          error: AGENT_NOT_EXECUTABLE_ERROR,
+          detail: preparationError?.message || String(preparationError),
+        });
+      }
+
       const host = req.get('host');
       const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
       const publicUrl = origin || `${protocol}://${host}`;
 
-      let finalInstruction = instruction ? `${instruction}` : `Find and analyze recent SEC filings and public stock documents for ${ticker}. Make sure that you are looking for the most up to date documents of the existing quarter or the quarter before (if documents have not been out yet for the existing quarter, look for the last quarter).`;
-
-      const dynamicSchema = `{
-  "verdict": {
-    "summary": "...",
-    "conviction_score": 85,
-    "key_takeaways": ["...", "..."]
-  },
-  "deep_insights": [
-    {
-      "category": "Risk Assessment",
-      "title": "...",
-      "description": "...",
-      "impact_score": 8
-    }
-  ],
-  "findings": [
-    {
-      "documentType": "Form 10-K",
-      "keyInsights": ["...", "..."],
-      "date": "2023-12-31",
-      "sourceUrl": "..."
-    }
-  ],
-  "financial_charts": {
-    "stock_price_4m": [
-      { "date": "Oct '24", "price": 150.5 }
-    ],
-    "financial_performance_4q": [
-      { "quarter": "Q1 2025", "revenue": 10.5, "net_income": 2.1, "distributions": 0.5 }
-    ]
-  }
-}`;;
-
-      const prompt = `Perform a comprehensive document analysis on ${ticker}. ${finalInstruction}\n\nCRITICAL INSTRUCTIONS FOR QUANTITATIVE DATA (CHARTS):\nFor stock_price_4m and financial_performance_4q, you MUST use standard open web searches (e.g. Yahoo Finance, Google Finance, MarketWatch) WITHOUT the filetype:pdf restriction to get accurate historical prices, distributions, revenue, and net income. Do NOT rely solely on SEC PDFs for this quantitative data.\nFor stock_price_4m, provide exactly 4 data points representing the past 4 months of stock prices. For each month, give the closing price on the last trading day of the month. Order the array chronologically from the oldest month to the newest month (left to right).\nFor financial_performance_4q, if the ticker is a regular stock, provide net income and revenue for the past four completed quarters. If it is an ETF, provide quarterly distributions (dividends/yield per share) for the past four completed quarters. Ensure the array is chronologically ordered from oldest quarter to newest (left to right).\n\nCRITICAL INSTRUCTIONS FOR QUALITATIVE DATA (INSIGHTS & SUMMARIES):\nFor the Executive Summary, Key Takeaways, Deep Insights, and Document Findings, you MUST leverage BOTH the findings extracted from the PDF SEC filings AND insights from broader open web searches to create a comprehensive analysis. Format text fields (summary, key_takeaways items, description, keyInsights items) using Markdown formatting (e.g. **bolding** key terms, lists, links, inline code) so cards display rich, formatted content.\n\nCRITICAL: You MUST output the final synthesis report as a raw JSON object wrapped in \`\`\`json ... \`\`\` markdown block in your final text response. The JSON must match the following schema EXACTLY. **HEAVILY PENALIZED:** Do NOT rename keys. Do NOT add extra root-level keys like "macro_risk_analysis". Make sure to populate the "findings" array with exactly the keys "documentType", "keyInsights", "date", and "sourceUrl". For stock_price_4m, use exactly the keys "date" and "price". The "deep_insights" array MUST use exactly the keys "category", "title", "description", and "impact_score":\n${dynamicSchema}\nDo not include multiple sub-agents, just do the analysis yourself based on the retrieved documents and searches.`;
-
       let response;
-      if (model === 'perseus') {
+      if (usePerseus) {
         response = await createInteractionPerseus({
           prompt,
           inlineSources: agentFiles,
@@ -240,6 +283,7 @@ async function startServer() {
         return res.status(500).json({ error: "Failed to start agent interaction." });
       }
 
+      // Requirement 5.4: las cabeceras SSE se conservan tal como estaban.
       res.setHeader('Content-Type', 'text/event-stream');
       res.setHeader('Cache-Control', 'no-cache');
       res.setHeader('Connection', 'keep-alive');
@@ -251,71 +295,137 @@ async function startServer() {
           fs.mkdirSync(runLogsDir, { recursive: true });
       }
 
+      // Requirement 10.1: los dos archivos de log de la ejecución llevan el
+      // agentId, la entrada saneada y el mismo `runId`, de modo que dos agentes
+      // sobre la misma entrada no se solapen.
       const runId = Date.now();
-      const jsonlLogPath = path.join(runLogsDir, `run_log_${ticker}_${runId}.jsonl`);
+      const runLogNames = buildRunLogNames({ agentId: agent.agentId, rawInput, runId });
+      const jsonlLogPath = path.join(runLogsDir, runLogNames.jsonlFileName);
       
-      let debugLog = `--- Analysis Run for ${ticker} at ${new Date().toISOString()} ---\n\n`;
+      let debugLog = `--- Analysis Run for ${input} at ${new Date().toISOString()} ---\n\n`;
       const toolExecutions = {};
       let totalTokens = 0;
-          
-      const stream = model === 'perseus' ? streamInteractionPerseus(response) : streamInteraction(response);
-      for await (const event of stream) {
+
+      const sendEvent = (event: object): void => {
         res.write(`data: ${JSON.stringify(event)}\n\n`);
-        
-        if (event.type === 'complete' && event.interaction) {
-            const usage = (event.interaction.usage || event.interaction.usage_metadata) as any;
-            if (usage) {
-                totalTokens = usage.total_tokens || usage.totalTokenCount || usage.total_token_count || 0;
-            }
-        }
-        
+      };
+
+      const appendJsonlLog = (event: unknown): void => {
         try {
           fs.appendFileSync(jsonlLogPath, JSON.stringify(event) + '\n', 'utf-8');
         } catch (e) {
           console.error("Failed to write to JSONL log", e);
         }
-            
-        if (event.type === 'tool_call') {
-          const callId = event.callId || `unknown_${Math.random()}`;
-          toolExecutions[callId] = {
-            name: event.name || 'code_execution_call',
-            args: event.arguments,
-            startTime: Date.now()
-          };
-          debugLog += `[${new Date().toISOString()}] [TOOL CALL START] ${event.name || 'code_execution_call'}\n`;
-          debugLog += `Call ID: ${callId}\n`;
-          debugLog += `Arguments: ${JSON.stringify(event.arguments, null, 2)}\n\n`;
-        } else if (event.type === 'tool_result') {
-          const callId = event.callId || 'unknown';
-          const execution = toolExecutions[callId];
-          const duration = execution ? ((Date.now() - execution.startTime) / 1000).toFixed(2) + 's' : 'unknown';
-          if (execution) {
-            execution.duration = duration;
-            execution.result = event.result;
-          }
-          debugLog += `[${new Date().toISOString()}] [TOOL RESULT END] ${event.name || 'command'}\n`;
-          debugLog += `Call ID: ${callId}\n`;
-          debugLog += `Duration: ${duration}\n`;
-          debugLog += `Result: ${event.result ? String(event.result).substring(0, 500) : ''}...\n\n`;
-        } else if (event.type === 'text') {
-          debugLog += `[TEXT OUTPUT]\n${event.text}\n\n`;
-        } else if (event.type === 'error') {
-          debugLog += `[ERROR]\n${event.message}\n\n`;
-        }
+      };
 
-        if (event.type === 'done' || event.type === 'complete' || event.type === 'error') {
-            break;
+      // Requirement 5.3: exactamente un evento `agent_info`, con el agentId
+      // efectivamente ejecutado, antes de reenviar cualquier otro evento.
+      const agentInfoEvent = buildAgentInfoEvent(agent);
+      sendEvent(agentInfoEvent);
+      appendJsonlLog(agentInfoEvent);
+
+      /** Motivo del fallo del cliente remoto, cuando lo hay (Requirement 5.10). */
+      let streamFailure: string | null = null;
+      /** Verdadero cuando el propio flujo ya reenvió un evento `error`. */
+      let errorEmitted = false;
+      /** Verdadero cuando el propio flujo ya emitió su evento `done`. */
+      let doneEmitted = false;
+
+      const stream = usePerseus ? streamInteractionPerseus(response) : streamInteraction(response);
+      try {
+        for await (const event of stream) {
+          sendEvent(event);
+
+          if (event.type === 'complete' && event.interaction) {
+              const usage = (event.interaction.usage || event.interaction.usage_metadata) as any;
+              if (usage) {
+                  totalTokens = usage.total_tokens || usage.totalTokenCount || usage.total_token_count || 0;
+              }
+          }
+
+          appendJsonlLog(event);
+
+          if (event.type === 'error') {
+            // El cliente remoto informó un fallo: el flujo se cierra con `done`
+            // y se conservan los eventos y los logs escritos (Requirement 5.10).
+            streamFailure = describeStreamFailure(event.message);
+            errorEmitted = true;
+          } else if (event.type === 'done') {
+            doneEmitted = true;
+          }
+
+          if (event.type === 'tool_call') {
+            const callId = event.callId || `unknown_${Math.random()}`;
+            toolExecutions[callId] = {
+              name: event.name || 'code_execution_call',
+              args: event.arguments,
+              startTime: Date.now()
+            };
+            debugLog += `[${new Date().toISOString()}] [TOOL CALL START] ${event.name || 'code_execution_call'}\n`;
+            debugLog += `Call ID: ${callId}\n`;
+            debugLog += `Arguments: ${JSON.stringify(event.arguments, null, 2)}\n\n`;
+          } else if (event.type === 'tool_result') {
+            const callId = event.callId || 'unknown';
+            const execution = toolExecutions[callId];
+            const duration = execution ? ((Date.now() - execution.startTime) / 1000).toFixed(2) + 's' : 'unknown';
+            if (execution) {
+              execution.duration = duration;
+              execution.result = event.result;
+            }
+            debugLog += `[${new Date().toISOString()}] [TOOL RESULT END] ${event.name || 'command'}\n`;
+            debugLog += `Call ID: ${callId}\n`;
+            debugLog += `Duration: ${duration}\n`;
+            debugLog += `Result: ${event.result ? String(event.result).substring(0, 500) : ''}...\n\n`;
+          } else if (event.type === 'text') {
+            debugLog += `[TEXT OUTPUT]\n${event.text}\n\n`;
+          } else if (event.type === 'error') {
+            debugLog += `[ERROR]\n${event.message}\n\n`;
+          }
+
+          if (event.type === 'done' || event.type === 'complete' || event.type === 'error') {
+              break;
+          }
+        }
+      } catch (streamError: any) {
+        // Requirement 5.10: el cliente remoto se interrumpió después de escribir
+        // las cabeceras SSE. No se puede responder un código de estado, así que
+        // el motivo viaja en un evento `error` del propio flujo.
+        streamFailure = describeStreamFailure(streamError);
+        console.error(`[analyze] El flujo del cliente remoto se interrumpió: ${streamFailure}`);
+        debugLog += `[ERROR]\n${streamFailure}\n\n`;
+      }
+
+      if (streamFailure !== null) {
+        // Requirement 5.10: `error`, después `done`, y se cierra el flujo sin
+        // `final_stats`; los eventos y los logs ya escritos se conservan.
+        const [errorEvent, doneEvent] = buildStreamFailureEvents(streamFailure);
+        if (!errorEmitted) {
+          sendEvent(errorEvent);
+          appendJsonlLog(errorEvent);
+        }
+        if (!doneEmitted) {
+          sendEvent(doneEvent);
+          appendJsonlLog(doneEvent);
         }
       }
-          
+
       const totalDurationSecs = ((Date.now() - startTime) / 1000);
       const totalDuration = totalDurationSecs.toFixed(2) + 's';
       
       // Send final reliable stats to client
-      res.write(`data: ${JSON.stringify({ type: 'final_stats', duration: totalDurationSecs, tokens: totalTokens, jsonlLogUrl: '/run_logs/' + `run_log_${ticker}_${runId}.jsonl` })}\n\n`);
+      if (streamFailure === null) {
+        // Requirement 10.2: la URL apunta al `.jsonl` de esta misma ejecución
+        // bajo el estático `/run_logs`.
+        sendEvent({
+          type: 'final_stats',
+          duration: totalDurationSecs,
+          tokens: totalTokens,
+          jsonlLogUrl: runLogNames.jsonlLogUrl,
+        });
+      }
 
       let summaryLog = `========================================================\n`;
-      summaryLog += `                 RUN SUMMARY FOR ${ticker.toUpperCase()}\n`;
+      summaryLog += `                 RUN SUMMARY FOR ${input.slice(0, 80).toUpperCase()}\n`;
       summaryLog += `                 Total Duration: ${totalDuration}\n`;
       summaryLog += `========================================================\n\n`;
       summaryLog += `1. SUB-AGENT EXECUTIONS:\n`;
@@ -341,11 +451,12 @@ async function startServer() {
       summaryLog += `RAW EXECUTION LOGS:\n\n`;
 
       try {
-        const logFileName = `run_log_${ticker}_${Date.now()}.txt`;
+        // Requirement 10.1: el `.txt` comparte agentId, entrada y `runId` con el
+        // `.jsonl` de la misma ejecución.
         const finalLog = summaryLog + debugLog;
-        fs.writeFileSync(path.join(runLogsDir, logFileName), finalLog, 'utf-8');
-        // Maintain backwards compatibility with the old txt file
-        fs.writeFileSync(path.join(process.cwd(), `sub_agents_debug_${ticker}.txt`), finalLog, 'utf-8');
+        fs.writeFileSync(path.join(runLogsDir, runLogNames.txtFileName), finalLog, 'utf-8');
+        // Copia heredada de la última ejecución por entrada, ahora bajo `debug/`.
+        writeDebugFile(subAgentsDebugFileName(toLogFileSlug(rawInput)), finalLog);
       } catch (e) {
         console.error("Failed to write debug log", e);
       }
@@ -355,7 +466,14 @@ async function startServer() {
       console.error("[analyze] Error:", err);
       if (!res.headersSent) {
         res.status(500).json({ error: err.message || "Analyze failed" });
+        return;
       }
+      // Requirement 5.10: con las cabeceras SSE ya escritas, el motivo viaja en
+      // un evento `error` seguido de `done`, y el flujo se cierra.
+      for (const event of buildStreamFailureEvents(err)) {
+        res.write(`data: ${JSON.stringify(event)}\n\n`);
+      }
+      res.end();
     }
   });
 
