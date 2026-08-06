@@ -1,0 +1,40 @@
+- generic [ref=f3e3]:
+  - banner [ref=f3e4]:
+    - generic [ref=f3e5]:
+      - generic [ref=f3e6]: Tickr
+      - button "Seleccionar agente" [active] [ref=f3e8]:
+        - generic [ref=f3e12]: Market News Digest
+    - button "Sign In" [ref=f3e16]
+  - main [ref=f3e17]:
+    - generic [ref=f3e138]:
+      - generic [ref=f3e139]:
+        - heading "Market News Digest, the recent news cycle in one page" [level=1] [ref=f3e140]
+        - paragraph [ref=f3e141]: Summarizes the latest coverage of a ticker and assesses the overall tone of the reporting.
+      - generic [ref=f3e142]:
+        - generic [ref=f3e143]:
+          - heading "Coverage gathered from public reporting." [level=3] [ref=f3e144]
+          - generic [ref=f3e145]:
+            - generic [ref=f3e152]:
+              - generic [ref=f3e153]: Company announcements
+              - generic [ref=f3e154]: Earnings, guidance and material events
+            - generic [ref=f3e162]:
+              - generic [ref=f3e163]: Analyst and market reaction
+              - generic [ref=f3e164]: Ratings, price action and commentary
+            - generic [ref=f3e172]:
+              - generic [ref=f3e173]: Sector and regulatory context
+              - generic [ref=f3e174]: Competitors, policy and supply chain
+        - generic [ref=f3e175]:
+          - heading "A digest you can read in a minute." [level=3] [ref=f3e176]
+          - generic [ref=f3e177]:
+            - generic [ref=f3e178]: Group the cycle into themes
+            - generic [ref=f3e184]: Separate confirmed facts from speculation
+            - generic [ref=f3e191]: Cite every source with its date
+    - generic [ref=f3e24]:
+      - generic [ref=f3e25]:
+        - textbox "Entrada del agente" [ref=f3e30]:
+          - /placeholder: TICKER
+        - textbox "Instrucción adicional" [ref=f3e31]:
+          - /placeholder: Instrucción opcional para el agente
+        - button "Summarize News" [disabled] [ref=f3e198]
+      - generic [ref=f3e33]: Gemini can make mistakes, don’t rely on it for financial advice.
+  - button "debug" [ref=f3e35]

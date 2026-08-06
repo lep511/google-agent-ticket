@@ -18,7 +18,7 @@ interface Props {
 
 const AnalysisCard = ({ title, subtext, children, className = "" }: any) => (
   <div className={`bg-white rounded-xl p-6 border border-stone-200 flex flex-col print:break-inside-avoid print:mb-6 print:shadow-none print:bg-white print:border-stone-300 ${className}`}>
-    <div className="flex justify-between items-start mb-2 print:break-after-avoid">
+    <div className="flex justify-between items-start mb-2 print:break-after-avoid print-keep-with-next">
       <h3 className="text-lg font-semibold text-stone-900">{title}</h3>
     </div>
     {subtext && (
@@ -86,7 +86,7 @@ export default function ReportTemplate({ data, ticker, onClose, durationSecs = 0
         </div>
 
         {/* Executive Summary */}
-        <div className="flex flex-col gap-6 print:gap-4 print:break-inside-avoid print:mb-8 print:w-full">
+        <div className="flex flex-col gap-6 print:gap-4 print:mb-8 print:w-full">
           <AnalysisCard title="Executive Summary" className="w-full print:block print:w-full print:mb-6">
             <div className="bg-stone-50 p-5 rounded-xl border border-stone-100 mb-6 text-stone-800 leading-relaxed font-medium text-lg w-full print:bg-stone-100/60 print:border-stone-200 print:mb-6">
               <FormattedMarkdown content={data.verdict?.summary || 'No summary available.'} />
@@ -96,7 +96,7 @@ export default function ReportTemplate({ data, ticker, onClose, durationSecs = 0
               <div className="md:col-span-7 flex flex-col print:w-7/12 print:flex-1">
                 {data.verdict?.key_takeaways && (Array.isArray(data.verdict.key_takeaways) ? data.verdict.key_takeaways.length > 0 : true) && (
                   <div className="w-full text-left flex-1">
-                     <div className="text-sm font-bold text-stone-500 uppercase tracking-wider mb-4 border-b border-stone-100 pb-2 print:border-stone-200">Key Takeaways</div>
+                     <div className="text-sm font-bold text-stone-500 uppercase tracking-wider mb-4 border-b border-stone-100 pb-2 print:border-stone-200 print-keep-with-next">Key Takeaways</div>
                      <div className="space-y-3">
                        {Array.isArray(data.verdict.key_takeaways) ? data.verdict.key_takeaways.map((takeaway, i) => (
                           <div key={i} className="flex gap-3 text-base print:break-inside-avoid">
@@ -200,7 +200,7 @@ export default function ReportTemplate({ data, ticker, onClose, durationSecs = 0
 
         {/* Deep Insights */}
         {data.deep_insights && data.deep_insights.length > 0 && (
-          <div className="mt-8 print:mt-6 print:break-inside-avoid print:mb-6">
+          <div className="mt-8 print:mt-6 print:mb-6">
             <h2 className="text-2xl font-display font-bold text-stone-900 uppercase tracking-wider mb-6 print:mb-4 print:break-after-avoid">Deep Insights</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 print:grid-cols-3 print:gap-4">
               {data.deep_insights.slice(0, 3).map((insight, index) => (

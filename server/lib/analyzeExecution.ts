@@ -127,3 +127,79 @@ export function toRemoteInlineSources(
 ): RemoteInlineSource[] {
   return sources.map(({ type, content, target }) => ({ type, content, target }));
 }
+
+/* ────────────────────────────────────────────────────────── */
+/*  Fallo al crear la interacción remota                       */
+/* ────────────────────────────────────────────────────────── */
+
+/**
+ * Respuesta HTTP con la que se rechaza una ejecución cuando el cliente remoto
+ * no llega a crear la interacción, es decir, antes de escribir las cabeceras
+ * SSE.
+ */
+export interface CreateInteractionFailure {
+  /** Código con el que responde `POST /api/analyze`. */
+  status: number;
+  body: {
+    error: string;
+    /** Código estable para que el cliente distinga el motivo sin parsear texto. */
+    code: 'upstream_rate_limited' | 'upstream_unavailable' | 'upstream_error';
+    /** Estado devuelto por el servicio remoto, como dato de diagnóstico. */
+    upstreamStatus: number;
+    /** Verdadero cuando repetir la misma petición más tarde puede funcionar. */
+    retryable: boolean;
+  };
+}
+
+/**
+ * Traduce el estado con el que el servicio remoto rechazó la creación de la
+ * interacción a la respuesta de `POST /api/analyze`.
+ *
+ * Colapsar todos estos casos en un 500 con un texto único dejaba al cliente sin
+ * forma de distinguir un límite de cuota temporal (reintentable) de un fallo
+ * real del servicio, y el motivo solo quedaba en el log del servidor.
+ */
+export function describeCreateInteractionFailure(
+  upstreamStatus: unknown,
+): CreateInteractionFailure {
+  const status =
+    typeof upstreamStatus === 'number' && Number.isFinite(upstreamStatus)
+      ? Math.trunc(upstreamStatus)
+      : 0;
+
+  if (status === 429) {
+    return {
+      status: 429,
+      body: {
+        error:
+          'El servicio del agente está limitando las peticiones. Espera unos segundos y vuelve a intentarlo.',
+        code: 'upstream_rate_limited',
+        upstreamStatus: status,
+        retryable: true,
+      },
+    };
+  }
+
+  if (status === 503 || status === 504) {
+    return {
+      status: 503,
+      body: {
+        error:
+          'El servicio del agente no está disponible en este momento. Vuelve a intentarlo en unos minutos.',
+        code: 'upstream_unavailable',
+        upstreamStatus: status,
+        retryable: true,
+      },
+    };
+  }
+
+  return {
+    status: 502,
+    body: {
+      error: `El servicio del agente rechazó la ejecución (estado ${status || 'desconocido'}).`,
+      code: 'upstream_error',
+      upstreamStatus: status,
+      retryable: false,
+    },
+  };
+}

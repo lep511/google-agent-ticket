@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { DottedBackground } from './components/PulsatingDots';
 import { Search, Loader2 } from 'lucide-react';
 import ReportTemplate from "./ReportTemplate";
-import SimpleReportView from './components/SimpleReportView';
+import SimpleReportView, { normalizeSimpleReport } from './components/SimpleReportView';
 import { AgentTimeline, TimelineEvent } from './components/AgentTimeline';
 import { AgentSelector } from './components/AgentSelector';
 // DEBUG (provisional): borrar este import junto con el bloque <DebugPanel /> del final.
@@ -65,6 +65,48 @@ export interface ReportData {
     stock_price_4m: { date: string; price: number }[];
     financial_performance_4q: { quarter: string; revenue?: number; net_income?: number; distributions?: number }[];
   };
+}
+
+/**
+ * Número de documentos citados por el informe, contado según el contrato del
+ * renderizador que lo produjo. `findings` solo existe en el contrato
+ * `financial_report`; los informes `simple_report` citan sus documentos en
+ * `sources`, así que contar siempre `findings` dejaba la métrica en cero para
+ * todos los agentes de informe simple (Requirement 14.3).
+ */
+export function countReportDocuments(
+  data: ReportData | Record<string, unknown> | null | undefined,
+  renderer: OutputRenderer,
+): number {
+  if (!data) return 0;
+  if (renderer === 'simple_report') {
+    return normalizeSimpleReport(data as Record<string, unknown>).sources.length;
+  }
+  return (data as ReportData).findings?.length ?? 0;
+}
+
+/**
+ * Motivo legible del rechazo de `POST /api/analyze`. El servidor responde un
+ * JSON con `error` y, cuando el fallo viene del servicio remoto, un `retryable`
+ * que indica si repetir la petición puede funcionar. Sin esto la línea de
+ * tiempo solo mostraba `Server responded 500`.
+ */
+async function describeAnalyzeFailure(resp: Response): Promise<string> {
+  if (!resp.body) return `El servidor no devolvió ningún flujo de eventos (estado ${resp.status}).`;
+
+  let payload: { error?: unknown; retryable?: unknown } | null = null;
+  try {
+    payload = (await resp.clone().json()) as { error?: unknown; retryable?: unknown };
+  } catch {
+    payload = null;
+  }
+
+  const message =
+    typeof payload?.error === 'string' && payload.error.trim().length > 0
+      ? payload.error.trim()
+      : `El servidor rechazó la ejecución (estado ${resp.status}).`;
+
+  return payload?.retryable === true ? `${message} (reintentable)` : message;
 }
 
 // Toggle this to true if you want the JSON logs to be downloaded automatically after a run.
@@ -415,7 +457,10 @@ export default function App() {
       });
 
       if (!resp.ok || !resp.body) {
-        throw new Error(`Server responded ${resp.status}`);
+        // El servidor explica el motivo en el cuerpo (límite de cuota, servicio
+        // remoto caído, entrada inválida); mostrar solo el código dejaba al
+        // usuario sin saber si merecía la pena reintentar.
+        throw new Error(await describeAnalyzeFailure(resp));
       }
 
       const reader = resp.body.getReader();
@@ -658,7 +703,7 @@ export default function App() {
              durationSecs={durationSecs}
              toolRuns={toolRuns}
              tokenCount={tokenCount}
-             documentCount={reportData.findings?.length || 0}
+             documentCount={countReportDocuments(reportData, reportRenderer)}
            />
          )}
       </div>
@@ -729,7 +774,20 @@ export default function App() {
                     running={running} 
                     hasReport={!!reportData && isReportOpen !== 'flash'}
                     onViewReport={() => setIsReportOpen('flash')}
-                    metrics={reportData ? { durationSecs, tokenCount, documentCount: reportData.findings?.length || 0 } : undefined}
+                    metrics={
+                      reportData
+                        ? {
+                            durationSecs,
+                            tokenCount,
+                            // El conteo sigue el contrato del agente que produjo
+                            // el informe, no el del analista financiero.
+                            documentCount: countReportDocuments(
+                              reportData,
+                              runAgent?.outputRenderer ?? FALLBACK_OUTPUT_RENDERER,
+                            ),
+                          }
+                        : undefined
+                    }
                     isStopped={isStopped}
                   />
                 </div>

@@ -1,0 +1,259 @@
+- generic [ref=f3e3]:
+  - banner [ref=f3e870]:
+    - generic [ref=f3e871]:
+      - generic [ref=f3e872]: Tickr
+      - button "Seleccionar agente" [ref=f3e874]:
+        - generic [ref=f3e879]: Market News Digest
+    - button "Sign In" [ref=f3e883]
+  - main [ref=f3e884]:
+    - generic [ref=f3e886]:
+      - generic [ref=f3e888]:
+        - img "Gemini Sparkle" [ref=f3e889]
+        - generic [ref=f3e890]: Market News Digest
+        - generic [ref=f3e891]: Gemini 3.6 Flash
+      - generic [ref=f3e895]:
+        - generic [ref=f3e896]:
+          - generic [ref=f3e898] [cursor=pointer]:
+            - heading "Analyzing Defining the Scope" [level=3] [ref=f3e908]
+            - button "View Results" [ref=f3e909]
+          - generic [ref=f3e913] [cursor=pointer]:
+            - generic [ref=f3e914]: Event Log
+            - generic [ref=f3e919]:
+              - generic [ref=f3e920]: View Results
+              - generic [ref=f3e924]: 1.04s
+        - generic [ref=f3e925]:
+          - generic [ref=f3e927] [cursor=pointer]:
+            - heading "Analyzing Refining the Query Parameters" [level=3] [ref=f3e937]
+            - button "View Results" [ref=f3e938]
+          - generic [ref=f3e942] [cursor=pointer]:
+            - generic [ref=f3e943]: Event Log
+            - generic [ref=f3e948]:
+              - generic [ref=f3e949]: View Results
+              - generic [ref=f3e953]: 0.74s
+        - generic [ref=f3e954]:
+          - generic [ref=f3e956] [cursor=pointer]:
+            - 'heading "Using tool: code_execution_call" [level=3] [ref=f3e961]'
+            - button "View Results" [ref=f3e962]
+          - generic [ref=f3e966] [cursor=pointer]:
+            - generic [ref=f3e967]: code_execution_call
+            - generic [ref=f3e973]:
+              - generic [ref=f3e974]: View Results
+              - generic [ref=f3e978]: 0.36s
+        - generic [ref=f3e979]:
+          - generic [ref=f3e981] [cursor=pointer]:
+            - heading "Analysis retrieved" [level=3] [ref=f3e986]
+            - button "View Results" [ref=f3e987]
+          - generic [ref=f3e991] [cursor=pointer]:
+            - generic [ref=f3e992]: Event Log
+            - generic [ref=f3e997]:
+              - generic [ref=f3e998]: View Results
+              - generic [ref=f3e1002]: 2.31s
+        - generic [ref=f3e1003]:
+          - generic [ref=f3e1005] [cursor=pointer]:
+            - heading "Analyzing Verifying the Timeframe" [level=3] [ref=f3e1015]
+            - button "View Results" [ref=f3e1016]
+          - generic [ref=f3e1020] [cursor=pointer]:
+            - generic [ref=f3e1021]: Event Log
+            - generic [ref=f3e1026]:
+              - generic [ref=f3e1027]: View Results
+              - generic [ref=f3e1031]: 2.18s
+        - generic [ref=f3e1032]:
+          - generic [ref=f3e1034] [cursor=pointer]:
+            - heading "Analyzing Financial Results" [level=3] [ref=f3e1044]
+            - button "View Results" [ref=f3e1045]
+          - generic [ref=f3e1049] [cursor=pointer]:
+            - generic [ref=f3e1050]: Event Log
+            - generic [ref=f3e1055]:
+              - generic [ref=f3e1056]: View Results
+              - generic [ref=f3e1060]: 1.60s
+        - generic [ref=f3e1061]:
+          - generic [ref=f3e1063] [cursor=pointer]:
+            - heading "Analyzing Summarizing Analyst Ratings" [level=3] [ref=f3e1073]
+            - button "View Results" [ref=f3e1074]
+          - generic [ref=f3e1078] [cursor=pointer]:
+            - generic [ref=f3e1079]: Event Log
+            - generic [ref=f3e1084]:
+              - generic [ref=f3e1085]: View Results
+              - generic [ref=f3e1089]: 1.33s
+        - generic [ref=f3e1090]:
+          - generic [ref=f3e1092] [cursor=pointer]:
+            - heading "Analyzing Reviewing Competition & Regulations" [level=3] [ref=f3e1102]
+            - button "View Results" [ref=f3e1103]
+          - generic [ref=f3e1107] [cursor=pointer]:
+            - generic [ref=f3e1108]: Event Log
+            - generic [ref=f3e1113]:
+              - generic [ref=f3e1114]: View Results
+              - generic [ref=f3e1118]: 1.53s
+        - generic [ref=f3e1119]:
+          - generic [ref=f3e1121] [cursor=pointer]:
+            - heading "Analyzing Assessing Negative Sentiment" [level=3] [ref=f3e1131]
+            - button "View Results" [ref=f3e1132]
+          - generic [ref=f3e1136] [cursor=pointer]:
+            - generic [ref=f3e1137]: Event Log
+            - generic [ref=f3e1142]:
+              - generic [ref=f3e1143]: View Results
+              - generic [ref=f3e1147]: 1.33s
+        - generic [ref=f3e1148]:
+          - generic [ref=f3e1150] [cursor=pointer]:
+            - heading "Analyzing Validating Source Data" [level=3] [ref=f3e1160]
+            - button "View Results" [ref=f3e1161]
+          - generic [ref=f3e1165] [cursor=pointer]:
+            - generic [ref=f3e1166]: Event Log
+            - generic [ref=f3e1171]:
+              - generic [ref=f3e1172]: View Results
+              - generic [ref=f3e1176]: 1.67s
+        - generic [ref=f3e1177]:
+          - generic [ref=f3e1179] [cursor=pointer]:
+            - heading "Analyzing Integrating New Data Points" [level=3] [ref=f3e1189]
+            - button "View Results" [ref=f3e1190]
+          - generic [ref=f3e1194] [cursor=pointer]:
+            - generic [ref=f3e1195]: Event Log
+            - generic [ref=f3e1200]:
+              - generic [ref=f3e1201]: View Results
+              - generic [ref=f3e1205]: 0.00s
+        - generic [ref=f3e1206] [cursor=pointer]:
+          - generic [ref=f3e1207]:
+            - generic [ref=f3e1212]:
+              - heading "Your report is now ready" [level=3] [ref=f3e1213]
+              - paragraph [ref=f3e1214]: Click to see the final intelligence report.
+            - generic [ref=f3e1215]: View Report
+          - generic [ref=f3e1219]:
+            - generic [ref=f3e1220]:
+              - generic [ref=f3e1221]: "Docs:"
+              - text: "0"
+            - generic [ref=f3e1222]:
+              - generic [ref=f3e1223]: "Time:"
+              - text: 48s
+            - generic [ref=f3e1224]:
+              - generic [ref=f3e1225]: "Tokens:"
+              - text: 71,571
+    - generic [ref=f3e1228]:
+      - generic [ref=f3e1229]:
+        - textbox "Entrada del agente" [ref=f3e1234]:
+          - /placeholder: TICKER
+          - text: TSLA
+        - textbox "Instrucción adicional" [ref=f3e1235]:
+          - /placeholder: Instrucción opcional para el agente
+        - button "Summarize News" [ref=f3e1236]
+      - generic [ref=f3e1237]: Gemini can make mistakes, don’t rely on it for financial advice.
+  - generic [ref=f3e1240]:
+    - generic [ref=f3e1241]:
+      - generic [ref=f3e1242]: Debug
+      - generic [ref=f3e1243]:
+        - button "copy" [ref=f3e1244]
+        - button "Cerrar panel de depuración" [ref=f3e1245]: ✕
+    - generic [ref=f3e1246]:
+      - generic [ref=f3e1247]:
+        - generic [ref=f3e1248]:
+          - generic "running" [ref=f3e1249]
+          - generic [ref=f3e1250]: "false"
+        - generic [ref=f3e1251]:
+          - generic "isStopped" [ref=f3e1252]
+          - generic [ref=f3e1253]: "false"
+        - generic [ref=f3e1254]:
+          - generic "error" [ref=f3e1255]
+          - generic [ref=f3e1256]: "null"
+        - generic [ref=f3e1257]:
+          - generic "catalogStatus" [ref=f3e1258]
+          - generic [ref=f3e1259]: ready
+        - generic [ref=f3e1260]:
+          - generic "catalogError" [ref=f3e1261]
+          - generic [ref=f3e1262]: "null"
+        - generic [ref=f3e1263]:
+          - generic "agents" [ref=f3e1264]
+          - generic [ref=f3e1265]: "3"
+        - generic [ref=f3e1266]:
+          - generic "activeAgentId" [ref=f3e1267]
+          - generic [ref=f3e1268]: market_news_agent
+        - generic [ref=f3e1269]:
+          - generic "defaultAgentId" [ref=f3e1270]
+          - generic [ref=f3e1271]: financial_analyst_agent
+        - generic [ref=f3e1272]:
+          - generic "activeAgentName" [ref=f3e1273]
+          - generic [ref=f3e1274]: Market News Digest
+        - generic [ref=f3e1275]:
+          - generic "outputRenderer" [ref=f3e1276]
+          - generic [ref=f3e1277]: simple_report
+        - generic [ref=f3e1278]:
+          - generic "runAgentId" [ref=f3e1279]
+          - generic [ref=f3e1280]: market_news_agent
+        - generic [ref=f3e1281]:
+          - generic "runRenderer" [ref=f3e1282]
+          - generic [ref=f3e1283]: simple_report
+        - generic [ref=f3e1284]:
+          - generic "inputMode" [ref=f3e1285]
+          - generic [ref=f3e1286]: ticker
+        - generic [ref=f3e1287]:
+          - generic "inputValue" [ref=f3e1288]
+          - generic [ref=f3e1289]: TSLA
+        - generic [ref=f3e1290]:
+          - generic "instruction" [ref=f3e1291]
+          - generic [ref=f3e1292]: "\"\""
+        - generic [ref=f3e1293]:
+          - generic "canRunAnalysis" [ref=f3e1294]
+          - generic [ref=f3e1295]: "true"
+        - generic [ref=f3e1296]:
+          - generic "model" [ref=f3e1297]
+          - generic [ref=f3e1298]: gemini-3.6-flash
+        - generic [ref=f3e1299]:
+          - generic "events" [ref=f3e1300]
+          - generic [ref=f3e1301]: "11"
+        - generic [ref=f3e1302]:
+          - generic "hasReport" [ref=f3e1303]
+          - generic [ref=f3e1304]: "true"
+        - generic [ref=f3e1305]:
+          - generic "unstructuredReport" [ref=f3e1306]
+          - generic [ref=f3e1307]: "false"
+        - generic [ref=f3e1308]:
+          - generic "reportOpen" [ref=f3e1309]
+          - generic [ref=f3e1310]: "false"
+        - generic [ref=f3e1311]:
+          - generic "durationSecs" [ref=f3e1312]
+          - generic [ref=f3e1313]: "48"
+        - generic [ref=f3e1314]:
+          - generic "tokenCount" [ref=f3e1315]
+          - generic [ref=f3e1316]: "71571"
+        - generic [ref=f3e1317]:
+          - generic "toolRuns" [ref=f3e1318]
+          - generic [ref=f3e1319]: "1"
+        - generic [ref=f3e1320]:
+          - generic "startTime" [ref=f3e1321]
+          - generic [ref=f3e1322]: "1786050309078"
+        - generic [ref=f3e1323]:
+          - generic "user" [ref=f3e1324]
+          - generic [ref=f3e1325]: "null"
+        - generic [ref=f3e1326]:
+          - generic [ref=f3e1327]: renders
+          - generic [ref=f3e1328]: "4"
+      - generic [ref=f3e1329]:
+        - generic [ref=f3e1330]: últimos eventos (11 en total)
+        - generic [ref=f3e1331]:
+          - generic [ref=f3e1332]: "10"
+          - generic "thinking" [ref=f3e1333]
+          - generic "Analyzing Financial Results" [ref=f3e1334]
+          - generic [ref=f3e1335]: 1.60s
+        - generic [ref=f3e1336]:
+          - generic [ref=f3e1337]: "12"
+          - generic "thinking" [ref=f3e1338]
+          - generic "Analyzing Summarizing Analyst Ratings" [ref=f3e1339]
+          - generic [ref=f3e1340]: 1.33s
+        - generic [ref=f3e1341]:
+          - generic [ref=f3e1342]: "14"
+          - generic "thinking" [ref=f3e1343]
+          - generic "Analyzing Reviewing Competition & Regulations" [ref=f3e1344]
+          - generic [ref=f3e1345]: 1.53s
+        - generic [ref=f3e1346]:
+          - generic [ref=f3e1347]: "16"
+          - generic "thinking" [ref=f3e1348]
+          - generic "Analyzing Assessing Negative Sentiment" [ref=f3e1349]
+          - generic [ref=f3e1350]: 1.33s
+        - generic [ref=f3e1351]:
+          - generic [ref=f3e1352]: "18"
+          - generic "thinking" [ref=f3e1353]
+          - generic "Analyzing Validating Source Data" [ref=f3e1354]
+          - generic [ref=f3e1355]: 1.67s
+        - generic [ref=f3e1356]:
+          - generic [ref=f3e1357]: "20"
+          - generic "thinking" [ref=f3e1358]
+          - generic "Analyzing Integrating New Data Points" [ref=f3e1359]
+          - generic [ref=f3e1360]: …

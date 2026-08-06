@@ -1,0 +1,59 @@
+- generic [ref=f5e3]:
+  - banner [ref=f5e4]:
+    - generic [ref=f5e5]:
+      - generic [ref=f5e6]: Tickr
+      - generic [ref=f5e7]:
+        - button "Seleccionar agente" [expanded] [ref=f5e8]:
+          - generic [ref=f5e13]: Market News Digest
+        - listbox "Agentes disponibles" [ref=f5e98]:
+          - option "Financial Analyst Predeterminado Finds and synthesizes recent SEC filings and public disclosures. Ticker" [ref=f5e100]:
+            - generic [ref=f5e104]:
+              - generic [ref=f5e105]:
+                - generic [ref=f5e106]: Financial Analyst
+                - generic [ref=f5e107]: Predeterminado
+              - generic [ref=f5e108]: Finds and synthesizes recent SEC filings and public disclosures.
+              - generic [ref=f5e109]: Ticker
+          - option "Market News Digest Summarizes recent news for a ticker and reads the tone of the cycle. Ticker" [active] [selected] [ref=f5e112]:
+            - generic [ref=f5e117]:
+              - generic [ref=f5e118]: Market News Digest
+              - generic [ref=f5e120]: Summarizes recent news for a ticker and reads the tone of the cycle.
+              - generic [ref=f5e121]: Ticker
+          - 'option "Company Profile Builds a corporate profile: business model, segments, competitors and risks. Texto libre" [ref=f5e127]':
+            - generic [ref=f5e133]:
+              - generic [ref=f5e134]: Company Profile
+              - generic [ref=f5e136]: "Builds a corporate profile: business model, segments, competitors and risks."
+              - generic [ref=f5e137]: Texto libre
+    - button "Sign In" [ref=f5e17]
+  - main [ref=f5e18]:
+    - generic [ref=f5e37]:
+      - generic [ref=f5e38]:
+        - heading "Market News Digest, the recent news cycle in one page" [level=1] [ref=f5e39]
+        - paragraph [ref=f5e40]: Summarizes the latest coverage of a ticker and assesses the overall tone of the reporting.
+      - generic [ref=f5e41]:
+        - generic [ref=f5e42]:
+          - heading "Coverage gathered from public reporting." [level=3] [ref=f5e43]
+          - generic [ref=f5e44]:
+            - generic [ref=f5e51]:
+              - generic [ref=f5e52]: Company announcements
+              - generic [ref=f5e53]: Earnings, guidance and material events
+            - generic [ref=f5e61]:
+              - generic [ref=f5e62]: Analyst and market reaction
+              - generic [ref=f5e63]: Ratings, price action and commentary
+            - generic [ref=f5e71]:
+              - generic [ref=f5e72]: Sector and regulatory context
+              - generic [ref=f5e73]: Competitors, policy and supply chain
+        - generic [ref=f5e74]:
+          - heading "A digest you can read in a minute." [level=3] [ref=f5e75]
+          - generic [ref=f5e76]:
+            - generic [ref=f5e77]: Group the cycle into themes
+            - generic [ref=f5e83]: Separate confirmed facts from speculation
+            - generic [ref=f5e90]: Cite every source with its date
+    - generic [ref=f5e25]:
+      - generic [ref=f5e26]:
+        - textbox "Entrada del agente" [ref=f5e31]:
+          - /placeholder: TICKER
+        - textbox "Instrucción adicional" [ref=f5e32]:
+          - /placeholder: Instrucción opcional para el agente
+        - button "Summarize News" [disabled] [ref=f5e33]
+      - generic [ref=f5e34]: Gemini can make mistakes, don’t rely on it for financial advice.
+  - button "debug" [ref=f5e36]

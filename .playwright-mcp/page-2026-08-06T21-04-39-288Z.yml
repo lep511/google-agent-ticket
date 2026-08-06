@@ -1,0 +1,59 @@
+- generic [ref=f3e3]:
+  - banner [ref=f3e4]:
+    - generic [ref=f3e5]:
+      - generic [ref=f3e6]: Tickr
+      - generic [ref=f3e7]:
+        - button "Seleccionar agente" [expanded] [ref=f3e8]:
+          - generic [ref=f3e12]: Financial Analyst
+        - listbox "Agentes disponibles" [ref=f3e95]:
+          - option "Financial Analyst Predeterminado Finds and synthesizes recent SEC filings and public disclosures. Ticker" [active] [selected] [ref=f3e97]:
+            - generic [ref=f3e101]:
+              - generic [ref=f3e102]:
+                - generic [ref=f3e103]: Financial Analyst
+                - generic [ref=f3e104]: Predeterminado
+              - generic [ref=f3e105]: Finds and synthesizes recent SEC filings and public disclosures.
+              - generic [ref=f3e106]: Ticker
+          - option "Market News Digest Summarizes recent news for a ticker and reads the tone of the cycle. Ticker" [ref=f3e112]:
+            - generic [ref=f3e117]:
+              - generic [ref=f3e118]: Market News Digest
+              - generic [ref=f3e120]: Summarizes recent news for a ticker and reads the tone of the cycle.
+              - generic [ref=f3e121]: Ticker
+          - 'option "Company Profile Builds a corporate profile: business model, segments, competitors and risks. Texto libre" [ref=f3e124]':
+            - generic [ref=f3e130]:
+              - generic [ref=f3e131]: Company Profile
+              - generic [ref=f3e133]: "Builds a corporate profile: business model, segments, competitors and risks."
+              - generic [ref=f3e134]: Texto libre
+    - button "Sign In" [ref=f3e16]
+  - main [ref=f3e17]:
+    - generic [ref=f3e36]:
+      - generic [ref=f3e37]:
+        - heading "Tickr, your intelligent financial document analyzer" [level=1] [ref=f3e38]
+        - paragraph [ref=f3e39]: Automatically finds and synthesizes recent SEC filings and public disclosures.
+      - generic [ref=f3e40]:
+        - generic [ref=f3e41]:
+          - heading "Comprehensive SEC document coverage." [level=3] [ref=f3e42]
+          - generic [ref=f3e43]:
+            - generic [ref=f3e50]:
+              - generic [ref=f3e51]: Form 10-K & 10-Q
+              - generic [ref=f3e52]: Annual and Quarterly Reports
+            - generic [ref=f3e59]:
+              - generic [ref=f3e60]: Form 8-K
+              - generic [ref=f3e61]: Current / Material Events
+            - generic [ref=f3e68]:
+              - generic [ref=f3e69]: Forms 3, 4, 5 & 13F
+              - generic [ref=f3e70]: Insider & Institutional Holdings
+        - generic [ref=f3e71]:
+          - heading "Deep insights pulled directly from the source." [level=3] [ref=f3e72]
+          - generic [ref=f3e73]:
+            - generic [ref=f3e74]: Identify key takeaways and risks
+            - generic [ref=f3e80]: Extract management commentary
+            - generic [ref=f3e87]: Synthesize multiple filings into one report
+    - generic [ref=f3e24]:
+      - generic [ref=f3e25]:
+        - textbox "Entrada del agente" [ref=f3e30]:
+          - /placeholder: TICKER
+        - textbox "Instrucción adicional" [ref=f3e31]:
+          - /placeholder: Instrucción opcional para el agente
+        - button "Analyze" [disabled] [ref=f3e32]
+      - generic [ref=f3e33]: Gemini can make mistakes, don’t rely on it for financial advice.
+  - button "debug" [ref=f3e35]

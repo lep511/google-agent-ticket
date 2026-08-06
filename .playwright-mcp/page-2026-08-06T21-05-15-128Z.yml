@@ -1,0 +1,26 @@
+- generic [ref=f3e3]:
+  - banner [ref=f3e4]:
+    - generic [ref=f3e5]:
+      - generic [ref=f3e6]: Tickr
+      - generic [ref=f3e7]:
+        - button "Seleccionar agente" [disabled] [ref=f3e8]:
+          - generic [ref=f3e12]: Market News Digest
+        - tooltip "You can’t switch agents while a run is in progress."
+    - button "Sign In" [ref=f3e16]
+  - main [ref=f3e17]:
+    - generic [ref=f3e200]:
+      - generic [ref=f3e202]:
+        - img "Gemini Sparkle" [ref=f3e203]
+        - generic [ref=f3e204]: Market News Digest
+        - generic [ref=f3e205]: Gemini 3.6 Flash
+      - generic [ref=f3e208]: Skill is working...
+    - generic [ref=f3e24]:
+      - generic [ref=f3e25]:
+        - textbox "Entrada del agente" [disabled] [ref=f3e30]:
+          - /placeholder: TICKER
+          - text: TSLA
+        - textbox "Instrucción adicional" [disabled] [ref=f3e31]:
+          - /placeholder: Instrucción opcional para el agente
+        - button "Stop" [active] [ref=f3e216]
+      - generic [ref=f3e33]: Gemini can make mistakes, don’t rely on it for financial advice.
+  - button "debug" [ref=f3e35]

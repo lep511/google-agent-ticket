@@ -8,6 +8,7 @@ import { GoogleGenAI } from "@google/genai";
 import { createInteraction, streamInteraction } from "./server/lib/agentClient.ts";
 import { createInteraction as createInteractionPerseus, streamInteraction as streamInteractionPerseus } from "./server/lib/agentClientPerseus.ts";
 import { subAgentsDebugFileName, writeDebugFile } from "./server/lib/debugFiles.ts";
+import { describeCreateInteractionFailure } from "./server/lib/analyzeExecution.ts";
 
 function loadAgentFiles(dir: string, basePath: string): Array<{type: string, content: string, target: string}> {
   let files: Array<{type: string, content: string, target: string}> = [];
@@ -240,7 +241,8 @@ async function startServer() {
       if (!response.ok) {
         const errorText = await response.text();
         console.error(`[analyze] createInteraction failed: ${response.status} ${errorText}`);
-        return res.status(500).json({ error: "Failed to start agent interaction." });
+        const failure = describeCreateInteractionFailure(response.status);
+        return res.status(failure.status).json(failure.body);
       }
 
       res.setHeader('Content-Type', 'text/event-stream');

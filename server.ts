@@ -16,6 +16,7 @@ import { agentRegistry } from "./server/lib/agentRegistry.ts";
 import {
   buildAgentInfoEvent,
   buildStreamFailureEvents,
+  describeCreateInteractionFailure,
   describeStreamFailure,
   isPerseusModel,
   toRemoteInlineSources,
@@ -280,7 +281,11 @@ async function startServer() {
       if (!response.ok) {
         const errorText = await response.text();
         console.error(`[analyze] createInteraction failed: ${response.status} ${errorText}`);
-        return res.status(500).json({ error: "Failed to start agent interaction." });
+        // El estado del servicio remoto se traduce a un estado propio y a un
+        // `code` estable, para que el cliente pueda distinguir un límite de
+        // cuota temporal de un fallo real en lugar de recibir siempre un 500.
+        const failure = describeCreateInteractionFailure(response.status);
+        return res.status(failure.status).json(failure.body);
       }
 
       // Requirement 5.4: las cabeceras SSE se conservan tal como estaban.

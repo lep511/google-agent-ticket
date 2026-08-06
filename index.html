@@ -3,6 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--
+      Sin un icono declarado el navegador pide `/favicon.ico` en cada carga y la
+      consola acumula un 404 por visita. El SVG se sirve desde `public/`.
+    -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>TICKR</title>
   </head>
   <body>

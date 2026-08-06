@@ -1,0 +1,17 @@
+- main [ref=f4e2]:
+  - generic [ref=f4e11]:
+    - generic [ref=f4e13]:
+      - heading "Sign in" [level=2] [ref=f4e15]
+      - paragraph [ref=f4e17]: Sign in to your account.
+    - form "primary-form" [ref=f4e22]:
+      - generic [ref=f4e23]:
+        - generic [ref=f4e25]:
+          - generic [ref=f4e26]: Email address
+          - textbox "Email address" [active] [ref=f4e31]:
+            - /placeholder: name@host.com
+        - generic [ref=f4e33]:
+          - button "Next" [ref=f4e35] [cursor=pointer]
+          - paragraph [ref=f4e38]:
+            - text: New user?
+            - link "Create an account" [ref=f4e39]:
+              - /url: /signup?client_id=78ibotg7kv9ac91s69ka3627m6&redirect_uri=http%3A%2F%2Flocalhost%3A3000&response_type=code&scope=email+openid+profile

@@ -105,16 +105,48 @@
     position: relative !important;
   }
 
-  /* Prevent headings from being orphaned at the bottom of a page */
-  h1, h2, h3, h4, h5, h6 {
+  /* Titles must never be left alone at the bottom of a page.
+     A title is never split, and never separated from what follows it. */
+  h1, h2, h3, h4, h5, h6,
+  .print-keep-with-next {
     break-after: avoid !important;
     page-break-after: avoid !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* `break-after: avoid` on the title only lowers the appeal of the break point
+     right after it: the browser can still break at the start of the following
+     block and leave the title stranded. Marking the following block, and the
+     break point at its start, as avoid too collapses those adjoining break
+     points, so the only remaining option is to move the whole group down. */
+  h1 + *, h2 + *, h3 + *, h4 + *, h5 + *, h6 + *,
+  .print-keep-with-next + * {
+    break-before: avoid !important;
+    page-break-before: avoid !important;
+  }
+
+  h1 + * > *:first-child,
+  h2 + * > *:first-child,
+  h3 + * > *:first-child,
+  h4 + * > *:first-child,
+  h5 + * > *:first-child,
+  h6 + * > *:first-child,
+  .print-keep-with-next + * > *:first-child {
+    break-before: avoid !important;
+    page-break-before: avoid !important;
   }
 
   /* Keep list items intact */
   li, tr, blockquote {
     break-inside: avoid !important;
     page-break-inside: avoid !important;
+  }
+
+  /* No single stranded line of body text either */
+  p, .markdown-body {
+    orphans: 3;
+    widows: 3;
   }
 
   /* Recharts & SVG print scaling */
