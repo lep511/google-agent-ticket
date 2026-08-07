@@ -1,27 +1,21 @@
 /**
- * Piezas puras de la ejecución de `POST /api/analyze`.
+ * Pure pieces of the `POST /api/analyze` execution.
  *
- * El endpoint conserva su forma actual (cabeceras SSE, reenvío de eventos,
- * `final_stats`, escritura de `run_logs`); este módulo aísla las decisiones que
- * introduce el catálogo de agentes, para que puedan comprobarse sin abrir un
- * flujo SSE ni tocar el cliente remoto:
+ * The endpoint keeps its shape (SSE headers, event forwarding, `final_stats`,
+ * `run_logs` writing); this module isolates the decisions around it so they can
+ * be checked without opening an SSE stream or running an agent:
  *
- *  - El evento `agent_info`, único tipo de evento nuevo, que se emite una sola
- *    vez y antes de cualquier otro evento de la ejecución (Requirements 5.3, 5.4).
- *  - La elección del cliente remoto según el campo `model`: `agentClientPerseus`
- *    solo cuando el valor recortado es exactamente `perseus`, y `agentClient` en
- *    cualquier otro caso (Requirements 5.5, 5.8).
- *  - La secuencia `error` seguida de `done` con la que se cierra el flujo cuando
- *    el cliente remoto falla o se interrumpe después de escribir las cabeceras
- *    SSE (Requirement 5.10).
- *  - El recorte de las fuentes inline a los campos que consume el cliente
- *    remoto, sin metadata del servidor (Requirement 6.1).
+ *  - The `agent_info` event, emitted exactly once and before any other event of
+ *    the run (Requirements 5.3, 5.4).
+ *  - The `error` followed by `done` sequence that closes the stream when a run
+ *    fails or is interrupted after the SSE headers are written (Requirement 5.10).
+ *  - The HTTP answer that rejects a run which never starts, that is, before
+ *    those headers are written.
  *
- * Requirements: 5.3, 5.4, 5.5, 5.6, 5.8, 5.10, 6.1
+ * Requirements: 5.3, 5.4, 5.6, 5.10
  */
 
-import type { AgentEvent } from './agentClient.ts';
-import type { AgentInlineSource } from './agentInlineSources.ts';
+import type { AgentEvent } from './agentEvents.ts';
 import type { OutputRenderer, ResolvedAgentDefinition } from './agentTypes.ts';
 
 /* ────────────────────────────────────────────────────────── */
@@ -55,42 +49,17 @@ export function buildAgentInfoEvent(definition: ResolvedAgentDefinition): AgentI
 }
 
 /* ────────────────────────────────────────────────────────── */
-/*  Selección del cliente remoto                               */
+/*  Closing the stream after a failed run                      */
 /* ────────────────────────────────────────────────────────── */
 
-/** Valor de `model` que selecciona el cliente alternativo (Requirement 5.5). */
-export const PERSEUS_MODEL_ID = 'perseus';
-
-/** Nombres de los dos clientes remotos disponibles. */
-export type AgentClientName = 'agentClient' | 'agentClientPerseus';
-
-/**
- * Indica si la petición pide el cliente alternativo: comparación exacta y
- * sensible a mayúsculas y minúsculas del valor recortado (Requirements 5.5, 5.8).
- * Un `model` ausente, vacío o con cualquier otro valor usa `agentClient`.
- */
-export function isPerseusModel(model: unknown): boolean {
-  return typeof model === 'string' && model.trim() === PERSEUS_MODEL_ID;
-}
-
-/** Cliente remoto que debe atender la ejecución (Requirements 5.5, 5.8). */
-export function selectAgentClientName(model: unknown): AgentClientName {
-  return isPerseusModel(model) ? 'agentClientPerseus' : 'agentClient';
-}
-
-/* ────────────────────────────────────────────────────────── */
-/*  Cierre del flujo ante un fallo del cliente remoto          */
-/* ────────────────────────────────────────────────────────── */
-
-/** Motivo genérico cuando el fallo del cliente remoto no trae mensaje. */
+/** Generic reason used when the failure carries no message. */
 export const DEFAULT_STREAM_FAILURE_MESSAGE =
-  'La ejecución del agente remoto falló o se interrumpió.';
+  'La ejecución del agente falló o se interrumpió.';
 
 /**
- * Secuencia con la que se cierra el flujo cuando el cliente remoto falla o se
- * interrumpe después de escribir las cabeceras SSE: un evento `error` con el
- * motivo y, a continuación, un evento `done` (Requirement 5.10). Los eventos y
- * los logs ya escritos no se tocan.
+ * Sequence that closes the stream when the run fails or is interrupted after the
+ * SSE headers are written: an `error` event with the reason and then a `done`
+ * event (Requirement 5.10). Events and logs already written are left untouched.
  */
 export function buildStreamFailureEvents(reason: unknown): AgentEvent[] {
   return [
@@ -99,7 +68,7 @@ export function buildStreamFailureEvents(reason: unknown): AgentEvent[] {
   ];
 }
 
-/** Motivo legible de un fallo del cliente remoto, sin volcar el objeto entero. */
+/** Readable reason for a failed run, without dumping the whole object. */
 export function describeStreamFailure(reason: unknown): string {
   if (typeof reason === 'string' && reason.trim().length > 0) return reason;
   if (reason instanceof Error && reason.message.trim().length > 0) return reason.message;
@@ -107,61 +76,36 @@ export function describeStreamFailure(reason: unknown): string {
 }
 
 /* ────────────────────────────────────────────────────────── */
-/*  Fuentes inline para el cliente remoto                      */
-/* ────────────────────────────────────────────────────────── */
-
-/** Forma exacta que `agentClient` envía al entorno remoto. */
-export interface RemoteInlineSource {
-  type: string;
-  content: string;
-  target: string;
-}
-
-/**
- * Recorta las fuentes inline del registro a los campos que consume el cliente
- * remoto: la metadata que el registro añade para las advertencias y las pruebas
- * (`relativePath`, `bytes`) no viaja al entorno del agente.
- */
-export function toRemoteInlineSources(
-  sources: readonly AgentInlineSource[],
-): RemoteInlineSource[] {
-  return sources.map(({ type, content, target }) => ({ type, content, target }));
-}
-
-/* ────────────────────────────────────────────────────────── */
-/*  Fallo al crear la interacción remota                       */
+/*  Failure to start a run                                     */
 /* ────────────────────────────────────────────────────────── */
 
 /**
- * Respuesta HTTP con la que se rechaza una ejecución cuando el cliente remoto
- * no llega a crear la interacción, es decir, antes de escribir las cabeceras
- * SSE.
+ * HTTP answer that rejects a run which never produced its first event, that is,
+ * before the SSE headers are written.
  */
-export interface CreateInteractionFailure {
-  /** Código con el que responde `POST /api/analyze`. */
+export interface AgentStartFailure {
+  /** Status `POST /api/analyze` answers with. */
   status: number;
   body: {
     error: string;
-    /** Código estable para que el cliente distinga el motivo sin parsear texto. */
+    /** Stable code, so the client can tell the reason apart without parsing text. */
     code: 'upstream_rate_limited' | 'upstream_unavailable' | 'upstream_error';
-    /** Estado devuelto por el servicio remoto, como dato de diagnóstico. */
+    /** Status returned by the model API, kept as diagnostic data. */
     upstreamStatus: number;
-    /** Verdadero cuando repetir la misma petición más tarde puede funcionar. */
+    /** True when repeating the same request later can work. */
     retryable: boolean;
   };
 }
 
 /**
- * Traduce el estado con el que el servicio remoto rechazó la creación de la
- * interacción a la respuesta de `POST /api/analyze`.
+ * Translates the status with which the model API rejected the start of a run
+ * into the answer of `POST /api/analyze`.
  *
- * Colapsar todos estos casos en un 500 con un texto único dejaba al cliente sin
- * forma de distinguir un límite de cuota temporal (reintentable) de un fallo
- * real del servicio, y el motivo solo quedaba en el log del servidor.
+ * Collapsing all of these into a single 500 left the client unable to tell a
+ * temporary quota limit (retryable) from a real service failure, and the reason
+ * only reached the server log.
  */
-export function describeCreateInteractionFailure(
-  upstreamStatus: unknown,
-): CreateInteractionFailure {
+export function describeAgentStartFailure(upstreamStatus: unknown): AgentStartFailure {
   const status =
     typeof upstreamStatus === 'number' && Number.isFinite(upstreamStatus)
       ? Math.trunc(upstreamStatus)

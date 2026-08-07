@@ -6,20 +6,23 @@ import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import fs from "fs";
-import { GoogleGenAI } from "@google/genai";
 
-import { createInteraction, streamInteraction } from "./server/lib/agentClient.ts";
-import { createInteraction as createInteractionPerseus, streamInteraction as streamInteractionPerseus } from "./server/lib/agentClientPerseus.ts";
+import type { AgentEvent } from "./server/lib/agentEvents.ts";
 import { buildAgentCatalogHttpResult } from "./server/lib/agentCatalog.ts";
 import { subAgentsDebugFileName, writeDebugFile } from "./server/lib/debugFiles.ts";
 import { agentRegistry } from "./server/lib/agentRegistry.ts";
 import {
+  classifyAgentFailureStatus,
+  createStrandsAgent,
+  isStrandsConfigured,
+  streamStrandsAgent,
+} from "./server/lib/strandsAgent.ts";
+import { synthesizeSpeech, TextToSpeechError } from "./server/lib/textToSpeech.ts";
+import {
   buildAgentInfoEvent,
   buildStreamFailureEvents,
-  describeCreateInteractionFailure,
+  describeAgentStartFailure,
   describeStreamFailure,
-  isPerseusModel,
-  toRemoteInlineSources,
 } from "./server/lib/analyzeExecution.ts";
 import { validateAnalyzeInput } from "./server/lib/analyzeInput.ts";
 import { buildAgentPrompt } from "./server/lib/promptBuilder.ts";
@@ -43,6 +46,14 @@ const NO_AGENTS_AVAILABLE_ERROR =
  * (Requirements 6.7, 7.4, 7.9).
  */
 const AGENT_NOT_EXECUTABLE_ERROR = "El agente seleccionado no se puede ejecutar.";
+
+/**
+ * Configuration error returned when the server has no credential for the model
+ * the agent talks to. Like every other preparation failure, it is answered before
+ * the SSE stream is opened.
+ */
+const MODEL_NOT_CONFIGURED_ERROR =
+  "El servidor no tiene configurada la credencial del modelo (GEMINI_API_KEY).";
 
 async function startServer() {
   const app = express();
@@ -91,78 +102,15 @@ async function startServer() {
         return res.status(400).json({ error: "Missing text." });
       }
 
-      if (!process.env.GEMINI_API_KEY) {
-        return res.status(500).json({ error: "GEMINI_API_KEY is not configured on the server." });
-      }
-
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      const interaction = await ai.interactions.create({
-        model: 'gemini-3.1-flash-tts-preview',
-        input: text,
-        response_modalities: ['audio'],
-        generation_config: {
-          speech_config: [
-            {
-              speaker: "Speaker 1",
-              language: "en-us",
-              voice: "kore"
-            },
-            {
-              speaker: "Speaker 2",
-              language: "en-us",
-              voice: "aoede"
-            }
-          ]
-        }
-      });
-
-      let audioBuffer = null;
-      let mimeType = "audio/wav";
-
-      for (const step of interaction.steps) {
-        if (step.type === 'model_output') {
-          const audioContent = step.content?.find(c => c.type === 'audio');
-          if (audioContent && audioContent.data) {
-            const pcmBuffer = Buffer.from(audioContent.data, 'base64');
-            
-            // If it's raw PCM, wrap it in a WAV header so browsers can play it
-            if (audioContent.mime_type === 'audio/l16' || !audioContent.mime_type) {
-              const sampleRate = 24000;
-              const numChannels = 1;
-              const wavHeader = Buffer.alloc(44);
-              wavHeader.write("RIFF", 0);
-              wavHeader.writeUInt32LE(36 + pcmBuffer.length, 4);
-              wavHeader.write("WAVE", 8);
-              wavHeader.write("fmt ", 12);
-              wavHeader.writeUInt32LE(16, 16);
-              wavHeader.writeUInt16LE(1, 20);
-              wavHeader.writeUInt16LE(numChannels, 22);
-              wavHeader.writeUInt32LE(sampleRate, 24);
-              wavHeader.writeUInt32LE(sampleRate * numChannels * 2, 28);
-              wavHeader.writeUInt16LE(numChannels * 2, 32);
-              wavHeader.writeUInt16LE(16, 34);
-              wavHeader.write("data", 36);
-              wavHeader.writeUInt32LE(pcmBuffer.length, 40);
-              
-              audioBuffer = Buffer.concat([wavHeader, pcmBuffer]);
-              mimeType = "audio/wav";
-            } else {
-              audioBuffer = pcmBuffer;
-              mimeType = audioContent.mime_type;
-            }
-          }
-        }
-      }
-
-      if (audioBuffer) {
-        res.setHeader("Content-Type", mimeType);
-        res.send(audioBuffer);
-      } else {
-        res.status(500).json({ error: "Failed to generate audio content" });
-      }
+      const { audio, mimeType } = await synthesizeSpeech(text);
+      res.setHeader("Content-Type", mimeType);
+      res.send(audio);
     } catch (error: any) {
+      if (error instanceof TextToSpeechError) {
+        return res.status(error.status).json({ error: error.message });
+      }
       console.error("[TTS] Error:", error);
-      res.status(500).json({ error: error.message || "TTS Generation failed" });
+      res.status(500).json({ error: "TTS generation failed." });
     }
   });
 
@@ -248,7 +196,9 @@ async function startServer() {
   app.post("/api/analyze", async (req, res) => {
     try {
       const body = (req.body ?? {}) as Record<string, unknown>;
-      const { origin, model } = body as { origin?: string; model?: string };
+      // `origin` still arrives in the body for compatibility, but the server no
+      // longer builds any public URL out of it.
+      const { model } = body as { model?: string };
 
       // El agente se resuelve antes de validar la entrada porque las reglas
       // dependen de su `inputMode` y de su `supportsInstruction`
@@ -282,20 +232,22 @@ async function startServer() {
 
       console.log(`[analyze] Starting analysis for ${input} with agent ${agent.agentId} using model ${model || 'default'}`);
 
-      // Requirements 5.5, 5.8: `agentClientPerseus` solo cuando `model` es
-      // exactamente `perseus` tras recortar los espacios.
-      const usePerseus = isPerseusModel(model);
+      // The credential is checked before anything is prepared: without it the
+      // agent cannot reach the model, and that is a configuration failure rather
+      // than a failed run, so no SSE stream is opened.
+      if (!isStrandsConfigured()) {
+        console.error('[analyze] GEMINI_API_KEY is not configured.');
+        return res.status(500).json({ error: MODEL_NOT_CONFIGURED_ERROR });
+      }
 
-      // Requirements 6.1 a 6.4: las fuentes inline se recorren solo dentro de la
-      // carpeta del agente resuelto y su contenido se lee aquí, al resolver la
-      // ejecución. Requirements 7.1 a 7.9: el prompt sale de la plantilla y del
-      // esquema del agente. Un fallo en cualquiera de los dos pasos se responde
-      // antes de las cabeceras SSE y sin crear ninguna interacción remota
-      // (Requirements 6.7, 7.4, 7.9).
-      let agentFiles;
+      // Requirements 7.1 to 7.9: the prompt comes from the agent template and
+      // schema, and its `AGENTS.md` is the system prompt it runs with. A failure
+      // in either read is answered before the SSE headers and without running the
+      // agent (Requirements 6.7, 7.4, 7.9).
+      let systemPrompt: string;
       let prompt: string;
       try {
-        agentFiles = toRemoteInlineSources(agentRegistry.getInlineSources(agent.agentId).sources);
+        systemPrompt = agentRegistry.getInstructions(agent.agentId).text;
         prompt = buildAgentPrompt({
           definition: agent,
           input,
@@ -305,7 +257,7 @@ async function startServer() {
         }).prompt;
       } catch (preparationError: any) {
         console.error(
-          `[analyze] El agente "${agent.agentId}" no se puede ejecutar: ${preparationError?.message || preparationError}`,
+          `[analyze] Agent "${agent.agentId}" cannot be executed: ${preparationError?.message || preparationError}`,
         );
         return res.status(500).json({
           error: AGENT_NOT_EXECUTABLE_ERROR,
@@ -313,32 +265,33 @@ async function startServer() {
         });
       }
 
-      const host = req.get('host');
-      const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
-      const publicUrl = origin || `${protocol}://${host}`;
+      // The agent runs in this process with the Strands SDK. If the client walks
+      // away, the loop is cancelled instead of burning tokens on a closed
+      // connection.
+      // The signal comes from the response: `req`'s `close` fires as soon as the
+      // request body has been read, which would cancel every run immediately.
+      const runAbort = new AbortController();
+      res.on('close', () => runAbort.abort());
 
-      let response;
-      if (usePerseus) {
-        response = await createInteractionPerseus({
-          prompt,
-          inlineSources: agentFiles,
-          tools: [{ type: "google_search" }]
-        });
-      } else {
-        response = await createInteraction({
-          prompt,
-          inlineSources: agentFiles,
-          tools: [{ type: "google_search" }]
-        });
-      }
+      const strandsAgent = createStrandsAgent({
+        systemPrompt,
+        modelId: model,
+        googleSearch: true,
+      });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`[analyze] createInteraction failed: ${response.status} ${errorText}`);
-        // El estado del servicio remoto se traduce a un estado propio y a un
-        // `code` estable, para que el cliente pueda distinguir un límite de
-        // cuota temporal de un fallo real en lugar de recibir siempre un 500.
-        const failure = describeCreateInteractionFailure(response.status);
+      /*
+        The first event is awaited before the headers are written: while there is
+        no output nothing has reached the client, so a startup failure (quota,
+        unknown model, invalid credential) can still be answered with an HTTP
+        status and a stable `code` instead of with an empty SSE stream.
+      */
+      const agentStream = streamStrandsAgent(strandsAgent, prompt, runAbort.signal);
+      let firstEvent: IteratorResult<AgentEvent>;
+      try {
+        firstEvent = await agentStream.next();
+      } catch (startError: any) {
+        console.error(`[analyze] The run did not start: ${describeStreamFailure(startError)}`);
+        const failure = describeAgentStartFailure(classifyAgentFailureStatus(startError));
         return res.status(failure.status).json(failure.body);
       }
 
@@ -390,7 +343,12 @@ async function startServer() {
       /** Verdadero cuando el propio flujo ya emitió su evento `done`. */
       let doneEmitted = false;
 
-      const stream = usePerseus ? streamInteractionPerseus(response) : streamInteraction(response);
+      /** Re-emits the already consumed event and continues with the rest. */
+      const stream = (async function* (): AsyncGenerator<AgentEvent> {
+        if (!firstEvent.done) yield firstEvent.value;
+        yield* agentStream;
+      })();
+
       try {
         for await (const event of stream) {
           sendEvent(event);

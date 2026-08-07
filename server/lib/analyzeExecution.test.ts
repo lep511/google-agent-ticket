@@ -1,9 +1,9 @@
 /**
- * Pruebas unitarias de las piezas de ejecución de `POST /api/analyze`:
- * el evento `agent_info`, la selección del cliente remoto y la secuencia de
- * cierre del flujo ante un fallo del cliente.
+ * Unit tests for the execution pieces of `POST /api/analyze`: the `agent_info`
+ * event, the HTTP answer of a run that never starts, and the sequence that
+ * closes the stream when a run fails midway.
  *
- * Requirements: 5.3, 5.4, 5.5, 5.8, 5.10, 6.1
+ * Requirements: 5.3, 5.4, 5.10
  */
 
 import { describe, expect, it } from 'vitest';
@@ -13,12 +13,9 @@ import {
   DEFAULT_STREAM_FAILURE_MESSAGE,
   buildAgentInfoEvent,
   buildStreamFailureEvents,
+  describeAgentStartFailure,
   describeStreamFailure,
-  isPerseusModel,
-  selectAgentClientName,
-  toRemoteInlineSources,
 } from './analyzeExecution.ts';
-import type { AgentInlineSource } from './agentInlineSources.ts';
 import type { ResolvedAgentDefinition } from './agentTypes.ts';
 
 function definition(
@@ -56,7 +53,7 @@ function definition(
 }
 
 describe('buildAgentInfoEvent', () => {
-  it('informa el agentId resuelto, el nombre visible y el renderizador', () => {
+  it('reports the resolved agentId, the display name and the renderer', () => {
     expect(buildAgentInfoEvent(definition())).toEqual({
       type: AGENT_INFO_EVENT_TYPE,
       agentId: 'market_news_agent',
@@ -65,7 +62,7 @@ describe('buildAgentInfoEvent', () => {
     });
   });
 
-  it('usa el renderizador del manifiesto del agente resuelto', () => {
+  it('uses the renderer of the resolved agent manifest', () => {
     const event = buildAgentInfoEvent(
       definition({ outputRenderer: 'financial_report', name: 'Financial Analyst' }),
     );
@@ -73,7 +70,7 @@ describe('buildAgentInfoEvent', () => {
     expect(event.agentName).toBe('Financial Analyst');
   });
 
-  it('expone solo los campos del contrato, sin rutas del sistema de archivos', () => {
+  it('exposes only the contract fields, without filesystem paths', () => {
     expect(Object.keys(buildAgentInfoEvent(definition())).sort()).toEqual([
       'agentId',
       'agentName',
@@ -83,37 +80,8 @@ describe('buildAgentInfoEvent', () => {
   });
 });
 
-describe('selección del cliente remoto', () => {
-  it('elige agentClientPerseus solo con el valor exacto perseus tras recortar', () => {
-    for (const model of ['perseus', ' perseus', 'perseus ', '\tperseus\n']) {
-      expect(isPerseusModel(model)).toBe(true);
-      expect(selectAgentClientName(model)).toBe('agentClientPerseus');
-    }
-  });
-
-  it('elige agentClient con cualquier otro valor, ausente o vacío', () => {
-    const others: unknown[] = [
-      undefined,
-      null,
-      '',
-      '   ',
-      'Perseus',
-      'PERSEUS',
-      'perseus2',
-      'per seus',
-      'gemini',
-      42,
-      { model: 'perseus' },
-    ];
-    for (const model of others) {
-      expect(isPerseusModel(model)).toBe(false);
-      expect(selectAgentClientName(model)).toBe('agentClient');
-    }
-  });
-});
-
-describe('cierre del flujo ante un fallo del cliente remoto', () => {
-  it('emite error y a continuación done, en ese orden', () => {
+describe('closing the stream after a run fails', () => {
+  it('emits error and then done, in that order', () => {
     const events = buildStreamFailureEvents('la conexión se cerró');
     expect(events).toEqual([
       { type: 'error', message: 'la conexión se cerró' },
@@ -121,7 +89,7 @@ describe('cierre del flujo ante un fallo del cliente remoto', () => {
     ]);
   });
 
-  it('toma el mensaje de un Error y cae a un motivo genérico si no hay ninguno', () => {
+  it('takes the message from an Error and falls back to a generic reason', () => {
     expect(describeStreamFailure(new Error('socket hang up'))).toBe('socket hang up');
     expect(describeStreamFailure(new Error(''))).toBe(DEFAULT_STREAM_FAILURE_MESSAGE);
     expect(describeStreamFailure(undefined)).toBe(DEFAULT_STREAM_FAILURE_MESSAGE);
@@ -129,39 +97,32 @@ describe('cierre del flujo ante un fallo del cliente remoto', () => {
   });
 });
 
-describe('toRemoteInlineSources', () => {
-  it('conserva type, content y target y descarta la metadata del registro', () => {
-    const sources: AgentInlineSource[] = [
-      {
-        type: 'inline',
-        content: 'base_agent: antigravity',
-        target: '/.agents/agent.yaml',
-        relativePath: 'agent.yaml',
-        bytes: 23,
-      },
-    ];
-
-    expect(toRemoteInlineSources(sources)).toEqual([
-      { type: 'inline', content: 'base_agent: antigravity', target: '/.agents/agent.yaml' },
-    ]);
+describe('describeAgentStartFailure', () => {
+  it('maps a rate limit to a retryable 429', () => {
+    const failure = describeAgentStartFailure(429);
+    expect(failure.status).toBe(429);
+    expect(failure.body.code).toBe('upstream_rate_limited');
+    expect(failure.body.retryable).toBe(true);
+    expect(failure.body.upstreamStatus).toBe(429);
   });
 
-  it('preserva el orden y no muta la lista recibida', () => {
-    const sources: AgentInlineSource[] = [
-      { type: 'inline', content: 'a', target: '/.agents/a.md', relativePath: 'a.md', bytes: 1 },
-      {
-        type: 'inline',
-        content: 'b',
-        target: '/.agents/sub/b.md',
-        relativePath: 'sub/b.md',
-        bytes: 1,
-      },
-    ];
+  it('maps an unavailable service to a retryable 503', () => {
+    for (const upstream of [503, 504]) {
+      const failure = describeAgentStartFailure(upstream);
+      expect(failure.status).toBe(503);
+      expect(failure.body.code).toBe('upstream_unavailable');
+      expect(failure.body.retryable).toBe(true);
+      expect(failure.body.upstreamStatus).toBe(upstream);
+    }
+  });
 
-    expect(toRemoteInlineSources(sources).map((source) => source.target)).toEqual([
-      '/.agents/a.md',
-      '/.agents/sub/b.md',
-    ]);
-    expect(sources[0]).toHaveProperty('relativePath', 'a.md');
+  it('maps anything else to a non-retryable 502, including unknown statuses', () => {
+    for (const upstream of [400, 401, 500, undefined, null, 'nope', Number.NaN]) {
+      const failure = describeAgentStartFailure(upstream);
+      expect(failure.status).toBe(502);
+      expect(failure.body.code).toBe('upstream_error');
+      expect(failure.body.retryable).toBe(false);
+    }
+    expect(describeAgentStartFailure(undefined).body.upstreamStatus).toBe(0);
   });
 });

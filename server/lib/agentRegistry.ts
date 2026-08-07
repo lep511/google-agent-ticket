@@ -44,6 +44,7 @@ import {
   type AgentManifestWarningCode,
 } from './agentManifestValidation.ts';
 import {
+  AGENTS_FILE_NAME,
   MANIFEST_FILE_NAME,
   MAX_AGENT_FOLDERS,
   MAX_MANIFEST_BYTES,
@@ -803,6 +804,22 @@ export function readAgentPromptTemplate(definition: ResolvedAgentDefinition): Ag
 }
 
 /**
+ * Agent instructions, read from `definition.paths.agentsFilePath`.
+ *
+ * `AGENTS.md` used to be uploaded to the remote environment as an inline source;
+ * with the agent running in this process it is the system prompt it is built with
+ * (Requirements 6.4, 7.10, 16.1).
+ */
+export function readAgentInstructions(definition: ResolvedAgentDefinition): AgentSourceFile {
+  return readAgentSourceFile(
+    definition,
+    definition.paths.agentsFilePath,
+    AGENTS_FILE_NAME,
+    MAX_PROMPT_BYTES,
+  );
+}
+
+/**
  * Esquema de salida del agente, leído desde `definition.paths.schemaPath`. Se
  * devuelve el texto literal, que es lo que sustituye a `{{schema}}`, junto con
  * su forma analizada (Requirements 7.1, 7.9, 7.10, 16.1).
@@ -942,6 +959,12 @@ export interface AgentRegistry {
    * analizada. Lanza `AgentSourceError` en las mismas condiciones (7.1, 7.10).
    */
   getSchema(agentId: string): AgentSchemaSource;
+
+  /**
+   * Instructions of the given agent, the `AGENTS.md` its system prompt is built
+   * from. Throws `AgentSourceError` under the same conditions (7.10).
+   */
+  getInstructions(agentId: string): AgentSourceFile;
   /**
    * Fuentes inline del agente indicado, con destino `/.agents`: se recorre solo
    * su carpeta y el contenido se lee aquí, durante la resolución de una
@@ -1070,6 +1093,7 @@ export function createAgentRegistry(options: AgentRegistryOptions = {}): AgentRe
     },
     getPromptTemplate: (agentId) => readAgentPromptTemplate(requireDefinition(agentId)),
     getSchema: (agentId) => readAgentSchema(requireDefinition(agentId)),
+    getInstructions: (agentId) => readAgentInstructions(requireDefinition(agentId)),
     // Requirement 6.4: el contenido de los archivos de ejecución se lee solo
     // aquí, cuando una ejecución resuelve su agente.
     getInlineSources: (agentId) => loadAgentInlineSources(requireDefinition(agentId), logger),
