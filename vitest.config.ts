@@ -33,7 +33,14 @@ export default defineConfig({
       },
       {
         plugins: [react()],
-        resolve: { alias: sharedAlias },
+        resolve: {
+          alias: {
+            ...sharedAlias,
+            // Animations add nothing to the assertions but dominate the cost of
+            // mounting the tree inside a 100-iteration property test.
+            'motion/react': path.resolve(__dirname, 'tests/helpers/motionStub.tsx'),
+          },
+        },
         define: { global: 'window' },
         test: {
           name: 'web',

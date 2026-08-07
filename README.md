@@ -27,6 +27,11 @@ View your app in AI Studio: https://ai.studio/apps/0e98dc47-4c39-44d6-b7a4-885bd
    
    # Gemini API Key (required for AI analysis)
    GEMINI_API_KEY=your_gemini_api_key
+   
+   # Server binding (optional). Defaults to 127.0.0.1, reachable only from this
+   # machine. Any other address requires API_ACCESS_TOKEN (see "Network exposure").
+   HOST=127.0.0.1
+   API_ACCESS_TOKEN=
    ```
    
    **Note**: See [COGNITO_SETUP.md](COGNITO_SETUP.md) for detailed instructions on configuring Cognito Hosted UI.
@@ -133,6 +138,14 @@ Every file in the agent folder is uploaded to the remote environment as an inlin
 Only the resolved agent's own folder is traversed, up to 5 levels deep and 200 files, with a 1 MB limit per file. Files from other agent folders, loose files at the root of `agent/` and symlinks resolving outside the folder are never uploaded.
 
 ## API notes
+
+### Network exposure and access control
+
+The server binds to `127.0.0.1` by default, so `npm run dev` is reachable only from the machine that runs it. `HOST` overrides the address, and any non-loopback value is refused unless `API_ACCESS_TOKEN` is set to a secret of at least 32 characters. When the server is bound to such an address, `/api/*`, `/artifacts` and `/run_logs` require `Authorization: Bearer <API_ACCESS_TOKEN>` and answer `401` with `{"code":"unauthorized"}` otherwise; the static frontend stays public.
+
+This is a fail-safe gate against accidental exposure, not user authentication: the Cognito session the frontend obtains is still not verified server side, and the browser does not send the access token, so an exposed server serves the UI but rejects its API calls.
+
+In dev the source is served by Vite from the project root, so `server.ts`, `server/**`, `agent/**`, the lockfiles and any root `test_*` script are denied through `server.fs.deny` in `vite.config.ts` and answer `403`. Production (`npm run build && npm start`) serves only `dist/`.
 
 - `GET /api/agents` — returns the ordered catalog and the resolved `defaultAgentId`. Filesystem paths and the content of `AGENTS.md`, the prompt and the schema are never exposed. An empty catalog answers `200` with an empty list and a `null` default.
 - `POST /api/analyze` — accepts `agentId` (falls back to the default agent when missing or unknown), `input` (with the legacy `ticker` field as alias), the optional `instruction` and `model`. The SSE stream starts with a single `agent_info` event carrying `agentId`, `agentName` and `outputRenderer`, before the usual `thinking`, `text`, `tool_call`, `tool_result`, `complete`, `error`, `done` and `final_stats` events.

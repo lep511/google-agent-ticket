@@ -277,7 +277,9 @@ describe('History_Panel ordering by descending age', () => {
       }),
       { numRuns: 100 },
     );
-  });
+    // 100 generated cases, each one a full mount of the panel, do not fit in the
+    // default per-test budget once the whole suite runs in parallel.
+  }, PROPERTY_TEST_TIMEOUT_MS);
 });
 
 /* ── Property 10 ─────────────────────────────────────────────── */
@@ -385,7 +387,9 @@ describe('History_Panel rendered content of each entry', () => {
       }),
       { numRuns: 100 },
     );
-  });
+    // 100 generated cases, each one a full mount of the panel, do not fit in the
+    // default per-test budget once the whole suite runs in parallel.
+  }, PROPERTY_TEST_TIMEOUT_MS);
 });
 /* ── Property 13 ─────────────────────────────────────────────── */
 

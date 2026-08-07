@@ -25,6 +25,8 @@ import { validateAnalyzeInput } from "./server/lib/analyzeInput.ts";
 import { buildAgentPrompt } from "./server/lib/promptBuilder.ts";
 import { resolveRunLogDownload } from "./server/lib/runLogDownload.ts";
 import { buildRunLogNames, toLogFileSlug } from "./server/lib/runLogNaming.ts";
+import { resolveArtifactPath } from "./server/lib/artifactUpload.ts";
+import { isAuthorizedRequest, resolveServerBinding } from "./server/lib/serverAccess.ts";
 
 /**
  * Mensaje del error de configuración cuando el catálogo no tiene ningún agente
@@ -46,7 +48,41 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  app.use(express.json({ limit: '50mb' }));
+  // Bind address and access control are resolved before any route is mounted, so
+  // the process refuses to start rather than exposing an open server.
+  const binding = resolveServerBinding(process.env);
+  if (binding.error !== null) {
+    console.error(`[server] ${binding.error}`);
+    process.exitCode = 1;
+    return;
+  }
+  const bindHost = binding.host as string;
+
+  // A body of a few hundred kilobytes covers every documented payload: the
+  // analyze input and instruction are capped at 2000 characters each and the TTS
+  // text is a report summary. The previous 50 MB limit was a free DoS vector on
+  // an unauthenticated endpoint.
+  app.use(express.json({ limit: '512kb' }));
+
+  /**
+   * Token gate for everything that is not the static frontend.
+   *
+   * On a loopback server the gate is inert, which keeps `npm run dev` unchanged.
+   * On any other address `resolveServerBinding` has already guaranteed a token
+   * exists, and it becomes mandatory here.
+   */
+  if (binding.exposed) {
+    const requiredToken = binding.accessToken as string;
+    app.use(['/api', '/artifacts', '/run_logs'], (req, res, next) => {
+      if (isAuthorizedRequest(req.headers.authorization, requiredToken)) {
+        return next();
+      }
+      res.status(401).json({
+        error: 'Missing or invalid API access token.',
+        code: 'unauthorized',
+      });
+    });
+  }
 
   app.post("/api/tts", async (req, res) => {
     try {
@@ -131,19 +167,37 @@ async function startServer() {
   });
 
 
-  app.post("/api/upload_artifact", express.raw({ type: '*/*', limit: '50mb' }), (req, res) => {
+  app.post("/api/upload_artifact", express.raw({ type: '*/*', limit: '25mb' }), (req, res) => {
     try {
-        const fileName = req.query.name || 'podcast_briefing.wav';
         const localArtifactsDir = path.join(process.cwd(), 'workspace', 'artifacts');
+
+        // The file name is validated against an allow-list and the resolved path
+        // is checked to stay inside the artifacts directory, so a name such as
+        // `../../server.ts` can no longer overwrite files outside it.
+        const target = resolveArtifactPath(localArtifactsDir, req.query.name);
+        if (target.rejection !== null) {
+            console.warn(`[upload] Rejected artifact name: ${target.rejection.body.code}`);
+            return res.status(target.rejection.status).json(target.rejection.body);
+        }
+
+        if (!Buffer.isBuffer(req.body) || req.body.length === 0) {
+            return res.status(400).json({
+                error: 'The request body must be a non-empty binary payload.',
+                code: 'empty_artifact_body',
+            });
+        }
+
         if (!fs.existsSync(localArtifactsDir)) {
             fs.mkdirSync(localArtifactsDir, { recursive: true });
         }
-        fs.writeFileSync(path.join(localArtifactsDir, fileName as string), req.body);
-        console.log(`[upload] Successfully saved ${fileName} (${req.body.length} bytes)`);
+        fs.writeFileSync(target.absolutePath, req.body);
+        console.log(`[upload] Successfully saved ${target.fileName} (${req.body.length} bytes)`);
         res.json({ success: true });
     } catch (e) {
+        // The internal message stays in the server log: the client only gets a
+        // generic failure, so a stack or a path is never echoed back.
         console.error("[upload] Error:", e);
-        res.status(500).json({ error: String(e) });
+        res.status(500).json({ error: 'Failed to store the artifact.', code: 'artifact_write_failed' });
     }
   });
 
@@ -486,7 +540,11 @@ async function startServer() {
   const indexHtmlExists = fs.existsSync(path.join(distPath, 'index.html'));
   app.use('/artifacts', express.static(path.join(process.cwd(), 'workspace', 'artifacts')));
   app.use('/run_logs', express.static(path.join(process.cwd(), 'run_logs')));
-  app.use('/latest_log', express.static(process.cwd()));
+  // `/latest_log` used to be mounted here as `express.static(process.cwd())`,
+  // which published the whole working directory over HTTP: the server source,
+  // `package-lock.json` and the `agent/*/prompt.md` and `agent/*/output.schema.json`
+  // files the catalog deliberately keeps server side. Nothing in the app consumed
+  // it, so the mount is gone. Run logs stay available under `/run_logs`.
 
   if (process.env.NODE_ENV !== "production" || !indexHtmlExists) {
     const vite = await createViteServer({
@@ -501,8 +559,11 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on port ${PORT}`);
+  app.listen(PORT, bindHost, () => {
+    const scope = binding.exposed
+      ? `${bindHost} (reachable from the network, API access token required)`
+      : `${bindHost} (local only)`;
+    console.log(`Server running on port ${PORT} at ${scope}`);
   });
 }
 

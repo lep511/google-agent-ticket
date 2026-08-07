@@ -31,3 +31,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Playwright MCP scratch output: accessibility snapshots, console logs and
+# screenshots written while browsing the app. Regenerated on every run.
+.playwright-mcp/

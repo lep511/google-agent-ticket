@@ -43,7 +43,7 @@ Nothing debug-related is written to the root itself.
 | Path | Written by | Contents |
 | --- | --- | --- |
 | `debug/debug_delta.log` | `server/lib/agentClient.ts`, `server/lib/agentClientPerseus.ts` | Appended raw tool-call and tool-result deltas from the remote agent stream. Grows across runs; safe to delete at any time. |
-| `debug/sub_agents_debug_<input>.txt` | `server.ts` (and the legacy `test_server.ts`) | Legacy copy of the run summary plus raw execution log for the **latest** run of that input. Overwritten on each run. |
+| `debug/sub_agents_debug_<input>.txt` | `server.ts` | Legacy copy of the run summary plus raw execution log for the **latest** run of that input. Overwritten on each run. |
 
 Both go through `server/lib/debugFiles.ts`, so the location is one constant
 (`DEBUG_DIR_NAME`) rather than a path repeated across call sites. The file name is reduced to

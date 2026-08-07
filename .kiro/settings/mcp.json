@@ -1,27 +1,7 @@
 {
   "mcpServers": {
-    "playwright": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@playwright/mcp@latest",
-        "--isolated",
-        "--browser",
-        "chromium"
-      ],
-      "disabled": false,
-      "autoApprove": [
-        "browser_navigate",
-        "browser_snapshot",
-        "browser_take_screenshot",
-        "browser_click",
-        "browser_find",
-        "browser_run_code_unsafe",
-        "browser_network_requests"
-      ]
-    },
     "strands-agents": {
-      "command": "uvx",
+      "command": "/home/admin/.local/bin/uvx",
       "args": ["strands-agents-mcp-server"],
       "disabled": false,
       "autoApprove": ["search_docs", "fetch_doc"]
