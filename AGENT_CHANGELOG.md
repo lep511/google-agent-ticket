@@ -1,5 +1,29 @@
 # Agent Change Log
 
+## [2026-08-07 18:00] Drop the unused `@google-cloud/storage` dependency
+
+**Context/prompt:** What is `@google-cloud/storage` used for? Remove it completely.
+
+**Files modified:**
+
+- `package.json`, `package-lock.json` (`-@google-cloud/storage`, 57 packages removed from the tree)
+
+**Summary:** Nothing imported it. A grep across every `.ts`, `.tsx`, `.js`, `.mjs`, `.cjs` and `.html` outside `node_modules` and `dist` returned no reference, and `npm ls` listed it as a direct dependency rather than something another package pulled in. The only "storage" in the code is `window.localStorage`, in `interactionHistory.ts` and `agentSelection.ts`.
+
+It is a leftover of a Firebase-era version of the app: `bun.lock` still records `firebase`, `firebase-admin` and `@google-cloud/firestore`, and `firebase-admin` declares `@google-cloud/storage` among its optional dependencies. Neither `firebase` nor `firebase-admin` is in `package.json` any more, but this one stayed behind. Artifacts are written to local disk today (`POST /api/upload_artifact` → `workspace/artifacts/`), and run logs to `run_logs/`; nothing uploads to a cloud bucket.
+
+Removing it pruned 57 packages, including the `google-auth-library`, `gaxios`, `google-gax` and `protobufjs` chain.
+
+**Also audited, left in place:** `archiver`, `jszip` and `pako` have no importers either (only their own `@types/*` entries reference them). They were not part of this request, so they stay for now.
+
+**Verification:** `npm run lint` clean; `npm test` 234 tests across 19 files; `npm run build` clean; `npm ls @google-cloud/storage` reports an empty tree. Server boots and `GET /api/agents` answers `200`.
+
+**Commit:** uncommitted
+
+**Status:** ✅ Applied
+
+---
+
 ## [2026-08-07 17:50] Remove the `/api/tts` endpoint
 
 **Context/prompt:** Remove `/api/tts` completely.

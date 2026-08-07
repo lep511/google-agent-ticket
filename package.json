@@ -16,7 +16,6 @@
   "dependencies": {
     "@ai-sdk/google": "^3.0.104",
     "@ai-sdk/provider": "^3.0.14",
-    "@google-cloud/storage": "^7.19.0",
     "@strands-agents/sdk": "1.11.2",
     "@tailwindcss/typography": "^0.5.20",
     "@tailwindcss/vite": "^4.1.14",
