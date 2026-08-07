@@ -7,7 +7,7 @@
 - **Tags:** gemini-3.1-pro, data-extraction, financial, agentic
 
 ## 2. Submission Justification
-This app demonstrates a robust implementation of a multi-agent orchestrated pipeline. It leverages server-side GenAI, file handling, and structured data extraction to deliver actionable financial insights automatically.
+This app demonstrates a robust implementation of a multi-agent orchestrated pipeline. It leverages a server-side agent loop, file handling, and structured data extraction to deliver actionable financial insights automatically.
 
 ## 3. Technical Profile & Capabilities
 - **Core Models:** gemini-3.1-pro
@@ -23,7 +23,7 @@ This app demonstrates a robust implementation of a multi-agent orchestrated pipe
 - **Access & Sharing:** N/A
 
 ## 5. Implementation Details
-- **Code Generation Source:** Purely AI-assisted using React, Tailwind CSS, Recharts, and Google GenAI SDK.
+- **Code Generation Source:** Purely AI-assisted using React, Tailwind CSS, Recharts, and the Strands Agents SDK on Gemini.
 - **Assets Sourcing:** N/A
 
 ## 6. QA & Safety Checklist

@@ -1,5 +1,39 @@
 # Agent Change Log
 
+## [2026-08-07 17:30] Run the agents on the Strands Agents SDK and drop `@google/genai`
+
+**Context/prompt:** Use strands-agents in this project and remove `@google/genai` completely; use the Strands MCP for any lookup.
+
+**Files modified:**
+
+- `server/lib/strandsAgent.ts` (rewritten: `VercelModel` instead of `GoogleModel`, token usage in `complete`, `GeminiRetryStrategy`, `classifyAgentFailureStatus`, failures thrown instead of swallowed)
+- `server/lib/geminiProvider.ts`, `server/lib/googleSearchTool.ts`, `server/lib/agentEvents.ts`, `server/lib/textToSpeech.ts` (new)
+- `server/lib/agentClient.ts`, `server/lib/agentClientPerseus.ts`, `tests/helpers/fakeAgentClient.ts` (deleted)
+- `server.ts` (`/api/analyze` runs the Strands agent; `/api/tts` through `synthesizeSpeech`)
+- `server/lib/agentRegistry.ts` (new `readAgentInstructions` / `getInstructions`)
+- `server/lib/analyzeExecution.ts` (dropped the Perseus client selection and `toRemoteInlineSources`; `describeCreateInteractionFailure` → `describeAgentStartFailure`)
+- `server/lib/strandsAgent.test.ts`, `server/lib/googleSearchTool.test.ts`, `server/lib/textToSpeech.test.ts` (new), `server/lib/analyzeExecution.test.ts`, `tests/server/helpers.test.ts`
+- `package.json` (`-@google/genai`, `+@ai-sdk/google`, `+@ai-sdk/provider`)
+- `README.md`, `.env.example`, `DEBUG_MODE.md`, `gallery.md`
+
+**Summary:** `/api/analyze` used to POST to the remote Gemini Managed Agents endpoint (`agentClient.ts` and its byte-identical `agentClientPerseus.ts` copy), and `/api/tts` was the only importer of `@google/genai`. The agent loop now runs in-process with the Strands Agents SDK, which was already a dependency but had no importers.
+
+`@google/genai` could not simply be replaced by the Strands Google provider: `@strands-agents/sdk/models/google` imports it, so the package would have stayed in the tree. The models are reached through `VercelModel` + `@ai-sdk/google` instead, which talks to the Generative Language REST API directly. `@ai-sdk/google` is pinned to the `3.x` line because that is what implements the `LanguageModelV3` interface the Strands adapter expects.
+
+Search is a named `google_search` function tool rather than silent Gemini grounding, because every agent prompt names that tool and the timeline labels its calls by `arguments.query`. Each call is one grounded lookup, and grounding redirect links are resolved to publisher URLs so reports cite real sources. `AGENTS.md` becomes the system prompt, replacing the `/.agents` inline-source upload the remote sandbox needed.
+
+The SSE contract is unchanged (`agent_info` → `thinking`/`text`/`tool_call`/`tool_result` → `complete` → `done` → `final_stats`), including the token count, which now comes from `result.metrics.accumulatedUsage`. Startup failures are still answered with `429`/`503`/`502` and a stable `code`: the first event is awaited before the SSE headers are written, so a run that never starts is rejected with a status instead of an empty stream. A run is also cancelled when the client disconnects (`res` close, not `req` close, which fires as soon as the body is read).
+
+**Trade-offs:** the remote sandbox is gone, so agents no longer have code execution, a python environment or artifact uploads; `agent.yaml` and `requirements.txt` are now deployment metadata only. `server/lib/agentInlineSources.ts` and `agentRegistry.getInlineSources` are left in place but no longer used by the analyze path. `gemini-2.5-flash` cannot serve the agent loop: it answers `500 INTERNAL` when the provider replays tool-call ids, so the default is `gemini-3.6-flash`.
+
+**Verification:** `npm run lint` clean; `npm test` 240 tests across 19 files; `npm run build` clean. Live end-to-end run of `market_news_agent` on TSLA: 8 `google_search` calls, 92 `text` events, `complete` with 36,192 tokens, `final_stats` with duration and log URL, and a valid `simple_report` JSON block citing 7 resolved publisher URLs. `POST /api/tts` returns a 167 KB `audio/wav`. Both run logs are written. `npm ls @google/genai` reports an empty tree.
+
+**Commit:** uncommitted
+
+**Status:** ✅ Applied
+
+---
+
 ## [2026-08-06 21:39] Fix the three errors found while browsing the site on port 3000
 
 **Context/prompt:** Browse the site on port 3000 looking for errors, then fix all of them.

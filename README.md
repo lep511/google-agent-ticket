@@ -27,6 +27,9 @@ View your app in AI Studio: https://ai.studio/apps/0e98dc47-4c39-44d6-b7a4-885bd
    
    # Gemini API Key (required for AI analysis)
    GEMINI_API_KEY=your_gemini_api_key
+
+   # Model overrides (optional). See .env.example for the rest.
+   GEMINI_MODEL_ID=gemini-3.6-flash
    
    # Server binding (optional). Defaults to 127.0.0.1, reachable only from this
    # machine. Any other address requires API_ACCESS_TOKEN (see "Network exposure").
@@ -60,12 +63,12 @@ The folder name is the `agentId`: it must be snake_case (`a`-`z`, `0`-`9`, singl
 
 ```
 agent/<agent_id>/
-├── manifest.json        # catalog + UI metadata (server only)
-├── prompt.md            # prompt template with {{input}}, {{instruction}}, {{schema}} (server only)
-├── output.schema.json   # JSON shape the model must return (server only)
-├── AGENTS.md            # workspace rules for the remote agent (uploaded)
-├── agent.yaml           # base agent, environment and tools (uploaded)
-└── requirements.txt     # python dependencies of the remote environment (uploaded)
+├── manifest.json        # catalog + UI metadata
+├── prompt.md            # prompt template with {{input}}, {{instruction}}, {{schema}}
+├── output.schema.json   # JSON shape the model must return
+├── AGENTS.md            # instructions used as the agent's system prompt
+├── agent.yaml           # deployment metadata, not read by the server
+└── requirements.txt     # deployment metadata, not read by the server
 ```
 
 `AGENTS.md`, the prompt file and the schema file must exist, be readable and be non-empty, and the schema must contain valid JSON. Otherwise the folder is skipped with a warning and the rest of the catalog keeps working.
@@ -121,21 +124,33 @@ No TypeScript file needs to change:
 1. Create `agent/<agent_id>/` using snake_case for the folder name.
 2. Add `manifest.json` with the required fields; set `id` to the folder name, pick an `icon` from the allowed list, and choose `inputMode` and `outputRenderer`.
 3. Add `prompt.md` with the placeholders your agent needs, and `output.schema.json` with the exact JSON shape it must return (use the `simple_report` contract unless you are building a financial report).
-4. Add `AGENTS.md`, `agent.yaml` and `requirements.txt`. Copy an existing agent as a starting point: `agent.yaml` declares `base_agent`, the remote environment and the tools (`google_search`), and `AGENTS.md` declares the workspace rules, workflow, anti-hallucination rules and output format.
+4. Add `AGENTS.md`, which becomes the system prompt: it declares the workflow, the search rules, the anti-hallucination rules and the output format. Copy an existing agent as a starting point. `agent.yaml` and `requirements.txt` are kept as deployment metadata and are not read by the server.
 5. Restart or just touch `agent/` — the catalog is cached in memory and rebuilt whenever the modification timestamp of `agent/` changes.
 6. Verify with `curl http://localhost:3000/api/agents` and pick the agent in the header selector.
 
 Anything malformed is skipped with a single warning naming the folder and the first offending field or file, so a broken manifest never takes down the rest of the catalog.
 
-### Files that are not uploaded to the remote environment
+## Agent runtime
 
-Every file in the agent folder is uploaded to the remote environment as an inline source under `/.agents`, preserving its relative path, **except** these server-side metadata files:
+Agents run **in this process** with the [Strands Agents SDK](https://strandsagents.com/) for TypeScript. There is no remote agent service and no `@google/genai` dependency: the models are reached through the Vercel AI SDK Google provider (`@ai-sdk/google`), which the Strands `VercelModel` adapter wraps.
 
-- `manifest.json`
-- the prompt file declared in `promptFile` (default `prompt.md`)
-- the schema file declared in `schemaFile` (default `output.schema.json`)
+One run is assembled from the agent folder like this:
 
-Only the resolved agent's own folder is traversed, up to 5 levels deep and 200 files, with a 1 MB limit per file. Files from other agent folders, loose files at the root of `agent/` and symlinks resolving outside the folder are never uploaded.
+| Piece | Source |
+| --- | --- |
+| System prompt | `AGENTS.md` |
+| User prompt | `prompt.md` with `{{input}}`, `{{instruction}}` and `{{schema}}` replaced |
+| Model | request `model` field, then `GEMINI_MODEL_ID`, then `gemini-3.6-flash` |
+| Tools | `google_search` |
+
+`google_search` takes a single `query` and answers with one grounded Gemini lookup: what the results say, the queries Google actually ran, and the pages they came from. Grounding hands back `vertexaisearch.cloud.google.com` redirect links, so each one is resolved to its publisher URL before the agent sees it, which is what lets the reports cite real sources.
+
+Model failures are retried with exponential backoff for throttling (`429`) and for transient server errors (`5xx`), up to 4 attempts, so a blip halfway through a run does not discard the searches already done. Anything else fails the run.
+
+Two notes on models:
+
+- Use a Gemini 3.x model for the agent loop. `gemini-2.5-flash` answers `500 INTERNAL` when the provider replays the tool-call ids of a previous turn, so multi-step runs cannot complete against it. It is fine for `GEMINI_SEARCH_MODEL_ID`, whose calls are single-shot.
+- A run that never produces its first event is rejected before the SSE stream opens, with `429` / `503` / `502` and a stable `code`, so the client can tell a temporary quota limit from a real failure.
 
 ## API notes
 
