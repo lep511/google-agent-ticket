@@ -2,12 +2,17 @@
  * Agent runner, built on the Strands Agents SDK (TypeScript).
  *
  * This is the only runner: `/api/analyze` builds an agent here and streams it to
- * the browser. The agent loop runs in this process, the model is Gemini reached
- * through the Vercel AI SDK provider, and web research happens through the
- * `google_search` tool in `googleSearchTool.ts`.
+ * the browser. The agent loop runs in this process and web research happens
+ * through the `google_search` tool in `googleSearchTool.ts`.
  *
- * The SDK stream is mapped onto the `AgentEvent` union the SSE endpoint has
- * always emitted, so the browser contract is unchanged.
+ * Two model providers are supported:
+ *  - **Gemini** (default): via the Vercel AI SDK Google provider + VercelModel adapter.
+ *  - **NVIDIA NIM**: via the OpenAI-compatible endpoint at integrate.api.nvidia.com,
+ *    using the Strands `OpenAIModel` in Chat Completions mode.
+ *
+ * The provider is selected through the `provider` field on agent options or the
+ * `MODEL_PROVIDER` env var (`gemini` | `nvidia`). MCP tools are loaded from the
+ * config path in `MCP_CONFIG_PATH` when set.
  *
  * Docs: https://strandsagents.com/docs/user-guide/quickstart/typescript/
  */
@@ -15,10 +20,12 @@
 import {
   Agent,
   DefaultModelRetryStrategy,
+  McpClient,
   ModelThrottledError,
   type AgentStreamEvent,
   type ToolList,
 } from '@strands-agents/sdk';
+import { OpenAIModel } from '@strands-agents/sdk/models/openai';
 import { VercelModel } from '@strands-agents/sdk/models/vercel';
 import type { ZodType } from 'zod';
 
@@ -28,7 +35,33 @@ import {
   isGeminiConfigured,
   resolveGeminiModelId,
 } from './geminiProvider.ts';
+import {
+  NVIDIA_BASE_URL,
+  isNvidiaConfigured,
+  resolveNvidiaModelId,
+} from './nvidiaProvider.ts';
 import { createGoogleSearchTool } from './googleSearchTool.ts';
+
+/* ────────────────────────────────────────────────────────── */
+/*  Provider selection                                         */
+/* ────────────────────────────────────────────────────────── */
+
+export type ModelProvider = 'gemini' | 'nvidia';
+
+const VALID_PROVIDERS: readonly ModelProvider[] = ['gemini', 'nvidia'];
+
+export function resolveModelProvider(requested?: unknown): ModelProvider {
+  if (typeof requested === 'string') {
+    const lower = requested.trim().toLowerCase();
+    if (VALID_PROVIDERS.includes(lower as ModelProvider)) return lower as ModelProvider;
+  }
+  const env = process.env.MODEL_PROVIDER;
+  if (typeof env === 'string') {
+    const lower = env.trim().toLowerCase();
+    if (VALID_PROVIDERS.includes(lower as ModelProvider)) return lower as ModelProvider;
+  }
+  return 'gemini';
+}
 
 /* ────────────────────────────────────────────────────────── */
 /*  Configuration                                              */
@@ -37,8 +70,10 @@ import { createGoogleSearchTool } from './googleSearchTool.ts';
 export interface StrandsAgentOptions {
   /** System prompt guiding the agent, normally the agent's `AGENTS.md`. */
   systemPrompt?: string;
-  /** Gemini model id. Falls back to `GEMINI_MODEL_ID` and then the default. */
+  /** Model id. Interpretation depends on the provider. */
   modelId?: string;
+  /** Provider to use: `gemini` (default) or `nvidia`. */
+  provider?: ModelProvider | string;
   /** Sampling temperature forwarded to the model. */
   temperature?: number;
   /** Extra function tools created with the SDK's `tool()` helper. */
@@ -47,23 +82,22 @@ export interface StrandsAgentOptions {
   googleSearch?: boolean;
   /** Zod schema the final answer must satisfy, exposed as `result.structuredOutput`. */
   structuredOutputSchema?: ZodType;
+  /** MCP clients to attach to the agent. */
+  mcpClients?: McpClient[];
 }
 
 /** Model attempts before a run gives up, counting the first one. */
 export const MAX_MODEL_ATTEMPTS = 4;
 
-/** True when the server has the credentials the runner needs. */
-export function isStrandsConfigured(): boolean {
+/** True when the server has the credentials for the resolved provider. */
+export function isStrandsConfigured(provider?: ModelProvider | string): boolean {
+  const resolved = resolveModelProvider(provider);
+  if (resolved === 'nvidia') return isNvidiaConfigured();
   return isGeminiConfigured();
 }
 
 /**
  * Retries throttling, as the SDK does by default, plus transient server errors.
- *
- * A research run makes one model call per tool cycle, so a single 500 or 503 from
- * the Gemini endpoint halfway through would throw away all the searches done so
- * far. Those statuses are transient by definition, so they are worth another
- * attempt with the same backoff.
  */
 export class GeminiRetryStrategy extends DefaultModelRetryStrategy {
   protected override isRetryable(error: Error): boolean {
@@ -72,18 +106,35 @@ export class GeminiRetryStrategy extends DefaultModelRetryStrategy {
 }
 
 /**
- * Builds an agent backed by Gemini.
+ * Builds the model instance for the resolved provider.
+ */
+function buildModel(provider: ModelProvider, options: StrandsAgentOptions) {
+  if (provider === 'nvidia') {
+    return new OpenAIModel({
+      api: 'chat',
+      modelId: resolveNvidiaModelId(options.modelId),
+      apiKey: process.env.NVIDIA_API_KEY,
+      clientConfig: { baseURL: NVIDIA_BASE_URL },
+      ...(options.temperature === undefined ? {} : { temperature: options.temperature }),
+    });
+  }
+
+  const google = createGeminiProvider();
+  return new VercelModel({
+    provider: google(resolveGeminiModelId(options.modelId)),
+    ...(options.temperature === undefined ? {} : { temperature: options.temperature }),
+  });
+}
+
+/**
+ * Builds an agent backed by the configured model provider.
  *
  * Console printing is disabled: this server streams events to the browser and
  * writes its own run logs, so the SDK's stdout printer would only duplicate them.
  */
 export function createStrandsAgent(options: StrandsAgentOptions = {}): Agent {
-  const google = createGeminiProvider();
-
-  const model = new VercelModel({
-    provider: google(resolveGeminiModelId(options.modelId)),
-    ...(options.temperature === undefined ? {} : { temperature: options.temperature }),
-  });
+  const provider = resolveModelProvider(options.provider);
+  const model = buildModel(provider, options);
 
   const tools: ToolList = [
     ...(options.googleSearch ? [createGoogleSearchTool()] : []),
@@ -93,15 +144,34 @@ export function createStrandsAgent(options: StrandsAgentOptions = {}): Agent {
   return new Agent({
     model,
     printer: false,
-    // A strategy instance keeps per-turn backoff state, so it belongs to this
-    // agent and must not be shared.
     retryStrategy: new GeminiRetryStrategy({ maxAttempts: MAX_MODEL_ATTEMPTS }),
     ...(options.systemPrompt === undefined ? {} : { systemPrompt: options.systemPrompt }),
     ...(tools.length === 0 ? {} : { tools }),
+    ...(options.mcpClients?.length ? { mcpClients: options.mcpClients } : {}),
     ...(options.structuredOutputSchema === undefined
       ? {}
       : { structuredOutputSchema: options.structuredOutputSchema }),
   });
+}
+
+/* ────────────────────────────────────────────────────────── */
+/*  MCP client loading                                         */
+/* ────────────────────────────────────────────────────────── */
+
+let _mcpClientsPromise: Promise<McpClient[]> | null = null;
+
+/**
+ * Lazily loads MCP clients from the config file at `MCP_CONFIG_PATH`.
+ * Returns an empty array when the env var is unset. Caches the result.
+ */
+export async function loadMcpClients(): Promise<McpClient[]> {
+  if (_mcpClientsPromise) return _mcpClientsPromise;
+
+  const configPath = process.env.MCP_CONFIG_PATH;
+  if (!configPath) return [];
+
+  _mcpClientsPromise = McpClient.loadServers(configPath);
+  return _mcpClientsPromise;
 }
 
 /* ────────────────────────────────────────────────────────── */

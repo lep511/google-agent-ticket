@@ -22,6 +22,11 @@ export const OUTPUT_RENDERERS = ['financial_report', 'simple_report'] as const;
 
 export type OutputRenderer = (typeof OUTPUT_RENDERERS)[number];
 
+/** Model providers an agent can declare in its manifest. */
+export const MODEL_PROVIDERS = ['gemini', 'nvidia'] as const;
+
+export type ModelProviderType = (typeof MODEL_PROVIDERS)[number];
+
 /**
  * Lista blanca de iconos de `lucide-react` que un manifiesto puede declarar
  * (Requirements 2.3, 16.4). Un nombre fuera de esta lista invalida el
@@ -130,6 +135,8 @@ export const DEFAULT_IS_DEFAULT = false;
 export const DEFAULT_SUPPORTS_INSTRUCTION = false;
 export const DEFAULT_PROMPT_FILE = 'prompt.md';
 export const DEFAULT_SCHEMA_FILE = 'output.schema.json';
+export const DEFAULT_MODEL_PROVIDER: ModelProviderType = 'gemini';
+export const DEFAULT_MODEL_NAME = 'gemini-3.6-flash';
 
 /**
  * Valores por defecto que el registro aplica cuando el manifiesto omite un
@@ -142,6 +149,8 @@ export const MANIFEST_DEFAULTS = {
   promptFile: DEFAULT_PROMPT_FILE,
   schemaFile: DEFAULT_SCHEMA_FILE,
   accentColor: DEFAULT_ACCENT_COLOR,
+  modelProvider: DEFAULT_MODEL_PROVIDER,
+  modelName: DEFAULT_MODEL_NAME,
   landing: null,
 } as const;
 
@@ -195,6 +204,8 @@ export interface AgentManifest {
   outputRenderer: OutputRenderer;
   promptFile: string;
   schemaFile: string;
+  modelProvider: ModelProviderType;
+  modelName: string;
   landing: AgentLanding | null;
 }
 
@@ -267,4 +278,8 @@ export function isOutputRenderer(value: unknown): value is OutputRenderer {
 /** Comparación exacta contra la lista blanca de iconos (Requirements 2.3, 16.4). */
 export function isAllowedIconName(value: unknown): value is AllowedIconName {
   return typeof value === 'string' && (ALLOWED_ICONS as readonly string[]).includes(value);
+}
+
+export function isModelProvider(value: unknown): value is ModelProviderType {
+  return typeof value === 'string' && (MODEL_PROVIDERS as readonly string[]).includes(value);
 }

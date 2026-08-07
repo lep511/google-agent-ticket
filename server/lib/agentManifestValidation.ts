@@ -33,6 +33,8 @@ import type {
 import {
   AGENTS_FILE_NAME,
   DEFAULT_ACCENT_COLOR,
+  DEFAULT_MODEL_NAME,
+  DEFAULT_MODEL_PROVIDER,
   DEFAULT_ORDER,
   FIELD_MAX_LENGTHS,
   MANIFEST_DEFAULTS,
@@ -40,12 +42,14 @@ import {
   ORDER_MIN,
   isAllowedIconName,
   isInputMode,
+  isModelProvider,
   isOutputRenderer,
   type AgentLanding,
   type AgentLandingHighlight,
   type AgentLandingHighlightGroup,
   type AgentManifest,
   type AgentPaths,
+  type ModelProviderType,
   type ResolvedAgentDefinition,
 } from './agentTypes.ts';
 
@@ -320,6 +324,8 @@ interface OptionalFields {
   promptFile: string;
   schemaFile: string;
   accentColor: string;
+  modelProvider: ModelProviderType;
+  modelName: string;
   landing: AgentLanding | null;
 }
 
@@ -422,6 +428,31 @@ function readOptionalFields(
     }
   }
 
+  let modelProvider: ModelProviderType = DEFAULT_MODEL_PROVIDER;
+  if (raw.modelProvider !== undefined && raw.modelProvider !== null) {
+    if (isModelProvider(raw.modelProvider)) {
+      modelProvider = raw.modelProvider;
+    } else {
+      degrade(
+        'invalid_optional_field',
+        `el campo opcional "modelProvider" vale "${String(raw.modelProvider)}" y no es un proveedor permitido: se aplica el valor por defecto "${DEFAULT_MODEL_PROVIDER}".`,
+      );
+    }
+  }
+
+  let modelName: string = DEFAULT_MODEL_NAME;
+  if (raw.modelName !== undefined && raw.modelName !== null) {
+    const trimmed = trimmedString(raw.modelName);
+    if (trimmed !== null && trimmed.length <= 120) {
+      modelName = trimmed;
+    } else {
+      degrade(
+        'invalid_optional_field',
+        `el campo opcional "modelName" no es una cadena válida: se aplica el valor por defecto "${DEFAULT_MODEL_NAME}".`,
+      );
+    }
+  }
+
   return {
     order: normalizedOrder.order,
     isDefault: readBooleanField(raw, 'isDefault', degrade),
@@ -429,6 +460,8 @@ function readOptionalFields(
     promptFile: readFileNameField(raw, 'promptFile', degrade),
     schemaFile: readFileNameField(raw, 'schemaFile', degrade),
     accentColor: readAccentColor(raw, degrade),
+    modelProvider,
+    modelName,
     landing,
   };
 }
@@ -578,6 +611,8 @@ export function validateAgentFolder(folder: DiscoveredAgentFolder): ManifestVali
       outputRenderer: required.outputRenderer as AgentManifest['outputRenderer'],
       promptFile: optional.promptFile,
       schemaFile: optional.schemaFile,
+      modelProvider: optional.modelProvider,
+      modelName: optional.modelName,
       landing: optional.landing,
     };
 

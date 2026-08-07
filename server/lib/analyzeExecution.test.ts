@@ -39,6 +39,8 @@ function definition(
       outputRenderer: 'simple_report',
       promptFile: 'prompt.md',
       schemaFile: 'output.schema.json',
+      modelProvider: 'gemini',
+      modelName: 'gemini-3.6-flash',
       landing: null,
       ...overrides,
     },

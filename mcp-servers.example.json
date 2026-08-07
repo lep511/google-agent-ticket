@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "strands-agents": {
+      "command": "uvx",
+      "args": ["strands-agents-mcp-server"],
+      "disabled": false
+    }
+  }
+}

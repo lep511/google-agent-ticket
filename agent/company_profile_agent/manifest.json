@@ -12,6 +12,8 @@
   "actionLabel": "Build Profile",
   "supportsInstruction": true,
   "outputRenderer": "simple_report",
+  "modelProvider": "gemini",
+  "modelName": "gemini-3.6-flash",
   "landing": {
     "title": "Company Profile, the shape of a business in one page",
     "subtitle": "Describe a company and get its business model, segments, competitors and structural risks.",

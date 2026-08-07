@@ -15,6 +15,8 @@ import {
   classifyAgentFailureStatus,
   createStrandsAgent,
   isStrandsConfigured,
+  loadMcpClients,
+  resolveModelProvider,
   streamStrandsAgent,
 } from "./server/lib/strandsAgent.ts";
 import {
@@ -208,13 +210,18 @@ async function startServer() {
 
       const { input, instruction, rawInput } = validation.value;
 
-      console.log(`[analyze] Starting analysis for ${input} with agent ${agent.agentId} using model ${model || 'default'}`);
+      // Provider precedence: request body > manifest > env > default (gemini).
+      const provider = resolveModelProvider(body.provider ?? agent.manifest.modelProvider);
+      // Model precedence: request body > manifest modelName > env > provider default.
+      const effectiveModel = model || agent.manifest.modelName;
+      console.log(`[analyze] Starting analysis for ${input} with agent ${agent.agentId} using provider ${provider}, model ${effectiveModel || 'default'}`);
 
       // The credential is checked before anything is prepared: without it the
       // agent cannot reach the model, and that is a configuration failure rather
       // than a failed run, so no SSE stream is opened.
-      if (!isStrandsConfigured()) {
-        console.error('[analyze] GEMINI_API_KEY is not configured.');
+      if (!isStrandsConfigured(provider)) {
+        const key = provider === 'nvidia' ? 'NVIDIA_API_KEY' : 'GEMINI_API_KEY';
+        console.error(`[analyze] ${key} is not configured.`);
         return res.status(500).json({ error: MODEL_NOT_CONFIGURED_ERROR });
       }
 
@@ -251,10 +258,13 @@ async function startServer() {
       const runAbort = new AbortController();
       res.on('close', () => runAbort.abort());
 
+      const mcpClients = await loadMcpClients();
       const strandsAgent = createStrandsAgent({
         systemPrompt,
-        modelId: model,
+        modelId: effectiveModel,
+        provider,
         googleSearch: true,
+        mcpClients: mcpClients.length > 0 ? mcpClients : undefined,
       });
 
       /*

@@ -11,6 +11,8 @@
   "actionLabel": "Analyze",
   "supportsInstruction": true,
   "outputRenderer": "financial_report",
+  "modelProvider": "gemini",
+  "modelName": "gemini-3.6-flash",
   "landing": {
     "title": "Tickr, your intelligent financial document analyzer",
     "subtitle": "Automatically finds and synthesizes recent SEC filings and public disclosures.",

@@ -67,8 +67,7 @@ agent/<agent_id>/
 ├── prompt.md            # prompt template with {{input}}, {{instruction}}, {{schema}}
 ├── output.schema.json   # JSON shape the model must return
 ├── AGENTS.md            # instructions used as the agent's system prompt
-├── agent.yaml           # deployment metadata, not read by the server
-└── requirements.txt     # deployment metadata, not read by the server
+└── agent.yaml           # deployment metadata, not read by the server
 ```
 
 `AGENTS.md`, the prompt file and the schema file must exist, be readable and be non-empty, and the schema must contain valid JSON. Otherwise the folder is skipped with a warning and the rest of the catalog keeps working.
@@ -124,7 +123,7 @@ No TypeScript file needs to change:
 1. Create `agent/<agent_id>/` using snake_case for the folder name.
 2. Add `manifest.json` with the required fields; set `id` to the folder name, pick an `icon` from the allowed list, and choose `inputMode` and `outputRenderer`.
 3. Add `prompt.md` with the placeholders your agent needs, and `output.schema.json` with the exact JSON shape it must return (use the `simple_report` contract unless you are building a financial report).
-4. Add `AGENTS.md`, which becomes the system prompt: it declares the workflow, the search rules, the anti-hallucination rules and the output format. Copy an existing agent as a starting point. `agent.yaml` and `requirements.txt` are kept as deployment metadata and are not read by the server.
+4. Add `AGENTS.md`, which becomes the system prompt: it declares the workflow, the search rules, the anti-hallucination rules and the output format. Copy an existing agent as a starting point. `agent.yaml` is deployment metadata and is not read by the server.
 5. Restart or just touch `agent/` — the catalog is cached in memory and rebuilt whenever the modification timestamp of `agent/` changes.
 6. Verify with `curl http://localhost:3000/api/agents` and pick the agent in the header selector.
 
