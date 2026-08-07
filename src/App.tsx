@@ -1,7 +1,7 @@
 import { LandingView } from './LandingView';
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { DottedBackground } from './components/PulsatingDots';
-import { Search, Loader2 } from 'lucide-react';
+import { History, Search, Loader2 } from 'lucide-react';
 import ReportTemplate from "./ReportTemplate";
 import SimpleReportView, { normalizeSimpleReport } from './components/SimpleReportView';
 import { AgentTimeline, TimelineEvent } from './components/AgentTimeline';
@@ -35,6 +35,18 @@ import {
   inputMaxLength,
 } from './agentInput';
 import { FALLBACK_OUTPUT_RENDERER, extractReport } from './resultExtraction';
+import { HistoryPanel } from './components/HistoryPanel';
+import {
+  HistoryEntryDraft,
+  InteractionHistoryEntry,
+  InteractionMetrics,
+  createHistoryEntry,
+  deleteEntry,
+  insertEntry,
+  persistHistory,
+  readHistory,
+  selectVisibleEntries,
+} from './interactionHistory';
 
 export interface DocumentFinding {
   documentType?: string;
@@ -131,6 +143,21 @@ export interface RunAgent {
   outputRenderer: OutputRenderer;
 }
 
+/**
+ * Copy of the Report Snapshot that feeds the restored report view (Requirement
+ * 5). It is a copy and not a reference to the History Entry so that deleting
+ * that entry, or clearing the whole history, leaves the report on screen
+ * untouched (Requirement 10.10).
+ */
+export interface RestoredReport {
+  entryId: string;
+  report: Record<string, unknown>;
+  outputRenderer: OutputRenderer;
+  agentName: string;
+  query: string;
+  metrics: InteractionMetrics;
+}
+
 export default function App() {
   /** Valor de entrada; su significado depende del `inputMode` del agente activo. */
   const [inputValue, setInputValue] = useState('');
@@ -169,6 +196,99 @@ export default function App() {
   const [showStopConfirm, setShowStopConfirm] = useState(false);
   const [isStopped, setIsStopped] = useState(false);
 
+  /* ── Interaction history ─────────────────────────────────────── */
+
+  /** Full history of every agent, as it is persisted (Requirement 8.3). */
+  const [historyEntries, setHistoryEntries] = useState<InteractionHistoryEntry[]>([]);
+  /**
+   * Mirror of `historyEntries` readable outside the render cycle. The recording
+   * and deletion paths run inside asynchronous callbacks, where the state
+   * captured by a closure can already be stale.
+   */
+  const historyRef = useRef<InteractionHistoryEntry[]>([]);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const historyTriggerRef = useRef<HTMLButtonElement | null>(null);
+  /**
+   * Report restored from the history. It lives beside the live run state
+   * (`reportData`, `runAgent`, `isReportOpen` and the live metrics) and never
+   * writes into it, so closing it gives back exactly the previous view
+   * (Requirement 5.7).
+   */
+  const [restoredReport, setRestoredReport] = useState<RestoredReport | null>(null);
+
+  /** Requirement 6.2: initial history load. */
+  useEffect(() => {
+    const stored = readHistory();
+    historyRef.current = stored;
+    setHistoryEntries(stored);
+  }, []);
+
+  /**
+   * Single write gate: persists the list and publishes the effective one, which
+   * is the trimmed list when the quota forced a trim (Requirements 6.1, 6.6,
+   * 7.5). Every history mutation goes through here.
+   */
+  const applyHistory = useCallback((next: InteractionHistoryEntry[]) => {
+    const { entries } = persistHistory(next);
+    historyRef.current = entries;
+    setHistoryEntries(entries);
+  }, []);
+
+  /**
+   * Requirements 10.3, 10.4: only the entry with that `id` disappears, the
+   * resulting list is persisted and the panel stays open.
+   */
+  const deleteHistoryEntry = useCallback(
+    (id: string) => {
+      applyHistory(deleteEntry(historyRef.current, id));
+    },
+    [applyHistory],
+  );
+
+  /** Requirement 10.7: full deletion, across every agent. */
+  const clearHistory = useCallback(() => {
+    applyHistory([]);
+  }, [applyHistory]);
+
+  /**
+   * Requirements 5.1, 5.5, 5.6: activating a Visible Entry paints its stored
+   * Report Snapshot and closes the panel. The whole restoration is a local state
+   * assignment, so no request reaches `/api/analyze`. While a run is in progress
+   * nothing is restored; the panel also disables its rows and explains why.
+   */
+  const restoreEntry = useCallback(
+    (entry: InteractionHistoryEntry) => {
+      if (running) return;
+      /*
+        The snapshot fields are copied into the restored state instead of keeping
+        a handle on the entry, which is what keeps the report on screen alive
+        after that entry is deleted or the history is cleared (Requirement 10.10).
+      */
+      setRestoredReport({
+        entryId: entry.id,
+        report: entry.report,
+        outputRenderer: entry.outputRenderer,
+        agentName: entry.agentName,
+        query: entry.query,
+        metrics: entry.metrics,
+      });
+      setIsHistoryOpen(false);
+    },
+    [running],
+  );
+
+  /**
+   * Requirement 2.9: closing the panel returns keyboard focus to the
+   * History_Trigger, whatever closed it (overlay, `Escape` or close control).
+   */
+  const wasHistoryOpen = useRef(false);
+  useEffect(() => {
+    if (wasHistoryOpen.current && !isHistoryOpen) {
+      historyTriggerRef.current?.focus();
+    }
+    wasHistoryOpen.current = isHistoryOpen;
+  }, [isHistoryOpen]);
+
   useEffect(() => {
     // Resolve the OAuth callback first, then fall back to an existing session.
     handleOAuthCallback()
@@ -188,6 +308,16 @@ export default function App() {
     await signOutCognito();
     setUser(null);
   };
+
+  /**
+   * Requirements 8.1, 8.2, 8.5: entries whose `agentId` matches the Active
+   * Agent exactly. A null Active Agent yields zero Visible Entries, and a change
+   * of Active Agent recomputes the list on the next render.
+   */
+  const visibleEntries = useMemo(
+    () => selectVisibleEntries(historyEntries, activeAgentId),
+    [historyEntries, activeAgentId],
+  );
 
   /** Entrada de catálogo del agente activo; nula mientras no hay catálogo. */
   const activeAgent = findAgent(agents, activeAgentId);
@@ -411,6 +541,28 @@ export default function App() {
     aRef.current = controller;
     const startTimestamp = Date.now();
     let currentToolRuns = 0;
+    /*
+      Run-local accumulators for the Report Snapshot (Requirement 3.3). Every
+      `set*` call schedules an asynchronous state update, so reading React state
+      when the run finishes would snapshot stale values; these mirrors always
+      carry the numbers this run produced.
+    */
+    /** Report object promoted by this run, or null when none was promoted. */
+    let promotedReport: Record<string, unknown> | null = null;
+    let currentTokenCount = 0;
+    let currentDuration = 0;
+    /**
+     * Requirement 3.2: identity of the agent that produced the report. It is
+     * frozen here and only `agent_info` refreshes it, so a later change of
+     * Active Agent cannot retag this run.
+     */
+    let runIdentity: RunAgent | null = requestedAgent
+      ? {
+          agentId: requestedAgent.id,
+          agentName: requestedAgent.name,
+          outputRenderer: requestedAgent.outputRenderer,
+        }
+      : null;
     /**
      * Renderizador con el que se interpreta el texto final de esta ejecución.
      * Arranca con el del agente enviado y lo confirma o corrige `agent_info`
@@ -486,20 +638,24 @@ export default function App() {
             try {
               const evt = JSON.parse(dataStr);
               if (evt.type === 'agent_info') {
-                  // Requirement 14.1: el renderizador de esta ejecución queda
-                  // fijado por el agente que la sirvió.
+                  // Requirement 14.1: the renderer of this run is fixed by the
+                  // agent that served it.
                   const informedAgentId = typeof evt.agentId === 'string' ? evt.agentId : null;
                   if (informedAgentId) {
                     runRenderer = isOutputRenderer(evt.outputRenderer)
                       ? evt.outputRenderer
                       : FALLBACK_OUTPUT_RENDERER;
-                    setRunAgent({
+                    // Requirement 3.2: the accumulator and the live state move
+                    // together, so the History Entry carries this identity.
+                    runIdentity = {
                       agentId: informedAgentId,
                       agentName: typeof evt.agentName === 'string' ? evt.agentName : informedAgentId,
                       outputRenderer: runRenderer,
-                    });
-                    // Requirements 12.5, 12.6: si el agente ejecutado no es el
-                    // enviado, el informado pasa a ser el activo y se almacena.
+                    };
+                    setRunAgent(runIdentity);
+                    // Requirements 12.5, 12.6: when the agent that ran is not
+                    // the requested one, the informed agent becomes active and
+                    // is stored.
                     if (informedAgentId !== requestedAgentId) {
                       setActiveAgentId(informedAgentId);
                       storeSelectedAgentId(informedAgentId);
@@ -543,13 +699,24 @@ export default function App() {
                       if (usage) {
                           const tokens = usage.total_token_count || usage.totalTokenCount || usage.total_tokens || 0;
                           if (tokens > 0) {
+                              // Requirement 3.3: mirrored into the run-local
+                              // accumulator for the History Entry metrics.
+                              currentTokenCount = tokens;
                               setTok(tokens);
                           }
                       }
                   }
               } else if (evt.type === 'final_stats') {
-                  if (evt.tokens > 0) setTok(evt.tokens);
-                  if (evt.duration > 0) setDur(Math.round(evt.duration));
+                  // Requirement 3.3: the accumulators follow the displayed
+                  // metrics step by step.
+                  if (evt.tokens > 0) {
+                      currentTokenCount = evt.tokens;
+                      setTok(evt.tokens);
+                  }
+                  if (evt.duration > 0) {
+                      currentDuration = Math.round(evt.duration);
+                      setDur(currentDuration);
+                  }
                   if (ENABLE_JSON_DOWNLOAD && evt.jsonlLogUrl) {
                       fetch(evt.jsonlLogUrl)
                         .then(res => res.blob())
@@ -577,6 +744,9 @@ export default function App() {
         if (accumulatedText) {
             const foundData = parseFinalText(accumulatedText, runRenderer);
             if (foundData) {
+                // Requirement 3.1: the promoted report is kept run-locally too,
+                // because the History Entry is built outside the render cycle.
+                promotedReport = foundData;
                 setRep(foundData);
                 reportPromoted = true;
             }
@@ -604,6 +774,8 @@ export default function App() {
       if (accumulatedText) {
           const finalData = parseFinalText(accumulatedText, runRenderer);
           if (finalData) {
+              // Requirement 3.1: same mirroring for the tail of the stream.
+              promotedReport = finalData;
               setRep(finalData);
               reportPromoted = true;
           }
@@ -634,9 +806,51 @@ export default function App() {
           setErr(message);
       }
 
-      setDur(Math.round((Date.now() - startTimestamp) / 1000));
+      currentDuration = Math.round((Date.now() - startTimestamp) / 1000);
+      setDur(currentDuration);
       setRun(false);
-      
+
+      /*
+        Requirements 3.1, 3.2, 3.6: exactly one History Entry per run that
+        promoted a report, tagged with the identity frozen for this run instead
+        of the Active Agent at the moment of saving. This is the only recording
+        point: the `AbortError` branch (user stop) and the error branch of the
+        `catch` never reach it, and a run that finished without promoting a
+        report leaves `reportPromoted` false, so all three paths leave the
+        history untouched.
+      */
+      if (reportPromoted && promotedReport && runIdentity) {
+        const draft: HistoryEntryDraft = {
+          agentId: runIdentity.agentId,
+          agentName: runIdentity.agentName,
+          outputRenderer: runIdentity.outputRenderer,
+          /*
+            `createHistoryEntry` trims the query and collapses an empty or
+            whitespace-only instruction into null (Requirements 3.3, 3.4, 3.5).
+            Requirement 13.6: only an agent that declares `supportsInstruction`
+            sent an instruction with this run, so any leftover text of a previous
+            agent is not recorded as part of it.
+          */
+          query: inputValue,
+          instruction: supportsInstruction ? instruction : null,
+          createdAt: Date.now(),
+          report: promotedReport,
+          metrics: {
+            durationSecs: currentDuration,
+            tokenCount: currentTokenCount,
+            toolRuns: currentToolRuns,
+          },
+        };
+        /*
+          The `ref` is read instead of the `historyEntries` state because this
+          callback closed over the list as it was when the run started.
+          Requirement 3.8: `insertEntry` places the entry first, so the list
+          stays ordered by `createdAt` descending.
+        */
+        const entries = historyRef.current;
+        applyHistory(insertEntry(entries, createHistoryEntry(draft, entries)));
+      }
+
     } catch (e: any) {
       if (e.name === 'AbortError') {
          console.log('Aborted');
@@ -668,6 +882,49 @@ export default function App() {
 
     startStream(MODEL_ID, activeAgentId, setRunning, setError, setReportData, setEvents, pushEvent, setTokenCount, setToolRuns, setDurationSecs, setStartTime, abortRef, eventIdRef);
   };
+
+  /*
+    Requirement 5.1: the restored report takes over the view. This guard runs
+    ahead of the live-report branch below so a restoration can be opened from the
+    landing view, from the run panel or on top of a live report, and closing it
+    only clears `restoredReport`: the live state was never touched, so whatever
+    was on screen before comes back on its own (Requirement 5.7).
+  */
+  if (restoredReport) {
+    /* Requirement 5.2: the renderer stored with the entry decides the view. */
+    const restoredRenderer = restoredReport.outputRenderer;
+    /* Requirement 5.3: the metrics are the ones frozen in the snapshot. */
+    const { durationSecs: restoredDuration, tokenCount: restoredTokens, toolRuns: restoredToolRuns } =
+      restoredReport.metrics;
+
+    return (
+      <div className="w-full h-screen print:h-auto print:overflow-visible">
+        {restoredRenderer === 'simple_report' ? (
+          <SimpleReportView
+            data={restoredReport.report as unknown as RawSimpleReport}
+            /* Requirement 5.4: stored agent name as title, stored query as subtitle. */
+            title={restoredReport.agentName}
+            subtitle={restoredReport.query}
+            onClose={() => setRestoredReport(null)}
+            durationSecs={restoredDuration}
+            toolRuns={restoredToolRuns}
+            tokenCount={restoredTokens}
+          />
+        ) : (
+          <ReportTemplate
+            data={restoredReport.report as unknown as ReportData}
+            /* `ticker` is the header identifier of this view (Requirement 5.4). */
+            ticker={restoredReport.query}
+            onClose={() => setRestoredReport(null)}
+            durationSecs={restoredDuration}
+            toolRuns={restoredToolRuns}
+            tokenCount={restoredTokens}
+            documentCount={countReportDocuments(restoredReport.report, restoredRenderer)}
+          />
+        )}
+      </div>
+    );
+  }
 
   if (isReportOpen === 'flash' && reportData) {
     /*
@@ -712,12 +969,17 @@ export default function App() {
 
 
   return (
-    <div className="relative h-screen bg-stone-900 overflow-hidden font-sans text-stone-100 flex flex-col">
+    /*
+      Shell bound to the viewport height (`dvh`, so mobile browser chrome does
+      not push the bottom row out of sight). The rows that scroll are the ones
+      inside it, never the document.
+    */
+    <div className="relative h-dvh bg-stone-900 overflow-hidden font-sans text-stone-100 flex flex-col">
       <DottedBackground />
       
       {/* Header */}
-      <header className="relative z-20 flex items-center justify-between px-6 py-4 border-b border-white/10 bg-black/20 backdrop-blur-md">
-        <div className="flex items-start gap-4">
+      <header className="relative z-20 flex shrink-0 items-center justify-between gap-3 px-6 py-4 border-b border-white/10 bg-black/20 backdrop-blur-md">
+        <div className="flex items-center gap-4">
           <span className="font-display font-bold text-xl tracking-wider uppercase text-white">Tickr</span>
           {/*
             Requirements 11.1, 11.4: selector del agente activo en la cabecera.
@@ -734,6 +996,28 @@ export default function App() {
             onSelect={selectAgent}
             onRetry={() => loadCatalog()}
           />
+          {/*
+            Requirements 1.1, 1.2, 1.3: History_Trigger in the header, right
+            after the Agent_Selector, so both controls share the left group.
+          */}
+          <button
+            ref={historyTriggerRef}
+            type="button"
+            aria-label="History"
+            /* Requirements 1.4, 1.5, 1.6: one toggle drives the panel and this state. */
+            aria-expanded={isHistoryOpen}
+            onClick={() => setIsHistoryOpen((open) => !open)}
+            className="flex items-center gap-2 rounded border border-white/10 bg-white/5 px-3 py-1.5 font-sans text-sm text-stone-300 transition-colors hover:bg-white/10 hover:text-stone-100"
+          >
+            <History className="h-4 w-4" aria-hidden="true" />
+            <span className="hidden sm:inline">History</span>
+            {/* Requirement 1.7: the count appears only with Visible Entries. */}
+            {visibleEntries.length > 0 && (
+              <span className="rounded-full bg-stone-800 px-1.5 py-0.5 font-mono text-[11px] text-stone-200">
+                {visibleEntries.length}
+              </span>
+            )}
+          </button>
         </div>
         <div>
           {user ? (
@@ -749,12 +1033,12 @@ export default function App() {
         </div>
       </header>
 
-      <main className="relative z-10 flex-1 flex flex-col pt-8 min-h-0">
+      <main className="relative z-10 flex-1 flex flex-col pt-4 sm:pt-8 min-h-0">
         {!running && !reportData && events.length === 0 ? (
            /* Requirements 13.1, 13.2: la vista de aterrizaje describe al agente activo. */
            <LandingView agent={activeAgent} />
         ) : (
-           <div className="flex-1 flex flex-row overflow-hidden pb-32 w-full px-6">
+           <div className="flex-1 flex flex-row overflow-hidden min-h-0 w-full px-6">
              <div className="flex-1 flex flex-col bg-stone-900 rounded-xl border border-stone-800 overflow-hidden min-h-0 max-w-4xl mx-auto w-full">
                 <div className="p-3 bg-stone-800 border-b border-stone-700 font-bold text-stone-200 text-sm flex justify-between items-center">
                   {/*
@@ -795,8 +1079,12 @@ export default function App() {
            </div>
         )}
 
-        {/* Input area fixed at bottom */}
-        <div className="mt-auto px-6 pb-8 pt-4 bg-gradient-to-t from-stone-900 via-stone-900 to-transparent w-full fixed bottom-0 z-20">
+        {/*
+          Input bar always visible at the bottom. It is the last row of the
+          column instead of a `fixed` overlay, so shrinking the window scrolls
+          the area above it rather than hiding it behind the viewport edge.
+        */}
+        <div className="relative z-20 mt-auto w-full shrink-0 bg-gradient-to-t from-stone-900 via-stone-900 to-transparent px-6 pb-4 pt-4 sm:pb-8">
           <div className="max-w-4xl mx-auto w-full">
             {error && (
               <div className="mb-4 bg-red-500/10 border border-red-500/50 text-red-200 px-4 py-3 rounded text-sm">
@@ -913,6 +1201,26 @@ export default function App() {
           </div>
         </div>
       </main>
+
+      {/*
+        Requirements 2.2, 2.3, 8.1: the drawer receives the Visible Entries
+        already filtered and returns intents; the panel itself resolves the
+        overlay click, the close control and the `Escape` layers.
+      */}
+      <HistoryPanel
+        open={isHistoryOpen}
+        entries={visibleEntries}
+        running={running}
+        onClose={() => setIsHistoryOpen(false)}
+        /*
+          Requirements 5.1, 5.6: activating an entry copies its Report Snapshot
+          into the restored state and closes the panel; a run in progress blocks
+          the restoration.
+        */
+        onRestore={restoreEntry}
+        onDelete={deleteHistoryEntry}
+        onClearAll={clearHistory}
+      />
 
       {showStopConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">

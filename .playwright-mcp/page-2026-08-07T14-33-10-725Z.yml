@@ -1,0 +1,19 @@
+- generic [ref=f3e3]:
+  - banner [ref=f3e4]:
+    - generic [ref=f3e5]:
+      - generic [ref=f3e6]: Tickr
+      - button "Seleccionar agente" [ref=f3e8]:
+        - generic "Cargando agentes…" [ref=f3e12]
+      - button "History" [ref=f3e15]
+    - button "Sign In" [ref=f3e21]
+  - main [ref=f3e22]:
+    - generic [ref=f3e26]:
+      - heading "Tickr, your intelligent research workspace" [level=1] [ref=f3e27]
+      - paragraph [ref=f3e28]: Pick an agent to start a run.
+    - generic [ref=f3e30]:
+      - generic [ref=f3e31]:
+        - textbox "Entrada del agente" [ref=f3e36]:
+          - /placeholder: TICKER
+        - button "Analyze" [disabled] [ref=f3e37]
+      - generic [ref=f3e38]: Gemini can make mistakes, don’t rely on it for financial advice.
+  - button "debug" [ref=f3e40]

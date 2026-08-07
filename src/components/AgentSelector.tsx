@@ -283,7 +283,12 @@ export function AgentSelector({
         aria-expanded={open}
         aria-label="Seleccionar agente"
         aria-describedby={running ? 'agent-selector-locked' : undefined}
-        className="flex items-center gap-2 px-3 py-2 bg-stone-800 border border-stone-700 rounded-lg text-stone-100 hover:bg-stone-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-stone-800"
+        /*
+          The trigger keeps a fixed width so the header does not reflow when the
+          Active Agent changes: the icon and the chevron never shrink and the
+          name takes the remaining space, truncated with an ellipsis.
+        */
+        className="w-56 flex items-center gap-2 px-3 py-2 bg-stone-800 border border-stone-700 rounded-lg text-stone-100 hover:bg-stone-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-stone-800"
       >
         <span
           className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center shrink-0"
@@ -295,11 +300,15 @@ export function AgentSelector({
             <TriggerIcon className="w-3.5 h-3.5" />
           )}
         </span>
-        <span className="font-display font-bold text-sm tracking-wide text-white">
+        {/* `title` reveals the full name on hover when it is truncated. */}
+        <span
+          title={triggerLabel}
+          className="flex-1 min-w-0 truncate text-left font-display font-bold text-sm tracking-wide text-white"
+        >
           {triggerLabel}
         </span>
         <ChevronDown
-          className={`w-4 h-4 text-stone-400 transition-transform duration-200 ${open ? 'rotate-180' : 'rotate-0'}`}
+          className={`w-4 h-4 shrink-0 text-stone-400 transition-transform duration-200 ${open ? 'rotate-180' : 'rotate-0'}`}
           aria-hidden="true"
         />
       </button>

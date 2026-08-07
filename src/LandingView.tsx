@@ -131,39 +131,49 @@ export function LandingView({ agent = null }: LandingViewProps) {
   const { title, subtitle, groups } = landingContent(agent);
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center p-8 overflow-y-auto no-scrollbar ">
-      <AnimatePresence mode="wait">
-        <motion.div
-          // La clave por agente reanima la vista en cada cambio de selección.
-          key={agent?.id ?? '__no_agent__'}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.25 }}
-          className="relative z-10 w-full max-w-4xl mx-auto flex flex-col items-center py-12"
-        >
-          {/* Header */}
-          <div className="text-center mb-16 max-w-3xl">
-            <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4 font-serif">
-              {title}
-            </h1>
-            <p className="text-lg text-[#b3b3b3] font-medium">{subtitle}</p>
-          </div>
-
-          {/* Cards */}
-          {groups.length > 0 && (
-            <div
-              className={`grid grid-cols-1 gap-6 w-full ${
-                groups.length === 1 ? 'md:grid-cols-1 max-w-2xl' : 'md:grid-cols-2'
-              }`}
-            >
-              {groups.map((group, index) => (
-                <HighlightCard key={`${group.title}-${index}`} group={group} />
-              ))}
+    /*
+      Scroll container of the view: it takes the space main leaves above the
+      input bar and shows its own scrollbar. Centering lives on the inner
+      wrapper with `min-h-full`, because a centered flex child of a scroll
+      container has its overflow clipped above the top edge instead of
+      becoming reachable, which is what made the agent copy unreadable on
+      short windows.
+    */
+    <div className="flex-1 min-h-0 w-full overflow-y-auto overflow-x-hidden fade-bottom-edge">
+      <div className="flex min-h-full items-center justify-center p-4 sm:p-8">
+        <AnimatePresence mode="wait">
+          <motion.div
+            // La clave por agente reanima la vista en cada cambio de selección.
+            key={agent?.id ?? '__no_agent__'}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25 }}
+            className="relative z-10 mx-auto flex w-full max-w-4xl flex-col items-center py-6 sm:py-12"
+          >
+            {/* Header */}
+            <div className="mb-10 max-w-3xl text-center sm:mb-16">
+              <h1 className="mb-4 font-serif text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
+                {title}
+              </h1>
+              <p className="text-lg font-medium text-[#b3b3b3]">{subtitle}</p>
             </div>
-          )}
-        </motion.div>
-      </AnimatePresence>
+
+            {/* Cards */}
+            {groups.length > 0 && (
+              <div
+                className={`grid w-full grid-cols-1 gap-6 ${
+                  groups.length === 1 ? 'md:grid-cols-1 max-w-2xl' : 'md:grid-cols-2'
+                }`}
+              >
+                {groups.map((group, index) => (
+                  <HighlightCard key={`${group.title}-${index}`} group={group} />
+                ))}
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

@@ -177,7 +177,8 @@ export function AgentTimeline({ events, running, paused, hasReport, onViewReport
     <div 
       ref={containerRef}
       onScroll={handleScroll}
-      className="w-full flex-1 overflow-y-auto relative px-6 py-8 flex flex-col items-center"
+      /* `fade-bottom-edge`: the events dissolve where the list meets the bar. */
+      className="w-full flex-1 overflow-y-auto relative px-6 py-8 flex flex-col items-center fade-bottom-edge"
     >
       {events.length > 0 && (
          <div className="absolute top-0 bottom-0 left-1/2 w-px bg-white/20 -translate-x-1/2 z-0" />
@@ -280,7 +281,8 @@ export function AgentTimeline({ events, running, paused, hasReport, onViewReport
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: 10 }}
             onClick={scrollToBottom}
-            className="sticky bottom-4 z-40 w-12 h-12 p-0 bg-stone-800 hover:bg-stone-700 active:scale-95 text-white border border-stone-600 rounded-full shadow-2xl backdrop-blur-md flex items-center justify-center cursor-pointer transition-all hover:border-white/50 hover:shadow-black/50 shrink-0"
+            /* Above the 2rem fade of `fade-bottom-edge`, so it stays solid. */
+            className="sticky bottom-10 z-40 w-12 h-12 p-0 bg-stone-800 hover:bg-stone-700 active:scale-95 text-white border border-stone-600 rounded-full shadow-2xl backdrop-blur-md flex items-center justify-center cursor-pointer transition-all hover:border-white/50 hover:shadow-black/50 shrink-0"
             title="Ir al final"
           >
             <ChevronDown className="w-6 h-6 text-white shrink-0 stroke-[2.5]" />

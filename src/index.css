@@ -21,6 +21,41 @@
     margin: 0;
     padding: 0;
   }
+
+  /* Dark form controls and default scrollbars to match the shell. */
+  html {
+    color-scheme: dark;
+  }
+
+  /*
+    Scroll areas keep a visible scrollbar at the platform's standard width.
+    The stone-600 thumb over a transparent track reads both on the dark shell
+    and on the light report views; `.no-scrollbar` still opts a container out.
+  */
+  * {
+    scrollbar-width: auto;
+    scrollbar-color: #57534e transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 15px;
+    height: 15px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #57534e;
+    background-clip: content-box;
+    border: 2px solid transparent;
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #78716c;
+  }
 }
 
 @layer utilities {
@@ -38,6 +73,22 @@
   .no-scrollbar {
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
+  }
+
+  /*
+    Soft bottom edge for scroll areas that end against the input bar: the last
+    rows dissolve into the background instead of being cut off by a hard line.
+    The mask sits on the scrollport, so the fade stays at the edge while the
+    content scrolls through it.
+  */
+  .fade-bottom-edge {
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      #000 0,
+      #000 calc(100% - 2rem),
+      transparent 100%
+    );
+    mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 2rem), transparent 100%);
   }
 }
 
