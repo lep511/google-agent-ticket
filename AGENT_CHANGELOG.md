@@ -1,5 +1,27 @@
 # Agent Change Log
 
+## [2026-08-07 18:10] Keep a single lockfile: delete the stale `bun.lock`
+
+**Context/prompt:** What is `bun.lock` for? Delete it and keep only `package-lock.json`.
+
+**Files modified:**
+
+- `bun.lock` (deleted)
+
+**Summary:** The repo tracked two lockfiles for one `package.json`, so the versions a contributor got depended on whether they ran `npm install` or `bun install`. `bun.lock` had not been touched since the initial commit (`ff79493`, 2026-07-28): it still declared `firebase`, `firebase-admin`, `@google-cloud/storage` and `@google/genai`, and knew nothing about `@strands-agents/sdk`, `@ai-sdk/google`, `zod` or `vitest`. A `bun install` would therefore have reinstalled the two packages just removed and left out the SDK the server needs, producing a tree that does not boot.
+
+`package-lock.json` is the one the scripts use and the one kept up to date, so it is now the single source of truth.
+
+The `**/bun.lock` entry in the `server.fs.deny` list of `vite.config.ts` is left in place on purpose: it is a deny-list for what the dev server may serve, and it keeps the file unreachable if anyone regenerates it.
+
+**Verification:** `npm run lint` clean; `npm test` 234 tests across 19 files; `npm run build` clean. `node_modules` untouched, since deleting a lockfile does not affect an existing install.
+
+**Commit:** uncommitted
+
+**Status:** ✅ Applied
+
+---
+
 ## [2026-08-07 18:00] Drop the unused `@google-cloud/storage` dependency
 
 **Context/prompt:** What is `@google-cloud/storage` used for? Remove it completely.
