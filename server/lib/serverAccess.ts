@@ -3,8 +3,8 @@
  *
  * The server used to call `app.listen(PORT, "0.0.0.0")` while no route checked
  * any credential, so every `/api/*` route — including the artifact upload and
- * the Gemini-backed `/api/analyze` and `/api/tts` — was reachable from the local
- * network by anyone.
+ * the Gemini-backed `/api/analyze` — was reachable from the local network by
+ * anyone.
  *
  * Two rules replace that:
  *  1. the default bind address is loopback, so a plain `npm run dev` is not

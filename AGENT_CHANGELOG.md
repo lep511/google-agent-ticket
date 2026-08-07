@@ -1,5 +1,28 @@
 # Agent Change Log
 
+## [2026-08-07 17:50] Remove the `/api/tts` endpoint
+
+**Context/prompt:** Remove `/api/tts` completely.
+
+**Files modified:**
+
+- `server.ts` (handler and its import deleted; body-limit comment no longer cites the TTS payload)
+- `server/lib/textToSpeech.ts`, `server/lib/textToSpeech.test.ts` (deleted)
+- `.env.example` (`GEMINI_TTS_MODEL_ID` dropped)
+- `server/lib/serverAccess.ts` (module comment no longer names the route)
+
+**Summary:** Narration is gone. `POST /api/tts` had no caller: nothing under `src/` ever requested it, so removing it changes no user-visible behaviour. It was also the last route that talked to a Gemini endpoint outside the Strands agent loop, so the server now reaches Gemini through exactly one path, the `@ai-sdk/google` provider used by `strandsAgent.ts` and `googleSearchTool.ts`.
+
+The artifact route is untouched: `DEFAULT_ARTIFACT_NAME` is still `podcast_briefing.wav` and `POST /api/upload_artifact` keeps accepting audio, since that upload came from the agent environment rather than from this endpoint.
+
+**Verification:** `npm run lint` clean; `npm test` 226 tests across 19 files; `npm run build` clean. Server boots and `GET /api/agents` answers `200`; `POST /api/tts` now answers `404`, and a `market_news_agent` run still streams to `final_stats`. A repo-wide grep for `tts`, `textToSpeech` and `synthesizeSpeech` returns nothing outside this changelog.
+
+**Commit:** uncommitted
+
+**Status:** ✅ Applied
+
+---
+
 ## [2026-08-07 17:30] Run the agents on the Strands Agents SDK and drop `@google/genai`
 
 **Context/prompt:** Use strands-agents in this project and remove `@google/genai` completely; use the Strands MCP for any lookup.

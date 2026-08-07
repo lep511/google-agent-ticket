@@ -17,7 +17,6 @@ import {
   isStrandsConfigured,
   streamStrandsAgent,
 } from "./server/lib/strandsAgent.ts";
-import { synthesizeSpeech, TextToSpeechError } from "./server/lib/textToSpeech.ts";
 import {
   buildAgentInfoEvent,
   buildStreamFailureEvents,
@@ -70,9 +69,8 @@ async function startServer() {
   const bindHost = binding.host as string;
 
   // A body of a few hundred kilobytes covers every documented payload: the
-  // analyze input and instruction are capped at 2000 characters each and the TTS
-  // text is a report summary. The previous 50 MB limit was a free DoS vector on
-  // an unauthenticated endpoint.
+  // analyze input and instruction are capped at 2000 characters each. The
+  // previous 50 MB limit was a free DoS vector on an unauthenticated endpoint.
   app.use(express.json({ limit: '512kb' }));
 
   /**
@@ -94,26 +92,6 @@ async function startServer() {
       });
     });
   }
-
-  app.post("/api/tts", async (req, res) => {
-    try {
-      const { text } = req.body;
-      if (!text) {
-        return res.status(400).json({ error: "Missing text." });
-      }
-
-      const { audio, mimeType } = await synthesizeSpeech(text);
-      res.setHeader("Content-Type", mimeType);
-      res.send(audio);
-    } catch (error: any) {
-      if (error instanceof TextToSpeechError) {
-        return res.status(error.status).json({ error: error.message });
-      }
-      console.error("[TTS] Error:", error);
-      res.status(500).json({ error: "TTS generation failed." });
-    }
-  });
-
 
   app.post("/api/upload_artifact", express.raw({ type: '*/*', limit: '25mb' }), (req, res) => {
     try {
