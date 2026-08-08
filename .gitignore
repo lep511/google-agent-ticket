@@ -2,7 +2,10 @@ old_version/*
 run_logs/*
 
 debug/*
-!debug/info.txt
+!debug/.info-debug.txt
+
+run_logs/*
+!run_logs/.info-logs.txt
 
 .env
 .env.local

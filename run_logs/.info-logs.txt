@@ -1,0 +1,10 @@
+This folder holds run logs written by the server after each agent execution.
+
+Everything here exists only to help review past runs. Nothing in this folder is
+read back by the application, and no feature depends on it. The contents are
+regenerated on the next run, so the folder can be emptied or deleted at any time
+without affecting how the app behaves.
+
+Whatever the server writes here is ignored by git and stays out of commits. This
+note is the exception: it is versioned so the folder keeps its explanation even
+when empty.

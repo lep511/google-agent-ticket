@@ -1,0 +1,11 @@
+{
+  "summary": "Overview of the brainstorm and top recommendation",
+  "key_points": ["Top idea 1", "Top idea 2", "Top idea 3"],
+  "sections": [
+    {
+      "title": "Category name (e.g. Practical, Innovative, Bold)",
+      "body": "Ideas in this category with rationale"
+    }
+  ],
+  "sources": []
+}

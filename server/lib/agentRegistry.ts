@@ -737,14 +737,14 @@ function readAgentSourceFile(
         'missing_source_file',
         agentId,
         relativePath,
-        `El agente "${agentId}" no tiene el archivo "${relativePath}".`,
+        `Agent "${agentId}" does not have the file "${relativePath}".`,
       );
     }
     throw new AgentSourceError(
       'unreadable_source_file',
       agentId,
       relativePath,
-      `El archivo "${relativePath}" del agente "${agentId}" no se pudo leer: ${errorMessage(error)}.`,
+      `File "${relativePath}" of agent "${agentId}" could not be read: ${errorMessage(error)}.`,
     );
   }
 
@@ -753,7 +753,7 @@ function readAgentSourceFile(
       'missing_source_file',
       agentId,
       relativePath,
-      `El archivo "${relativePath}" del agente "${agentId}" no es un archivo.`,
+      `"${relativePath}" of agent "${agentId}" is not a file.`,
     );
   }
 
@@ -762,7 +762,7 @@ function readAgentSourceFile(
       'source_file_too_large',
       agentId,
       relativePath,
-      `El archivo "${relativePath}" del agente "${agentId}" ocupa ${stat.size} bytes y supera el límite de ${maxBytes} bytes.`,
+      `File "${relativePath}" of agent "${agentId}" is ${stat.size} bytes and exceeds the ${maxBytes}-byte limit.`,
     );
   }
 
@@ -774,7 +774,7 @@ function readAgentSourceFile(
       'unreadable_source_file',
       agentId,
       relativePath,
-      `El archivo "${relativePath}" del agente "${agentId}" no se pudo leer: ${errorMessage(error)}.`,
+      `File "${relativePath}" of agent "${agentId}" could not be read: ${errorMessage(error)}.`,
     );
   }
 
@@ -783,7 +783,7 @@ function readAgentSourceFile(
       'empty_source_file',
       agentId,
       relativePath,
-      `El archivo "${relativePath}" del agente "${agentId}" está vacío.`,
+      `File "${relativePath}" of agent "${agentId}" is empty.`,
     );
   }
 
@@ -840,7 +840,7 @@ export function readAgentSchema(definition: ResolvedAgentDefinition): AgentSchem
       'invalid_schema_json',
       source.agentId,
       source.relativePath,
-      `El archivo de esquema "${source.relativePath}" del agente "${source.agentId}" no contiene JSON válido: ${errorMessage(error)}.`,
+      `Schema file "${source.relativePath}" of agent "${source.agentId}" does not contain valid JSON: ${errorMessage(error)}.`,
     );
   }
 
@@ -1057,7 +1057,7 @@ export function createAgentRegistry(options: AgentRegistryOptions = {}): AgentRe
         'unknown_agent',
         typeof agentId === 'string' ? agentId : String(agentId),
         'agent',
-        `El agente solicitado no está en el catálogo: ${describeRequestedAgentId(agentId)}.`,
+        `The requested agent is not in the catalog: ${describeRequestedAgentId(agentId)}.`,
       );
     }
     return definition;

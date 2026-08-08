@@ -54,7 +54,7 @@ export function buildAgentInfoEvent(definition: ResolvedAgentDefinition): AgentI
 
 /** Generic reason used when the failure carries no message. */
 export const DEFAULT_STREAM_FAILURE_MESSAGE =
-  'La ejecución del agente falló o se interrumpió.';
+  'The agent run failed or was interrupted.';
 
 /**
  * Sequence that closes the stream when the run fails or is interrupted after the
@@ -116,7 +116,7 @@ export function describeAgentStartFailure(upstreamStatus: unknown): AgentStartFa
       status: 429,
       body: {
         error:
-          'El servicio del agente está limitando las peticiones. Espera unos segundos y vuelve a intentarlo.',
+          'The agent service is rate-limiting requests. Wait a few seconds and try again.',
         code: 'upstream_rate_limited',
         upstreamStatus: status,
         retryable: true,
@@ -129,7 +129,7 @@ export function describeAgentStartFailure(upstreamStatus: unknown): AgentStartFa
       status: 503,
       body: {
         error:
-          'El servicio del agente no está disponible en este momento. Vuelve a intentarlo en unos minutos.',
+          'The agent service is currently unavailable. Try again in a few minutes.',
         code: 'upstream_unavailable',
         upstreamStatus: status,
         retryable: true,
@@ -140,7 +140,7 @@ export function describeAgentStartFailure(upstreamStatus: unknown): AgentStartFa
   return {
     status: 502,
     body: {
-      error: `El servicio del agente rechazó la ejecución (estado ${status || 'desconocido'}).`,
+      error: `The agent service rejected the run (status ${status || 'unknown'}).`,
       code: 'upstream_error',
       upstreamStatus: status,
       retryable: false,

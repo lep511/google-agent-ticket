@@ -1,0 +1,11 @@
+{
+  "summary": "A 1-3 sentence overview of the text",
+  "key_points": ["First key point", "Second key point"],
+  "sections": [
+    {
+      "title": "Theme or section title",
+      "body": "Brief description of this theme"
+    }
+  ],
+  "sources": []
+}

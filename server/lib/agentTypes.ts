@@ -135,8 +135,8 @@ export const DEFAULT_IS_DEFAULT = false;
 export const DEFAULT_SUPPORTS_INSTRUCTION = false;
 export const DEFAULT_PROMPT_FILE = 'prompt.md';
 export const DEFAULT_SCHEMA_FILE = 'output.schema.json';
-export const DEFAULT_MODEL_PROVIDER: ModelProviderType = 'gemini';
-export const DEFAULT_MODEL_NAME = 'gemini-3.6-flash';
+export const DEFAULT_MODEL_PROVIDER: ModelProviderType = 'nvidia';
+export const DEFAULT_MODEL_NAME = 'deepseek-ai/deepseek-v4-flash-0731';
 
 /**
  * Valores por defecto que el registro aplica cuando el manifiesto omite un

@@ -348,11 +348,11 @@ function emptyInlineSourcesError(
   const discarded =
     warnings.length === 0
       ? ''
-      : ` Se descartaron ${warnings.length} entradas por las exclusiones o los límites.`;
+      : ` ${warnings.length} entries were discarded due to exclusions or limits.`;
   return new AgentInlineSourcesError(
     'empty_inline_sources',
     agentId,
     path.posix.join('agent', agentId),
-    `El agente "${agentId}" no tiene ningún archivo de ejecución que subir al entorno remoto.${discarded}`,
+    `Agent "${agentId}" has no runtime files to upload to the remote environment.${discarded}`,
   );
 }

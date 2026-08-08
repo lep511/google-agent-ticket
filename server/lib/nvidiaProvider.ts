@@ -10,7 +10,7 @@
 
 export const NVIDIA_BASE_URL = 'https://integrate.api.nvidia.com/v1';
 
-export const DEFAULT_NVIDIA_MODEL_ID = 'nvidia/llama-3.1-nemotron-ultra-253b-v1';
+export const DEFAULT_NVIDIA_MODEL_ID = 'deepseek-ai/deepseek-v4-flash-0731';
 
 const NVIDIA_MODEL_ID_PATTERN = /^[a-z0-9_-]+\/[a-z0-9._-]{1,100}$/i;
 

@@ -97,14 +97,8 @@ export function countReportDocuments(
   return (data as ReportData).findings?.length ?? 0;
 }
 
-/**
- * Motivo legible del rechazo de `POST /api/analyze`. El servidor responde un
- * JSON con `error` y, cuando el fallo viene del servicio remoto, un `retryable`
- * que indica si repetir la petición puede funcionar. Sin esto la línea de
- * tiempo solo mostraba `Server responded 500`.
- */
 async function describeAnalyzeFailure(resp: Response): Promise<string> {
-  if (!resp.body) return `El servidor no devolvió ningún flujo de eventos (estado ${resp.status}).`;
+  if (!resp.body) return `The server did not return an event stream (status ${resp.status}).`;
 
   let payload: { error?: unknown; retryable?: unknown } | null = null;
   try {
@@ -116,18 +110,16 @@ async function describeAnalyzeFailure(resp: Response): Promise<string> {
   const message =
     typeof payload?.error === 'string' && payload.error.trim().length > 0
       ? payload.error.trim()
-      : `El servidor rechazó la ejecución (estado ${resp.status}).`;
+      : `The server rejected the run (status ${resp.status}).`;
 
-  return payload?.retryable === true ? `${message} (reintentable)` : message;
+  return payload?.retryable === true ? `${message} (retryable)` : message;
 }
 
 // Toggle this to true if you want the JSON logs to be downloaded automatically after a run.
 const ENABLE_JSON_DOWNLOAD = false;
 
-/** Modelo con el que se ejecutan los agentes desde esta vista. */
-const MODEL_ID = 'gemini-3.6-flash';
-/** Requirement 12.7: nombre del modelo como texto secundario de la cabecera. */
-const MODEL_DISPLAY_NAME = 'Gemini 3.6 Flash';
+const MODEL_ID = 'deepseek-ai/deepseek-v4-flash-0731';
+const MODEL_DISPLAY_NAME = 'DeepSeek V4 Flash';
 
 /** Estado de la petición del catálogo de agentes (Requirements 11.7, 11.8, 11.9). */
 export type CatalogStatus = 'loading' | 'ready' | 'error';
@@ -666,12 +658,7 @@ export default function App() {
               } else if (evt.type === 'tool_call') {
                   currentToolRuns += 1;
                   setTRuns(currentToolRuns);
-                  let label = "Searching for documents...";
-                  if (evt.name === "google_search") {
-                    label = `Searching web: ${evt.arguments?.query || ''}`;
-                  } else if (evt.name) {
-                    label = `Using tool: ${evt.name}`;
-                  }
+                  const label = evt.name ? `Using tool: ${evt.name}` : 'Tool call';
                   emit('tool_call', label, JSON.stringify(evt.arguments, null, 2), evt.name, evt.callId);
               } else if (evt.type === 'tool_result') {
                   emit('tool_result', `Analysis retrieved`, evt.result, undefined, evt.callId);
@@ -688,9 +675,9 @@ export default function App() {
                   streamErrorMessage =
                     typeof evt.message === 'string' && evt.message.trim()
                       ? evt.message
-                      : 'El agente informó un error sin detalle.';
+                      : 'The agent reported an error with no detail.';
                   console.error('[stream] Evento de error del agente:', streamErrorMessage);
-                  emit('error', 'La ejecución falló', streamErrorMessage);
+                  emit('error', 'Run failed', streamErrorMessage);
                   setErr(streamErrorMessage);
               } else if (evt.type === 'complete') {
                   if (evt.interaction) {
@@ -736,7 +723,7 @@ export default function App() {
             } catch (parseError) {
               // Un evento ilegible ya no desaparece sin dejar rastro: queda en
               // consola con su carga para poder diagnosticarlo.
-              console.warn('[stream] Evento SSE descartado por ilegible:', dataStr, parseError);
+              console.warn('[stream] Unreadable SSE event discarded:', dataStr, parseError);
             }
           }
         }
@@ -767,7 +754,7 @@ export default function App() {
                   }
               }
           } catch (tailError) {
-              console.warn('[stream] Cola del buffer descartada por ilegible:', buffer, tailError);
+              console.warn('[stream] Buffer tail discarded as unreadable:', buffer, tailError);
           }
       }
       
@@ -787,7 +774,7 @@ export default function App() {
         aviso explica que no pudo estructurarse.
       */
       if (!reportPromoted && accumulatedText.trim()) {
-          emit('text', 'Respuesta sin estructurar', accumulatedText);
+          emit('text', 'Unstructured response', accumulatedText);
           setUnstructuredReport(true);
       }
 
@@ -800,9 +787,9 @@ export default function App() {
       if (!reportPromoted && !accumulatedText.trim() && eventsPushed === 0) {
           const message =
             streamErrorMessage ??
-            'El agente terminó sin devolver ninguna respuesta.';
-          console.error('[stream] Ejecución terminada sin resultado:', message);
-          emit('error', 'Ejecución sin resultado', message);
+            'The agent finished without returning any response.';
+          console.error('[stream] Run finished with no result:', message);
+          emit('error', 'No result', message);
           setErr(message);
       }
 
@@ -859,13 +846,13 @@ export default function App() {
            registra el corte para que la ejecución siga siendo visible.
          */
          if (eventsPushed === 0) {
-            emit('info', 'Ejecución detenida', 'La ejecución se detuvo antes de producir resultados.');
+            emit('info', 'Run stopped', 'The run was stopped before producing results.');
          }
       } else {
-         console.error('[stream] Ejecución interrumpida:', e);
+         console.error('[stream] Run interrupted:', e);
          setErr(e.message || 'Unknown error');
          if (eventsPushed === 0) {
-            emit('error', 'La ejecución falló', e.message || 'Unknown error');
+            emit('error', 'Run failed', e.message || 'Unknown error');
          }
       }
       setDur(Math.round((Date.now() - startTimestamp) / 1000));
@@ -1046,7 +1033,7 @@ export default function App() {
                     panel y el nombre del modelo queda como texto secundario.
                   */}
                   <div className="flex items-center gap-2 min-w-0">
-                    <img src="https://www.gstatic.com/lamda/images/gemini_sparkle_aurora_33f86dc0c0257da337c63.svg" alt="Gemini Sparkle" className="w-5 h-5 shrink-0" />
+                    <img src="https://asset.brandfetch.io/idmHERnQ_v/idLQy1TAJE.png" alt="NVIDIA" className="w-5 h-5 shrink-0" />
                     <span className="truncate">{executionPanelAgentName}</span>
                     <span className="text-xs font-normal text-stone-400 shrink-0">{MODEL_DISPLAY_NAME}</span>
                   </div>

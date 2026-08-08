@@ -11,12 +11,12 @@ import type { AgentEvent } from "./server/lib/agentEvents.ts";
 import { buildAgentCatalogHttpResult } from "./server/lib/agentCatalog.ts";
 import { subAgentsDebugFileName, writeDebugFile } from "./server/lib/debugFiles.ts";
 import { agentRegistry } from "./server/lib/agentRegistry.ts";
+import { createCalculatorTool } from "./server/lib/calculatorTool.ts";
 import {
   classifyAgentFailureStatus,
   createStrandsAgent,
   isStrandsConfigured,
   loadMcpClients,
-  resolveModelProvider,
   streamStrandsAgent,
 } from "./server/lib/strandsAgent.ts";
 import {
@@ -32,29 +32,13 @@ import { buildRunLogNames, toLogFileSlug } from "./server/lib/runLogNaming.ts";
 import { resolveArtifactPath } from "./server/lib/artifactUpload.ts";
 import { isAuthorizedRequest, resolveServerBinding } from "./server/lib/serverAccess.ts";
 
-/**
- * Mensaje del error de configuración cuando el catálogo no tiene ningún agente
- * válido: se responde antes de abrir el flujo SSE y sin nombrar rutas del
- * sistema de archivos (Requirements 5.6, 16.3).
- */
 const NO_AGENTS_AVAILABLE_ERROR =
-  "No hay agentes disponibles en el servidor para atender la ejecución.";
+  "No agents are available on the server to handle this run.";
 
-/**
- * Mensaje del error con el que se rechaza una ejecución cuyo agente resuelto no
- * puede preparar sus fuentes inline, su plantilla o su esquema: se responde
- * antes de abrir el flujo SSE y sin crear ninguna interacción remota
- * (Requirements 6.7, 7.4, 7.9).
- */
-const AGENT_NOT_EXECUTABLE_ERROR = "El agente seleccionado no se puede ejecutar.";
+const AGENT_NOT_EXECUTABLE_ERROR = "The selected agent cannot be executed.";
 
-/**
- * Configuration error returned when the server has no credential for the model
- * the agent talks to. Like every other preparation failure, it is answered before
- * the SSE stream is opened.
- */
 const MODEL_NOT_CONFIGURED_ERROR =
-  "El servidor no tiene configurada la credencial del modelo (GEMINI_API_KEY).";
+  "The server does not have the model credential configured (NVIDIA_API_KEY).";
 
 async function startServer() {
   const app = express();
@@ -203,25 +187,18 @@ async function startServer() {
       if (validation.rejection !== null) {
         const { status, body: errorBody } = validation.rejection;
         console.warn(
-          `[analyze] Petición rechazada por validación (${errorBody.code}, campo "${errorBody.field}").`,
+          `[analyze] Request rejected by validation (${errorBody.code}, field "${errorBody.field}").`,
         );
         return res.status(status).json(errorBody);
       }
 
       const { input, instruction, rawInput } = validation.value;
 
-      // Provider precedence: request body > manifest > env > default (gemini).
-      const provider = resolveModelProvider(body.provider ?? agent.manifest.modelProvider);
-      // Model precedence: request body > manifest modelName > env > provider default.
-      const effectiveModel = model || agent.manifest.modelName;
-      console.log(`[analyze] Starting analysis for ${input} with agent ${agent.agentId} using provider ${provider}, model ${effectiveModel || 'default'}`);
+      const effectiveModel = model || undefined;
+      console.log(`[analyze] Starting analysis for ${input} with agent ${agent.agentId}, model ${effectiveModel || 'default'}`);
 
-      // The credential is checked before anything is prepared: without it the
-      // agent cannot reach the model, and that is a configuration failure rather
-      // than a failed run, so no SSE stream is opened.
-      if (!isStrandsConfigured(provider)) {
-        const key = provider === 'nvidia' ? 'NVIDIA_API_KEY' : 'GEMINI_API_KEY';
-        console.error(`[analyze] ${key} is not configured.`);
+      if (!isStrandsConfigured()) {
+        console.error(`[analyze] NVIDIA_API_KEY is not configured.`);
         return res.status(500).json({ error: MODEL_NOT_CONFIGURED_ERROR });
       }
 
@@ -259,11 +236,11 @@ async function startServer() {
       res.on('close', () => runAbort.abort());
 
       const mcpClients = await loadMcpClients();
+      const agentTools = agent.agentId === 'calculator_agent' ? [createCalculatorTool()] : [];
       const strandsAgent = createStrandsAgent({
         systemPrompt,
         modelId: effectiveModel,
-        provider,
-        googleSearch: true,
+        tools: agentTools.length > 0 ? agentTools : undefined,
         mcpClients: mcpClients.length > 0 ? mcpClients : undefined,
       });
 
@@ -303,6 +280,7 @@ async function startServer() {
       const jsonlLogPath = path.join(runLogsDir, runLogNames.jsonlFileName);
       
       let debugLog = `--- Analysis Run for ${input} at ${new Date().toISOString()} ---\n\n`;
+      let accumulatedLogText = '';
       const toolExecutions = {};
       let totalTokens = 0;
 
@@ -360,6 +338,11 @@ async function startServer() {
           }
 
           if (event.type === 'tool_call') {
+            // Flush accumulated text before a tool call
+            if (accumulatedLogText) {
+              debugLog += `[TEXT OUTPUT]\n${accumulatedLogText}\n\n`;
+              accumulatedLogText = '';
+            }
             const callId = event.callId || `unknown_${Math.random()}`;
             toolExecutions[callId] = {
               name: event.name || 'code_execution_call',
@@ -380,9 +363,9 @@ async function startServer() {
             debugLog += `[${new Date().toISOString()}] [TOOL RESULT END] ${event.name || 'command'}\n`;
             debugLog += `Call ID: ${callId}\n`;
             debugLog += `Duration: ${duration}\n`;
-            debugLog += `Result: ${event.result ? String(event.result).substring(0, 500) : ''}...\n\n`;
+            debugLog += `Result: ${event.result ? String(event.result) : ''}\n\n`;
           } else if (event.type === 'text') {
-            debugLog += `[TEXT OUTPUT]\n${event.text}\n\n`;
+            accumulatedLogText += event.text;
           } else if (event.type === 'error') {
             debugLog += `[ERROR]\n${event.message}\n\n`;
           }
@@ -392,12 +375,15 @@ async function startServer() {
           }
         }
       } catch (streamError: any) {
-        // Requirement 5.10: el cliente remoto se interrumpió después de escribir
-        // las cabeceras SSE. No se puede responder un código de estado, así que
-        // el motivo viaja en un evento `error` del propio flujo.
         streamFailure = describeStreamFailure(streamError);
-        console.error(`[analyze] El flujo del cliente remoto se interrumpió: ${streamFailure}`);
+        console.error(`[analyze] Stream interrupted: ${streamFailure}`);
         debugLog += `[ERROR]\n${streamFailure}\n\n`;
+      }
+
+      // Flush any remaining accumulated text to the debug log
+      if (accumulatedLogText) {
+        debugLog += `[TEXT OUTPUT]\n${accumulatedLogText}\n\n`;
+        accumulatedLogText = '';
       }
 
       if (streamFailure !== null) {
@@ -445,13 +431,11 @@ async function startServer() {
           summaryLog += `Duration: ${exec.duration || 'unknown'}\n`;
           summaryLog += `Arguments: ${JSON.stringify(exec.args)}\n`;
           const resultStr = exec.result ? String(exec.result) : '';
-          summaryLog += `Output Preview: ${resultStr ? resultStr.substring(0, 200).replace(/\n/g, ' ') + '...' : 'None'}\n`;
+          summaryLog += `Output Preview: ${resultStr ? resultStr.substring(0, 2000).replace(/\n/g, ' ') : 'None'}\n`;
           summaryLog += `--------------------------------------------------------\n`;
       });
       
       summaryLog += `\n2. OVERALL AGENT STATUS: ${allWorked ? 'SUCCESS' : 'WITH ERRORS'}\n`;
-      summaryLog += `\n3. GENERATED MEDIA ARTIFACTS:\n`;
-      summaryLog += `Audio Briefing Link: /artifacts/podcast_briefing.wav\n`;
       summaryLog += `\n========================================================\n\n`;
       summaryLog += `RAW EXECUTION LOGS:\n\n`;
 

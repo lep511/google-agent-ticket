@@ -1,0 +1,58 @@
+{
+  "id": "brainstorm_agent",
+  "name": "Brainstorm",
+  "tagline": "Generates creative ideas and solutions for any topic.",
+  "description": "Takes a topic or problem statement and generates diverse ideas, approaches, and creative solutions organized by category.",
+  "icon": "Brain",
+  "accentColor": "#A78BFA",
+  "order": 30,
+  "isDefault": false,
+  "inputMode": "text",
+  "inputPlaceholder": "Describe the topic or problem to brainstorm about",
+  "actionLabel": "Brainstorm",
+  "supportsInstruction": true,
+  "outputRenderer": "simple_report",
+  "landing": {
+    "title": "Brainstorm, creative ideation on demand",
+    "subtitle": "Describe a topic or problem and get diverse ideas organized by category.",
+    "highlights": [
+      {
+        "title": "Explores multiple angles.",
+        "items": [
+          {
+            "title": "Divergent thinking",
+            "subtitle": "Wide range of unconventional ideas",
+            "icon": "Brain"
+          },
+          {
+            "title": "Practical solutions",
+            "subtitle": "Actionable approaches you can try now",
+            "icon": "Activity"
+          },
+          {
+            "title": "Wild cards",
+            "subtitle": "Bold ideas that challenge assumptions",
+            "icon": "AlertTriangle"
+          }
+        ]
+      },
+      {
+        "title": "Structured output.",
+        "items": [
+          {
+            "title": "Ideas grouped by category",
+            "icon": "CheckCircle2"
+          },
+          {
+            "title": "Each idea with a brief rationale",
+            "icon": "CheckCircle2"
+          },
+          {
+            "title": "Top recommendation highlighted",
+            "icon": "CheckCircle2"
+          }
+        ]
+      }
+    ]
+  }
+}

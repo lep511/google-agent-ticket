@@ -26,51 +26,46 @@ export const MAX_LOG_SLUG_LENGTH = 40;
 export const EMPTY_INPUT_SLUG = 'input';
 
 /**
- * Convierte el valor de entrada en un fragmento seguro para un nombre de
- * archivo: conserva letras y dígitos tal como llegaron, para no cambiar el
- * nombre de los logs de los agentes de tipo `ticker`, y sustituye cualquier
- * otro carácter, de modo que un texto libre no pueda introducir separadores de
- * ruta ni secuencias de recorrido.
+ * Converts a raw input string into a filesystem-safe slug.
  */
 export function toLogFileSlug(rawInput: string): string {
   const slug = rawInput.trim().replace(/[^A-Za-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
   return (slug.length === 0 ? EMPTY_INPUT_SLUG : slug).slice(0, MAX_LOG_SLUG_LENGTH);
 }
 
-/** Datos con los que se nombran los dos archivos de log de una ejecución. */
+/**
+ * Formats a timestamp as a filesystem-safe datetime string with milliseconds.
+ * Example: "2026-08-08_10-15-30-123"
+ */
+function formatTimestamp(ts: number): string {
+  const d = new Date(ts);
+  const pad = (n: number, len = 2) => String(n).padStart(len, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}-${pad(d.getMilliseconds(), 3)}`;
+}
+
 export interface RunLogNamingInput {
-  /** agentId efectivamente ejecutado, no el recibido en la petición. */
   agentId: string;
-  /** Valor de entrada tal como llegó, antes de sanear. */
   rawInput: string;
-  /** Identificador de la ejecución, común a los dos archivos y a la URL. */
   runId: number | string;
 }
 
-/** Nombres de archivo y URL pública de los logs de una ejecución. */
 export interface RunLogNames {
-  /** `run_log_<agentId>_<input>_<runId>`, sin extensión. */
   baseName: string;
-  /** `run_log_<agentId>_<input>_<runId>.jsonl` (Requirement 10.1). */
   jsonlFileName: string;
-  /** `run_log_<agentId>_<input>_<runId>.txt` (Requirement 10.1). */
   txtFileName: string;
-  /** URL del `.jsonl` de esa ejecución bajo `/run_logs` (Requirement 10.2). */
   jsonlLogUrl: string;
 }
 
 /**
- * Nombre base compartido por los dos archivos de log de una ejecución:
- * `run_log_<agentId>_<input>_<runId>` (Requirement 10.1).
+ * Base name: `run_log_<agentId>_<datetime with ms>`.
  */
-export function buildRunLogBaseName({ agentId, rawInput, runId }: RunLogNamingInput): string {
-  return `${RUN_LOG_PREFIX}_${agentId}_${toLogFileSlug(rawInput)}_${runId}`;
+export function buildRunLogBaseName({ agentId, runId }: RunLogNamingInput): string {
+  const ts = typeof runId === 'number' ? runId : Date.now();
+  return `${RUN_LOG_PREFIX}_${agentId}_${formatTimestamp(ts)}`;
 }
 
 /**
- * Nombres de los dos archivos de log de una ejecución y URL del `.jsonl`. Los
- * dos archivos comparten el mismo `runId`, así que el `.txt` y el `.jsonl` de
- * una ejecución siempre se corresponden (Requirements 10.1, 10.2).
+ * File names and public URL for a run's log files.
  */
 export function buildRunLogNames(naming: RunLogNamingInput): RunLogNames {
   const baseName = buildRunLogBaseName(naming);

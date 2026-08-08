@@ -1,0 +1,58 @@
+{
+  "id": "summarizer_agent",
+  "name": "Summarizer",
+  "tagline": "Condenses any text into a clear, concise summary.",
+  "description": "Takes any text input and produces a structured summary with key points, main themes, and a brief conclusion.",
+  "icon": "FileText",
+  "accentColor": "#38BDF8",
+  "order": 10,
+  "isDefault": true,
+  "inputMode": "text",
+  "inputPlaceholder": "Paste the text you want summarized",
+  "actionLabel": "Summarize",
+  "supportsInstruction": true,
+  "outputRenderer": "simple_report",
+  "landing": {
+    "title": "Summarizer, distill any text into its essentials",
+    "subtitle": "Paste any text and get a structured summary with key points and themes.",
+    "highlights": [
+      {
+        "title": "Works on any content.",
+        "items": [
+          {
+            "title": "Articles and reports",
+            "subtitle": "News, research, and business documents",
+            "icon": "FileText"
+          },
+          {
+            "title": "Emails and messages",
+            "subtitle": "Long threads distilled to action items",
+            "icon": "Activity"
+          },
+          {
+            "title": "Technical documentation",
+            "subtitle": "Specs, RFCs, and API docs",
+            "icon": "Bot"
+          }
+        ]
+      },
+      {
+        "title": "Clear, actionable output.",
+        "items": [
+          {
+            "title": "Key points extracted and prioritized",
+            "icon": "CheckCircle2"
+          },
+          {
+            "title": "Main themes identified",
+            "icon": "CheckCircle2"
+          },
+          {
+            "title": "Brief conclusion with next steps",
+            "icon": "CheckCircle2"
+          }
+        ]
+      }
+    ]
+  }
+}

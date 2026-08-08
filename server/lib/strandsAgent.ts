@@ -2,17 +2,11 @@
  * Agent runner, built on the Strands Agents SDK (TypeScript).
  *
  * This is the only runner: `/api/analyze` builds an agent here and streams it to
- * the browser. The agent loop runs in this process and web research happens
- * through the `google_search` tool in `googleSearchTool.ts`.
+ * the browser. The agent loop runs in this process.
  *
- * Two model providers are supported:
- *  - **Gemini** (default): via the Vercel AI SDK Google provider + VercelModel adapter.
- *  - **NVIDIA NIM**: via the OpenAI-compatible endpoint at integrate.api.nvidia.com,
- *    using the Strands `OpenAIModel` in Chat Completions mode.
- *
- * The provider is selected through the `provider` field on agent options or the
- * `MODEL_PROVIDER` env var (`gemini` | `nvidia`). MCP tools are loaded from the
- * config path in `MCP_CONFIG_PATH` when set.
+ * Model provider: NVIDIA NIM via the OpenAI-compatible endpoint at
+ * integrate.api.nvidia.com, using the Strands `OpenAIModel` in Chat Completions
+ * mode. Configured through `NVIDIA_API_KEY` and `NVIDIA_MODEL_ID` env vars.
  *
  * Docs: https://strandsagents.com/docs/user-guide/quickstart/typescript/
  */
@@ -26,42 +20,14 @@ import {
   type ToolList,
 } from '@strands-agents/sdk';
 import { OpenAIModel } from '@strands-agents/sdk/models/openai';
-import { VercelModel } from '@strands-agents/sdk/models/vercel';
 import type { ZodType } from 'zod';
 
 import type { AgentEvent, AgentUsage } from './agentEvents.ts';
-import {
-  createGeminiProvider,
-  isGeminiConfigured,
-  resolveGeminiModelId,
-} from './geminiProvider.ts';
 import {
   NVIDIA_BASE_URL,
   isNvidiaConfigured,
   resolveNvidiaModelId,
 } from './nvidiaProvider.ts';
-import { createGoogleSearchTool } from './googleSearchTool.ts';
-
-/* ────────────────────────────────────────────────────────── */
-/*  Provider selection                                         */
-/* ────────────────────────────────────────────────────────── */
-
-export type ModelProvider = 'gemini' | 'nvidia';
-
-const VALID_PROVIDERS: readonly ModelProvider[] = ['gemini', 'nvidia'];
-
-export function resolveModelProvider(requested?: unknown): ModelProvider {
-  if (typeof requested === 'string') {
-    const lower = requested.trim().toLowerCase();
-    if (VALID_PROVIDERS.includes(lower as ModelProvider)) return lower as ModelProvider;
-  }
-  const env = process.env.MODEL_PROVIDER;
-  if (typeof env === 'string') {
-    const lower = env.trim().toLowerCase();
-    if (VALID_PROVIDERS.includes(lower as ModelProvider)) return lower as ModelProvider;
-  }
-  return 'gemini';
-}
 
 /* ────────────────────────────────────────────────────────── */
 /*  Configuration                                              */
@@ -70,16 +36,12 @@ export function resolveModelProvider(requested?: unknown): ModelProvider {
 export interface StrandsAgentOptions {
   /** System prompt guiding the agent, normally the agent's `AGENTS.md`. */
   systemPrompt?: string;
-  /** Model id. Interpretation depends on the provider. */
+  /** Model id override. Falls back to NVIDIA_MODEL_ID env var. */
   modelId?: string;
-  /** Provider to use: `gemini` (default) or `nvidia`. */
-  provider?: ModelProvider | string;
   /** Sampling temperature forwarded to the model. */
   temperature?: number;
   /** Extra function tools created with the SDK's `tool()` helper. */
   tools?: ToolList;
-  /** Adds the `google_search` tool. Defaults to `false`. */
-  googleSearch?: boolean;
   /** Zod schema the final answer must satisfy, exposed as `result.structuredOutput`. */
   structuredOutputSchema?: ZodType;
   /** MCP clients to attach to the agent. */
@@ -89,62 +51,48 @@ export interface StrandsAgentOptions {
 /** Model attempts before a run gives up, counting the first one. */
 export const MAX_MODEL_ATTEMPTS = 4;
 
-/** True when the server has the credentials for the resolved provider. */
-export function isStrandsConfigured(provider?: ModelProvider | string): boolean {
-  const resolved = resolveModelProvider(provider);
-  if (resolved === 'nvidia') return isNvidiaConfigured();
-  return isGeminiConfigured();
+/** Output token ceiling passed to the model on every call. */
+export const DEFAULT_MAX_OUTPUT_TOKENS = 65_536;
+
+/** True when the server has the NVIDIA API key configured. */
+export function isStrandsConfigured(): boolean {
+  return isNvidiaConfigured();
 }
 
 /**
- * Retries throttling, as the SDK does by default, plus transient server errors.
+ * Retries throttling, transient server errors, and malformed function calls.
  */
-export class GeminiRetryStrategy extends DefaultModelRetryStrategy {
+export class RetryStrategy extends DefaultModelRetryStrategy {
   protected override isRetryable(error: Error): boolean {
-    return super.isRetryable(error) || classifyAgentFailureStatus(error) >= 500;
+    if (super.isRetryable(error)) return true;
+    if (classifyAgentFailureStatus(error) >= 500) return true;
+    if (error.message?.includes('MALFORMED_FUNCTION_CALL')) return true;
+    return false;
   }
 }
 
 /**
- * Builds the model instance for the resolved provider.
- */
-function buildModel(provider: ModelProvider, options: StrandsAgentOptions) {
-  if (provider === 'nvidia') {
-    return new OpenAIModel({
-      api: 'chat',
-      modelId: resolveNvidiaModelId(options.modelId),
-      apiKey: process.env.NVIDIA_API_KEY,
-      clientConfig: { baseURL: NVIDIA_BASE_URL },
-      ...(options.temperature === undefined ? {} : { temperature: options.temperature }),
-    });
-  }
-
-  const google = createGeminiProvider();
-  return new VercelModel({
-    provider: google(resolveGeminiModelId(options.modelId)),
-    ...(options.temperature === undefined ? {} : { temperature: options.temperature }),
-  });
-}
-
-/**
- * Builds an agent backed by the configured model provider.
+ * Builds an agent backed by NVIDIA NIM (OpenAI-compatible).
  *
  * Console printing is disabled: this server streams events to the browser and
  * writes its own run logs, so the SDK's stdout printer would only duplicate them.
  */
 export function createStrandsAgent(options: StrandsAgentOptions = {}): Agent {
-  const provider = resolveModelProvider(options.provider);
-  const model = buildModel(provider, options);
+  const model = new OpenAIModel({
+    api: 'chat',
+    modelId: resolveNvidiaModelId(options.modelId),
+    apiKey: process.env.NVIDIA_API_KEY,
+    maxTokens: DEFAULT_MAX_OUTPUT_TOKENS,
+    clientConfig: { baseURL: NVIDIA_BASE_URL },
+    ...(options.temperature === undefined ? {} : { temperature: options.temperature }),
+  });
 
-  const tools: ToolList = [
-    ...(options.googleSearch ? [createGoogleSearchTool()] : []),
-    ...(options.tools ?? []),
-  ];
+  const tools: ToolList = [...(options.tools ?? [])];
 
   return new Agent({
     model,
     printer: false,
-    retryStrategy: new GeminiRetryStrategy({ maxAttempts: MAX_MODEL_ATTEMPTS }),
+    retryStrategy: new RetryStrategy({ maxAttempts: MAX_MODEL_ATTEMPTS }),
     ...(options.systemPrompt === undefined ? {} : { systemPrompt: options.systemPrompt }),
     ...(tools.length === 0 ? {} : { tools }),
     ...(options.mcpClients?.length ? { mcpClients: options.mcpClients } : {}),
@@ -247,6 +195,13 @@ export function mapStrandsEvent(event: AgentStreamEvent): AgentEvent | null {
 }
 
 /**
+ * Maximum number of agent-loop turns (one model call + tool execution each).
+ * Prevents runaway loops when the model keeps calling tools without producing
+ * a final answer — e.g. retrying a rate-limited search tool indefinitely.
+ */
+export const MAX_AGENT_TURNS = 15;
+
+/**
  * Runs the agent and yields `AgentEvent`s, closing with a `done` event.
  *
  * Failures are thrown, not turned into events: only the caller knows whether
@@ -258,7 +213,10 @@ export async function* streamStrandsAgent(
   prompt: string,
   signal?: AbortSignal
 ): AsyncGenerator<AgentEvent> {
-  for await (const event of agent.stream(prompt, signal ? { cancelSignal: signal } : {})) {
+  for await (const event of agent.stream(prompt, {
+    ...(signal ? { cancelSignal: signal } : {}),
+    limits: { turns: MAX_AGENT_TURNS },
+  })) {
     const mapped = mapStrandsEvent(event);
     if (mapped) yield mapped;
   }

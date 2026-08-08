@@ -647,7 +647,7 @@ describe('operaciones del catálogo por identificador', () => {
     const registry = createAgentRegistry({ agentsDir: catalog.agentsDir, logger: null });
 
     expect(() => registry.getPromptTemplate('../beta_agent')).toThrowError(AgentSourceError);
-    expect(() => registry.getSchema('gamma_agent')).toThrowError(/no está en el catálogo/);
+    expect(() => registry.getSchema('gamma_agent')).toThrowError(/not in the catalog/);
   });
 
   it('falla nombrando el archivo cuando la plantilla supera su límite de tamaño', () => {

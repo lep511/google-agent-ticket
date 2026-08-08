@@ -641,7 +641,7 @@ async function driveRun(
       for it proves the stopped run reached its end instead of being asserted
       mid-flight.
     */
-    await screen.findByText('Ejecución detenida');
+    await screen.findByText('Run stopped');
     return;
   }
 
@@ -1190,7 +1190,7 @@ function captureInterfaceState(): InterfaceStateSnapshot {
   return {
     landingVisible:
       screen.queryByRole('heading', { level: 1, name: CATALOG_AGENT.name }) !== null,
-    runPanelVisible: screen.queryByAltText('Gemini Sparkle') !== null,
+    runPanelVisible: screen.queryByAltText('NVIDIA') !== null,
     reportCardVisible:
       screen.queryByRole('heading', { name: 'Your report is now ready' }) !== null,
     reportViewVisible: screen.queryByTitle('Close report') !== null,

@@ -1,0 +1,15 @@
+{
+  "id": "calculator_agent",
+  "name": "Calculator",
+  "tagline": "Solves math problems step by step using a calculate tool.",
+  "description": "Takes a math problem or expression and solves it step by step, using a calculate tool to perform arithmetic operations accurately.",
+  "icon": "Activity",
+  "accentColor": "#10B981",
+  "order": 20,
+  "isDefault": false,
+  "inputMode": "text",
+  "inputPlaceholder": "Enter a math problem or expression",
+  "actionLabel": "Calculate",
+  "supportsInstruction": true,
+  "outputRenderer": "simple_report"
+}

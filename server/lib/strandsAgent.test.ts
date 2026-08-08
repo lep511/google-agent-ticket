@@ -9,7 +9,7 @@ import type { Agent, AgentStreamEvent } from '@strands-agents/sdk';
 import { describe, expect, it } from 'vitest';
 
 import {
-  GeminiRetryStrategy,
+  RetryStrategy,
   MAX_MODEL_ATTEMPTS,
   classifyAgentFailureStatus,
   describeAgentFailure,
@@ -68,8 +68,8 @@ describe('mapStrandsEvent', () => {
         type: 'contentBlockEvent',
         contentBlock: {
           type: 'toolUseBlock',
-          name: 'google_search',
-          input: { query: 'NVDA 10-Q filetype:pdf' },
+          name: 'my_tool',
+          input: { param: 'value' },
           toolUseId: 'call-1',
         },
       }),
@@ -77,8 +77,8 @@ describe('mapStrandsEvent', () => {
 
     expect(mapped).toEqual({
       type: 'tool_call',
-      name: 'google_search',
-      arguments: { query: 'NVDA 10-Q filetype:pdf' },
+      name: 'my_tool',
+      arguments: { param: 'value' },
       callId: 'call-1',
     });
   });
@@ -227,10 +227,9 @@ describe('describeAgentFailure', () => {
   });
 });
 
-describe('GeminiRetryStrategy', () => {
-  /** Reaches the protected predicate the agent loop consults. */
+describe('RetryStrategy', () => {
   function isRetryable(error: Error): boolean {
-    const strategy = new GeminiRetryStrategy({ maxAttempts: MAX_MODEL_ATTEMPTS }) as unknown as {
+    const strategy = new RetryStrategy({ maxAttempts: MAX_MODEL_ATTEMPTS }) as unknown as {
       isRetryable(error: Error): boolean;
     };
     return strategy.isRetryable(error);
@@ -240,13 +239,18 @@ describe('GeminiRetryStrategy', () => {
     expect(isRetryable(new ModelThrottledError('quota exceeded'))).toBe(true);
   });
 
-  it('also retries transient server errors, which would waste the run so far', () => {
+  it('also retries transient server errors', () => {
     for (const status of [500, 502, 503, 504]) {
       const failure = new Error('model call failed', {
         cause: Object.assign(new Error('upstream'), { statusCode: status }),
       });
       expect(isRetryable(failure)).toBe(true);
     }
+  });
+
+  it('retries malformed function call errors', () => {
+    const malformed = new Error('model finished with error | raw=<MALFORMED_FUNCTION_CALL>');
+    expect(isRetryable(malformed)).toBe(true);
   });
 
   it('does not retry a request the model rejected on its merits', () => {
