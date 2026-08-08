@@ -1,16 +1,16 @@
 {
-  "buildCommand": "vite build",
+  "buildCommand": "npm run build:vercel",
   "outputDirectory": "dist",
   "framework": "vite",
   "functions": {
-    "api/**/*.ts": {
+    "api/**/*.mjs": {
       "maxDuration": 60,
       "includeFiles": "agent/**"
     }
   },
   "rewrites": [
-    { "source": "/api/agents", "destination": "/api/agents" },
-    { "source": "/api/analyze", "destination": "/api/analyze" },
+    { "source": "/api/agents", "destination": "/api/agents.mjs" },
+    { "source": "/api/analyze", "destination": "/api/analyze.mjs" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],
   "headers": [

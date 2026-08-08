@@ -40,3 +40,4 @@ dist-ssr
 # screenshots written while browsing the app. Regenerated on every run.
 .playwright-mcp/
 .vercel
+api/*.mjs
