@@ -185,6 +185,7 @@ export default function App() {
 
   const [isReportOpen, setIsReportOpen] = useState<'flash'|false>(false);
   const [user, setUser] = useState<CognitoUserSession | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
   const [showStopConfirm, setShowStopConfirm] = useState(false);
   const [isStopped, setIsStopped] = useState(false);
 
@@ -282,7 +283,6 @@ export default function App() {
   }, [isHistoryOpen]);
 
   useEffect(() => {
-    // Resolve the OAuth callback first, then fall back to an existing session.
     handleOAuthCallback()
       .then((oauthUser) => {
         if (oauthUser) {
@@ -293,12 +293,17 @@ export default function App() {
       })
       .catch((err) => {
         console.error('❌ Error in auth flow:', err);
-      });
+      })
+      .finally(() => setAuthChecked(true));
   }, []);
 
   const handleSignOut = async () => {
     await signOutCognito();
     setUser(null);
+    setHistoryEntries([]);
+    setReportData(null);
+    setEvents([]);
+    setError(null);
   };
 
   /**
@@ -963,6 +968,33 @@ export default function App() {
     );
   }
 
+  if (!authChecked) {
+    return (
+      <div className="h-dvh bg-stone-900 flex items-center justify-center">
+        <span className="font-display font-bold text-2xl tracking-wider uppercase text-white animate-pulse">Tickr</span>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="relative h-dvh bg-stone-900 overflow-hidden font-sans text-stone-100 flex flex-col items-center justify-center">
+        <DottedBackground />
+        <div className="relative z-10 flex flex-col items-center gap-6 p-8">
+          <span className="font-display font-bold text-4xl tracking-wider uppercase text-white">Tickr</span>
+          <p className="text-stone-400 text-center max-w-md">
+            Sign in to access AI agents and run analyses.
+          </p>
+          <button
+            onClick={signInWithHostedUI}
+            className="px-6 py-3 bg-white text-black hover:bg-stone-200 rounded-lg font-semibold text-base transition-colors"
+          >
+            Sign In
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     /*
