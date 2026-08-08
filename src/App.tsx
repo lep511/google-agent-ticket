@@ -1088,8 +1088,8 @@ export default function App() {
                 role="status"
                 className="mb-4 bg-amber-500/10 border border-amber-500/50 text-amber-100 px-4 py-3 rounded text-sm"
               >
-                El informe no pudo estructurarse. La respuesta del agente se conserva sin
-                formatear en la línea de tiempo.
+                The report could not be structured. The agent's raw response is preserved
+                in the timeline below.
               </div>
             )}
             

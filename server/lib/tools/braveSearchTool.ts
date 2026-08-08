@@ -22,11 +22,6 @@ interface BraveSearchResponse {
 }
 
 export function createBraveSearchTool() {
-  const apiKey = process.env.BRAVE_API_KEY;
-  if (!apiKey) {
-    throw new Error('BRAVE_API_KEY environment variable is required for the search_web tool');
-  }
-
   return tool({
     name: 'search_web',
     description:
@@ -38,6 +33,18 @@ export function createBraveSearchTool() {
       count: z.number().optional().default(5).describe('Number of results to return (1-10, default 5).'),
     }),
     callback: async ({ query, count }) => {
+      const apiKey = process.env.BRAVE_API_KEY;
+      if (!apiKey) {
+        return {
+          error: 'BRAVE_API_KEY is not configured. Web search is unavailable.',
+          query,
+          web_results: [],
+          news_results: [],
+          total_web: 0,
+          total_news: 0,
+        } as unknown as Record<string, unknown>;
+      }
+
       const numResults = Math.min(Math.max(count ?? 5, 1), 10);
       const params = new URLSearchParams({ q: query, count: String(numResults) });
 
