@@ -23,9 +23,16 @@ const ICONS = {
   error: AlertCircle,
 } as const;
 
+function isToolResultError(event: TimelineEvent): boolean {
+  if (event.kind !== 'tool_result' || !event.detail) return false;
+  const d = event.detail.toLowerCase();
+  return d.includes('"error"') || d.startsWith('error') || d.includes('is not configured') || d.includes('api returned 4') || d.includes('api returned 5');
+}
+
 function TimelineItem({ event, running }: { event: TimelineEvent; running: boolean }) {
   const [expanded, setExpanded] = useState(false);
-  const Icon = ICONS[event.kind] || Info;
+  const toolFailed = isToolResultError(event);
+  const Icon = toolFailed ? AlertCircle : (ICONS[event.kind] || Info);
   const now = Date.now();
   const durationMs = event.endTime
     ? event.endTime - (event.startTime || event.endTime)
@@ -84,7 +91,9 @@ function TimelineItem({ event, running }: { event: TimelineEvent; running: boole
           >
             <div className="shrink-0 mt-0.5">
               {event.kind === 'tool_result' ? (
-                <CheckCircle className="w-4 h-4 text-emerald-400" />
+                toolFailed
+                  ? <AlertCircle className="w-4 h-4 text-red-400" />
+                  : <CheckCircle className="w-4 h-4 text-emerald-400" />
               ) : (
                 <div className="w-4 h-4 border-2 border-white/30 border-dashed rounded-full" />
               )}
