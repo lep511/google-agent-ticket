@@ -1,5 +1,6 @@
 {
-  "userPoolId": "us-east-1_exampleId",
-  "userPoolClientId": "exampleAppClientId123456",
-  "region": "us-east-1"
+  "userPoolId": "us-east-1_2kDiHif9V",
+  "userPoolClientId": "7a309k570ocrkqttopdd3ep4ek",
+  "region": "us-east-1",
+  "hostedUIDomain": "tickr-486697"
 }

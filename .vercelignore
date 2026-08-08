@@ -1,0 +1,10 @@
+run_logs/
+workspace/
+debug/
+cognito_setup/
+tests/
+*.test.ts
+*.test.tsx
+.env
+.env.local
+.env.cognito
