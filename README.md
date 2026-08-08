@@ -200,9 +200,17 @@ Model failures retry with exponential backoff (429, 5xx) up to 4 attempts. Agent
 
 ## API
 
-- `GET /api/agents` — ordered catalog + `defaultAgentId`
-- `POST /api/analyze` — SSE stream: `agent_info` → `thinking`/`text`/`tool_call`/`tool_result` → `complete` → `final_stats` → `done`
+- `GET /api/agents` — ordered catalog + `defaultAgentId` (public)
+- `POST /api/analyze` — SSE stream: `agent_info` → `thinking`/`text`/`tool_call`/`tool_result` → `complete` → `final_stats` → `done` (**requires auth**)
 - `GET /api/download_jsonl?ticker=<input>[&agent=<agentId>]` — download run log
+
+### Authentication
+
+Agent execution (`POST /api/analyze`) requires a valid Cognito ID token. The frontend sends it automatically via `Authorization: Bearer <id_token>`.
+
+The backend verifies tokens using `aws-jwt-verify` against the configured user pool (`VITE_COGNITO_USER_POOL_ID` + `VITE_COGNITO_CLIENT_ID`). Invalid or expired tokens receive a 401 response with a descriptive error code (`auth_required`, `token_expired`, `invalid_token`).
+
+The frontend gates all app functionality behind authentication — unauthenticated users see only a login screen. On sign out, all session state (history, reports, events) is cleared.
 
 ### Network access control
 
