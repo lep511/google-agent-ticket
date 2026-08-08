@@ -3,6 +3,7 @@ dotenv.config({ path: ".env.local" });
 dotenv.config();
 
 import express from "express";
+import https from "https";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import fs from "fs";
@@ -513,11 +514,31 @@ async function startServer() {
     });
   }
 
+  // HTTPS when certs are available (required for cross-origin from HTTPS frontends).
+  const certDir = path.join(process.cwd(), 'certs');
+  const keyPath = path.join(certDir, 'key.pem');
+  const certPath = path.join(certDir, 'cert.pem');
+  const useHttps = fs.existsSync(keyPath) && fs.existsSync(certPath);
+
+  if (useHttps) {
+    const httpsPort = Number(process.env.HTTPS_PORT || 3443);
+    const sslOptions = {
+      key: fs.readFileSync(keyPath),
+      cert: fs.readFileSync(certPath),
+    };
+    https.createServer(sslOptions, app).listen(httpsPort, bindHost, () => {
+      const scope = binding.exposed
+        ? `${bindHost} (reachable from the network, API access token required)`
+        : `${bindHost} (local only)`;
+      console.log(`HTTPS server running on port ${httpsPort} at ${scope}`);
+    });
+  }
+
   app.listen(PORT, bindHost, () => {
     const scope = binding.exposed
       ? `${bindHost} (reachable from the network, API access token required)`
       : `${bindHost} (local only)`;
-    console.log(`Server running on port ${PORT} at ${scope}`);
+    console.log(`HTTP server running on port ${PORT} at ${scope}`);
   });
 }
 

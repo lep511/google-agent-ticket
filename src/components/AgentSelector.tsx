@@ -356,12 +356,12 @@ export function AgentSelector({
                   <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm font-medium text-white">
-                      No se pudo cargar el catálogo de agentes
+                      Could not load the agent catalog
                     </p>
                     <p className="text-xs text-white/60 mt-0.5">
                       {errorMessage?.trim()
                         ? errorMessage
-                        : 'Seguimos con el último agente conocido.'}
+                        : 'Continuing with the last known agent.'}
                     </p>
                   </div>
                 </div>
@@ -371,7 +371,7 @@ export function AgentSelector({
                   className="self-start flex items-center gap-1.5 text-xs font-medium text-white px-2.5 py-1.5 bg-white/10 hover:bg-white/20 rounded-md transition-colors"
                 >
                   <RefreshCw className="w-3.5 h-3.5" aria-hidden="true" />
-                  <span>Reintentar</span>
+                  <span>Retry</span>
                 </button>
               </div>
             )}

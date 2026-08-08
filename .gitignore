@@ -41,3 +41,4 @@ dist-ssr
 .playwright-mcp/
 .vercel
 api/*.mjs
+certs/
