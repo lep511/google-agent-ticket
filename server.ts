@@ -32,6 +32,7 @@ import { resolveRunLogDownload } from "./server/lib/runLogDownload.ts";
 import { buildRunLogNames, toLogFileSlug } from "./server/lib/runLogNaming.ts";
 import { resolveArtifactPath } from "./server/lib/artifactUpload.ts";
 import { isAuthorizedRequest, resolveServerBinding } from "./server/lib/serverAccess.ts";
+import { requireAuth } from "./server/lib/cognitoAuth.ts";
 
 const NO_AGENTS_AVAILABLE_ERROR =
   "No agents are available on the server to handle this run.";
@@ -182,7 +183,7 @@ async function startServer() {
     return res.download(path.join(runLogsDir, result.match.fileName));
   });
 
-  app.post("/api/analyze", async (req, res) => {
+  app.post("/api/analyze", requireAuth, async (req, res) => {
     try {
       const body = (req.body ?? {}) as Record<string, unknown>;
       // `origin` still arrives in the body for compatibility, but the server no

@@ -581,9 +581,13 @@ export default function App() {
     };
 
     try {
+      const idToken = localStorage.getItem('cognito_id_token');
       const resp = await fetch('/api/analyze', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(idToken ? { 'Authorization': `Bearer ${idToken}` } : {}),
+        },
         body: JSON.stringify({
           // Requirement 12.6: el agentId del agente activo viaja en el cuerpo.
           agentId: requestedAgentId ?? undefined,
@@ -600,10 +604,15 @@ export default function App() {
         signal: controller.signal,
       });
 
+      if (resp.status === 401) {
+        const body = await resp.json().catch(() => ({}));
+        const msg = body.code === 'token_expired'
+          ? 'Session expired. Please sign in again.'
+          : 'Authentication required. Please sign in.';
+        throw new Error(msg);
+      }
+
       if (!resp.ok || !resp.body) {
-        // El servidor explica el motivo en el cuerpo (límite de cuota, servicio
-        // remoto caído, entrada inválida); mostrar solo el código dejaba al
-        // usuario sin saber si merecía la pena reintentar.
         throw new Error(await describeAnalyzeFailure(resp));
       }
 
