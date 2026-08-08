@@ -96,10 +96,12 @@ VITE_COGNITO_DOMAIN=tickr-123456
 
 ### `brand.sh`
 
-Applies custom CSS (and optionally a logo) to the Cognito Hosted UI so the login page matches the app's visual design.
+Applies Tickr branding to the **Cognito Managed Login** (new experience). This uses the `CreateManagedLoginBranding` / `UpdateManagedLoginBranding` API with a structured JSON settings file — not the legacy CSS approach.
+
+Requires the **Essentials** or **Plus** feature plan (the deploy script creates pools on Essentials by default).
 
 ```bash
-# Apply the default Tickr theme
+# Apply the Tickr theme
 ./brand.sh
 
 # Apply with a custom logo
@@ -107,6 +109,9 @@ Applies custom CSS (and optionally a logo) to the Cognito Hosted UI so the login
 
 # Reset to Cognito defaults
 ./brand.sh --reset
+
+# Use a custom settings file
+./brand.sh --settings my-theme.json
 ```
 
 | Option | Default | Description |
@@ -114,18 +119,19 @@ Applies custom CSS (and optionally a logo) to the Cognito Hosted UI so the login
 | `--region` | `us-east-1` | AWS region |
 | `--pool-id` | Auto-detected | User pool ID (reads from cognito-config.json) |
 | `--client-id` | Auto-detected | App client ID (reads from cognito-config.json) |
-| `--css FILE` | `hosted-ui.css` | Custom CSS file to upload |
-| `--logo FILE` | None | Logo image (PNG/JPG, max 100KB) |
-| `--reset` | Off | Remove all customizations |
+| `--settings FILE` | `managed-login-settings.json` | Branding settings JSON |
+| `--logo FILE` | None | Logo image (PNG/SVG/JPG/ICO) |
+| `--reset` | Off | Reset to Cognito default branding |
 
-The CSS file (`hosted-ui.css`) is pre-configured to match Tickr's design:
-- Warm cream background (`#F6F4F0`)
-- Dark teal primary buttons (`#0b5a4b`)
-- System sans-serif font stack
-- Rounded inputs with subtle borders
-- Error messages in the app's red (`#CC3131`)
+The settings file (`managed-login-settings.json`) configures all visual components:
+- **Page background**: `#F6F4F0` (warm cream in light mode)
+- **Primary button**: `#0b5a4b` (dark teal)
+- **Secondary button**: white with stone borders
+- **Form container**: white, rounded corners (12px)
+- **Alerts/errors**: `#CC3131` background
+- **Text**: stone palette matching the app
 
-Edit `hosted-ui.css` and re-run `./brand.sh` to update styles.
+Edit `managed-login-settings.json` and re-run `./brand.sh` to update the theme. The JSON structure maps to the Cognito branding editor components (pageBackground, form, primaryButton, secondaryButton, pageText, alert, etc.).
 
 ### `teardown.sh`
 

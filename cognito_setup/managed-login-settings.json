@@ -1,0 +1,134 @@
+{
+  "categories": {
+    "global": {
+      "colorSchemeMode": "LIGHT",
+      "pageHeader": { "enabled": false },
+      "pageFooter": { "enabled": false },
+      "spacingDensity": "REGULAR"
+    },
+    "form": {
+      "displayGraphics": true,
+      "location": {
+        "horizontal": "CENTER",
+        "vertical": "CENTER"
+      }
+    }
+  },
+  "components": {
+    "pageBackground": {
+      "lightMode": {
+        "color": "F6F4F0ff"
+      },
+      "darkMode": {
+        "color": "1c1917ff"
+      }
+    },
+    "form": {
+      "lightMode": {
+        "backgroundColor": "ffffffff",
+        "borderColor": "e7e5e4ff"
+      },
+      "darkMode": {
+        "backgroundColor": "1c1917ff",
+        "borderColor": "44403cff"
+      },
+      "borderRadius": 12.0,
+      "logo": {
+        "enabled": false
+      }
+    },
+    "primaryButton": {
+      "lightMode": {
+        "defaults": {
+          "backgroundColor": "0b5a4bff",
+          "textColor": "ffffffff"
+        },
+        "hover": {
+          "backgroundColor": "064e42ff",
+          "textColor": "ffffffff"
+        },
+        "active": {
+          "backgroundColor": "043d34ff",
+          "textColor": "ffffffff"
+        }
+      },
+      "darkMode": {
+        "defaults": {
+          "backgroundColor": "10b981ff",
+          "textColor": "1c1917ff"
+        },
+        "hover": {
+          "backgroundColor": "34d399ff",
+          "textColor": "1c1917ff"
+        },
+        "active": {
+          "backgroundColor": "6ee7b7ff",
+          "textColor": "1c1917ff"
+        }
+      }
+    },
+    "secondaryButton": {
+      "lightMode": {
+        "defaults": {
+          "backgroundColor": "ffffffff",
+          "borderColor": "d6d3d1ff",
+          "textColor": "1c1917ff"
+        },
+        "hover": {
+          "backgroundColor": "fafaf9ff",
+          "borderColor": "a8a29eff",
+          "textColor": "1c1917ff"
+        },
+        "active": {
+          "backgroundColor": "f5f5f4ff",
+          "borderColor": "78716cff",
+          "textColor": "1c1917ff"
+        }
+      },
+      "darkMode": {
+        "defaults": {
+          "backgroundColor": "292524ff",
+          "borderColor": "57534eff",
+          "textColor": "e7e5e4ff"
+        },
+        "hover": {
+          "backgroundColor": "44403cff",
+          "borderColor": "78716cff",
+          "textColor": "e7e5e4ff"
+        },
+        "active": {
+          "backgroundColor": "57534eff",
+          "borderColor": "a8a29eff",
+          "textColor": "e7e5e4ff"
+        }
+      }
+    },
+    "pageText": {
+      "lightMode": {
+        "headingColor": "1c1917ff",
+        "bodyColor": "44403cff",
+        "descriptionColor": "78716cff"
+      },
+      "darkMode": {
+        "headingColor": "e7e5e4ff",
+        "bodyColor": "a8a29eff",
+        "descriptionColor": "78716cff"
+      }
+    },
+    "alert": {
+      "lightMode": {
+        "error": {
+          "backgroundColor": "fef2f2ff",
+          "borderColor": "CC3131ff"
+        }
+      },
+      "darkMode": {
+        "error": {
+          "backgroundColor": "1a0000ff",
+          "borderColor": "f87171ff"
+        }
+      },
+      "borderRadius": 8.0
+    }
+  }
+}
