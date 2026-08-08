@@ -19,7 +19,7 @@
  *  - Cualquier excepción se captura: la carpeta se omite con una advertencia y
  *    el resto del catálogo continúa (2.8, 2.9).
  *
- * Requirements: 1.3, 1.7, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 16.4
+ 
  */
 
 import fs from 'node:fs';

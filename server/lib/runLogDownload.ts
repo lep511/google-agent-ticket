@@ -29,7 +29,7 @@
  *
  * El módulo es puro: no toca el sistema de archivos ni construye rutas.
  *
- * Requirements: 9.6, 9.7, 10.3, 10.4, 10.5, 16.3
+ 
  */
 
 import { RUN_LOG_PREFIX } from './runLogNaming.ts';

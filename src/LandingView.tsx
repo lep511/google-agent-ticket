@@ -7,7 +7,7 @@
 /*  existente, y degrada a `name`, `tagline` y `description`     */
 /*  cuando el manifiesto omite `landing`.                        */
 /*                                                              */
-/*  Requirements: 13.1, 13.2                                     */
+
 /* ──────────────────────────────────────────────────────────── */
 
 import { AnimatePresence, motion } from 'motion/react';

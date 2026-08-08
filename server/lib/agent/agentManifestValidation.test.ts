@@ -6,7 +6,7 @@ import {
   validManifest,
   type AgentFolderSpec,
   type CatalogSpec,
-} from '../../tests/helpers/tempCatalog.ts';
+} from '../../../tests/helpers/tempCatalog.ts';
 import {
   normalizeLanding,
   normalizeOrder,

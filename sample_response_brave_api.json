@@ -1,0 +1,1106 @@
+{
+  "type": "search",
+  "query": {
+    "original": "artificial intelligence",
+    "show_strict_warning": false,
+    "is_navigational": false,
+    "is_news_breaking": false,
+    "spellcheck_off": false,
+    "country": "us",
+    "bad_results": false,
+    "should_fallback": false,
+    "postal_code": "",
+    "city": "",
+    "header_country": "",
+    "more_results_available": true,
+    "state": ""
+  },
+  "mixed": {
+    "type": "mixed",
+    "main": [
+      {
+        "type": "web",
+        "index": 0,
+        "all": false
+      },
+      {
+        "type": "web",
+        "index": 1,
+        "all": false
+      },
+      {
+        "type": "news",
+        "all": true
+      },
+      {
+        "type": "web",
+        "index": 2,
+        "all": false
+      },
+      {
+        "type": "videos",
+        "all": true
+      },
+      {
+        "type": "web",
+        "index": 3,
+        "all": false
+      },
+      {
+        "type": "web",
+        "index": 4,
+        "all": false
+      },
+      {
+        "type": "web",
+        "index": 5,
+        "all": false
+      },
+      {
+        "type": "web",
+        "index": 6,
+        "all": false
+      },
+      {
+        "type": "web",
+        "index": 7,
+        "all": false
+      },
+      {
+        "type": "web",
+        "index": 8,
+        "all": false
+      },
+      {
+        "type": "web",
+        "index": 9,
+        "all": false
+      },
+      {
+        "type": "web",
+        "index": 10,
+        "all": false
+      },
+      {
+        "type": "web",
+        "index": 11,
+        "all": false
+      },
+      {
+        "type": "web",
+        "index": 12,
+        "all": false
+      },
+      {
+        "type": "web",
+        "index": 13,
+        "all": false
+      },
+      {
+        "type": "web",
+        "index": 14,
+        "all": false
+      },
+      {
+        "type": "web",
+        "index": 15,
+        "all": false
+      },
+      {
+        "type": "web",
+        "index": 16,
+        "all": false
+      },
+      {
+        "type": "web",
+        "index": 17,
+        "all": false
+      },
+      {
+        "type": "web",
+        "index": 18,
+        "all": false
+      },
+      {
+        "type": "web",
+        "index": 19,
+        "all": false
+      }
+    ],
+    "top": [],
+    "side": []
+  },
+  "news": {
+    "type": "news",
+    "results": [
+      {
+        "title": "AI designs synthetic virus in scientific first, raising biosecurity concerns",
+        "url": "https://www.axios.com/2026/08/06/ai-virus-designed-bacteria-viruses",
+        "is_source_local": false,
+        "is_source_both": false,
+        "description": "A Stanford-led research team has used generative AI to design a synthetic virus — the first time <strong>artificial</strong> <strong>intelligence</strong> has been harnessed to create an organism that has never been seen in nature.",
+        "page_age": "2026-08-07T02:40:02",
+        "fetched_content_timestamp": 1786147362,
+        "family_friendly": true,
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "axios.com",
+          "hostname": "www.axios.com",
+          "favicon": "https://imgs.search.brave.com/36Qcnqeww33w_XW2TE8H562NGeN_xx12UkMckmcwb90/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNDRhMTdhMDcy/YWUwZGExMjA2ZGVi/NTVmYTQ3YmNhN2E1/NDdiODg2ZDBiYzNk/Y2RkYzFkNWQ4MmI4/OWY4MDIxMi93d3cu/YXhpb3MuY29tLw",
+          "path": "› 2026  › 08  › 06  › ai-virus-designed-bacteria-viruses"
+        },
+        "breaking": false,
+        "is_live": false,
+        "thumbnail": {
+          "src": "https://imgs.search.brave.com/ea8npnNWWkP1K_wjfljwIDaxmraIV8DCMBZ8KR3YD9E/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9pbWFn/ZXMuYXhpb3MuY29t/L0lnWHBwWE5MUHNB/TnU0UDR1b2xpUDh0/TGMwTT0vMHgwOjE5/MjB4MTA4MC8xMzY2/eDc2OC8yMDI2LzA4/LzA2LzE3ODYwNDU3/NjgyMTIuanBn",
+          "original": "https://images.axios.com/IgXppXNLPsANu4P4uoliP8tLc0M=/0x0:1920x1080/1366x768/2026/08/06/1786045768212.jpg"
+        },
+        "age": "1 day ago"
+      },
+      {
+        "title": "Human Exceptionalism Aims To Be Waylaid Due To Artificial General Intelligence And ASI",
+        "url": "https://www.forbes.com/sites/lanceeliot/2026/08/08/human-exceptionalism-aims-to-be-waylaid-due-to-artificial-general-intelligence-and-asi/",
+        "is_source_local": false,
+        "is_source_both": false,
+        "description": "The article examines how <strong>Artificial</strong> General <strong>Intelligence</strong> (AGI) and <strong>Artificial</strong> Superintelligence (ASI) could end human exceptionalism, potentially dethroning humanity as the planet&#x27;s apex species. AGI, matching human intellect, might become a peer, while ASI, with its vastly superior <strong>intelligence</strong>, ...",
+        "page_age": "2026-08-08T07:15:00",
+        "fetched_content_timestamp": 1786179721,
+        "family_friendly": true,
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "forbes.com",
+          "hostname": "www.forbes.com",
+          "favicon": "https://imgs.search.brave.com/qg6-E4bARcUpS7pHuJ2FXSeQ2YI51iPfbI8wpUBx9tg/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvZWY0NWFiMTBk/YmY2MjkyN2M0MTI0/NmRkYTM3ZjQzMGJj/Y2Q2MTBkYjVmZjA2/OGRjODBhMTM1M2Yx/YmRlZTA1NS93d3cu/Zm9yYmVzLmNvbS8",
+          "path": "› sites  › lanceeliot  › 2026  › 08  › 08  › human-exceptionalism-aims-to-be-waylaid-due-to-artificial-general-intelligence-and-asi"
+        },
+        "breaking": false,
+        "is_live": false,
+        "thumbnail": {
+          "src": "https://imgs.search.brave.com/jF8qCS6FTqAygAfK9fK7VPro_03G2XbFYh46vFddIRI/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9pbWFn/ZWlvLmZvcmJlcy5j/b20vc3BlY2lhbHMt/aW1hZ2VzL2ltYWdl/c2VydmUvNjdmOWE5/YTEyZDQ3YmQwMWRl/NzRjZTBmLzB4MC5q/cGc_Zm9ybWF0PWpw/ZyZhbXA7aGVpZ2h0/PTYwMCZhbXA7d2lk/dGg9MTIwMCZhbXA7/Zml0PWJvdW5kcw",
+          "original": "https://imageio.forbes.com/specials-images/imageserve/67f9a9a12d47bd01de74ce0f/0x0.jpg?format=jpg&amp;height=600&amp;width=1200&amp;fit=bounds"
+        },
+        "age": "6 hours ago"
+      },
+      {
+        "title": "Gemini App Reaches 950 Million Monthly Users, Google Says",
+        "url": "https://quantumzeitgeist.com/google-gemini-app-million-monthly-users/",
+        "is_source_local": false,
+        "is_source_both": false,
+        "description": "Google’s Gemini application has ... detailed in communications from CEO Sundar Pichai, signals a heightened prioritization of long-term <strong>Artificial</strong> General <strong>Intelligence</strong> research alongside continued product development....",
+        "page_age": "2026-08-08T08:32:37",
+        "fetched_content_timestamp": 1786184244,
+        "family_friendly": true,
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "quantumzeitgeist.com",
+          "hostname": "quantumzeitgeist.com",
+          "favicon": "https://imgs.search.brave.com/qaOAESE5-U9KK8OOLhf7yvh6jSFQ2S_BjKDZYTLrVwU/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNTJjNTA5YzM1/ZTQ2MjJkMGFhN2Zl/NTlmY2VjZjc0YjMz/YzEzYzNmYjE0ZWRh/OWYyYzJmMjQ3ODc3/NDNkNmI4Mi9xdWFu/dHVtemVpdGdlaXN0/LmNvbS8",
+          "path": "› google-gemini-app-million-monthly-users"
+        },
+        "breaking": false,
+        "is_live": false,
+        "thumbnail": {
+          "src": "https://imgs.search.brave.com/_K93jyyi_52eIEybLEH53y9JAYv3HtFaPaDe0m_qn_o/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9xdWFu/dHVtemVpdGdlaXN0/LmNvbS93cC1jb250/ZW50L3VwbG9hZHMv/Z2VtaW5pLWFwcC05/NTAtbWlsbGlvbi1t/b250aGx5LXVzZXJz/LTEyMDB4NjMwLmpw/Zw",
+          "original": "https://quantumzeitgeist.com/wp-content/uploads/gemini-app-950-million-monthly-users-1200x630.jpg"
+        },
+        "age": "5 hours ago"
+      },
+      {
+        "title": "Artificial Intelligence used to design brand new viruses",
+        "url": "https://www.bbc.com/news/articles/c5y3j3ngevmo",
+        "is_source_local": false,
+        "is_source_both": false,
+        "description": "Scientists made 16 successful viruses that had their genetic code designed by <strong>artificial</strong> <strong>intelligence</strong>.",
+        "page_age": "2026-08-07T13:00:02",
+        "fetched_content_timestamp": 1786194108,
+        "family_friendly": true,
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "bbc.com",
+          "hostname": "www.bbc.com",
+          "favicon": "https://imgs.search.brave.com/-9uoAONEhH31ac708C2NinDM9OjKbNcruJo3O1baQTM/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYTljMGQ4ZTFj/YzcwNTIyYTU4ZDk4/ZTg5NTQ0NGQyYjQy/NzU3NTMxNDRjZGFi/NjFkMmRiNGE1MGE5/ZDhhOWMyZS93d3cu/YmJjLmNvbS8",
+          "path": "› news  › articles  › c5y3j3ngevmo"
+        },
+        "breaking": false,
+        "is_live": false,
+        "thumbnail": {
+          "src": "https://imgs.search.brave.com/fKKOhAbiJeQTP62Ux-1NdSotJI_8GiLqyudJite29Vo/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9pY2hl/Zi5iYmNpLmNvLnVr/L25ld3MvMTAyNC9i/cmFuZGVkX25ld3Mv/OTAxNS9saXZlL2I2/ZmM4ODcwLTkyMjMt/MTFmMS1hZjRkLTUx/NjQyOTRhODVjNy5q/cGc",
+          "original": "https://ichef.bbci.co.uk/news/1024/branded_news/9015/live/b6fc8870-9223-11f1-af4d-5164294a85c7.jpg"
+        },
+        "age": "1 day ago"
+      },
+      {
+        "title": "This A.I. Just Created Viruses Not Found in Nature - The New York Times",
+        "url": "https://www.nytimes.com/2026/08/06/science/ai-viruses-bacteria-arc.html",
+        "is_source_local": false,
+        "is_source_both": false,
+        "description": "Scientists trained <strong>artificial</strong> <strong>intelligence</strong> on libraries of DNA and then asked the model to create recipes for viral genomes. Sixteen of them were viable, yielding new viruses.",
+        "page_age": "2026-08-07T00:30:08",
+        "fetched_content_timestamp": 1786156921,
+        "family_friendly": true,
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "nytimes.com",
+          "hostname": "www.nytimes.com",
+          "favicon": "https://imgs.search.brave.com/lWA-zkTMlWM2cUvrcYa1Fls86e-Vl-rkSBOjichQqVs/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvMGFlZWRkYmVh/YWFhZmFjYjM4MWYy/NTQzZmExMTIwN2Nm/NGJmZjgwYTRhYjI5/OTliM2JkYmI2MWY0/M2RlOGFlMi93d3cu/bnl0aW1lcy5jb20v",
+          "path": "› 2026  › 08  › 06  › science  › ai-viruses-bacteria-arc.html"
+        },
+        "breaking": false,
+        "is_live": false,
+        "thumbnail": {
+          "src": "https://imgs.search.brave.com/lBRf4AvCo-3mXshhoC-FCEOiLtBpckiq1ErLb3-uznw/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9zdGF0/aWMwMS5ueXQuY29t/L2ltYWdlcy8yMDI2/LzA4LzA1LzAwc2Np/LWFpLXZpcnVzLTE3/ODEyLWNvdmVyLzAw/c2NpLWFpLXZpcnVz/LTE3ODEyLWNvdmVy/LWZhY2Vib29rSnVt/Ym8uanBn",
+          "original": "https://static01.nyt.com/images/2026/08/05/00sci-ai-virus-17812-cover/00sci-ai-virus-17812-cover-facebookJumbo.jpg"
+        },
+        "age": "2 days ago"
+      },
+      {
+        "title": "Scientists Trained An AI Model In DNA—And It Invented 16 New Viruses",
+        "url": "https://www.forbes.com/sites/maryroeloffs/2026/08/06/scientists-trained-an-ai-model-in-dna-and-it-invented-16-new-viruses/",
+        "is_source_local": false,
+        "is_source_both": false,
+        "description": "Scientists are worried about how smart DNA-trained <strong>artificial</strong> <strong>intelligence</strong> models could get—and that they could become a weapon in biological warfare.",
+        "page_age": "2026-08-07T03:40:03",
+        "fetched_content_timestamp": 1786160500,
+        "family_friendly": true,
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "forbes.com",
+          "hostname": "www.forbes.com",
+          "favicon": "https://imgs.search.brave.com/qg6-E4bARcUpS7pHuJ2FXSeQ2YI51iPfbI8wpUBx9tg/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvZWY0NWFiMTBk/YmY2MjkyN2M0MTI0/NmRkYTM3ZjQzMGJj/Y2Q2MTBkYjVmZjA2/OGRjODBhMTM1M2Yx/YmRlZTA1NS93d3cu/Zm9yYmVzLmNvbS8",
+          "path": "› sites  › maryroeloffs  › 2026  › 08  › 06  › scientists-trained-an-ai-model-in-dna-and-it-invented-16-new-viruses"
+        },
+        "breaking": false,
+        "is_live": false,
+        "thumbnail": {
+          "src": "https://imgs.search.brave.com/bA5oKNoYqJBklnyS9_Oozuggg6EvW93eBq8a3G_xHxM/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9pbWFn/ZWlvLmZvcmJlcy5j/b20vc3BlY2lhbHMt/aW1hZ2VzL2ltYWdl/c2VydmUvNmE3NGUx/MDZhNTFlMjkyY2Ni/NzIyZmNkLzB4MC5q/cGc_Zm9ybWF0PWpw/ZyZhbXA7Y3JvcD0y/MDA2LDExMjkseDAs/eTY4MyxzYWZlJmFt/cDtoZWlnaHQ9NjAw/JmFtcDt3aWR0aD0x/MjAwJmFtcDtmaXQ9/Ym91bmRz",
+          "original": "https://imageio.forbes.com/specials-images/imageserve/6a74e106a51e292ccb722fcd/0x0.jpg?format=jpg&amp;crop=2006,1129,x0,y683,safe&amp;height=600&amp;width=1200&amp;fit=bounds"
+        },
+        "age": "1 day ago"
+      },
+      {
+        "title": "Deepfake victim calls for better regulation of 'dangerous' AI",
+        "url": "https://www.bbc.com/news/articles/c75gvyk6d4yo",
+        "is_source_local": false,
+        "is_source_both": false,
+        "description": "She said she was speaking publicly about her experience now in the hope of raising awareness of what she describes as the &quot;darker side&quot; of <strong>artificial</strong> <strong>intelligence</strong>.",
+        "page_age": "2026-08-08T06:18:58",
+        "fetched_content_timestamp": 1786181264,
+        "family_friendly": true,
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "bbc.com",
+          "hostname": "www.bbc.com",
+          "favicon": "https://imgs.search.brave.com/-9uoAONEhH31ac708C2NinDM9OjKbNcruJo3O1baQTM/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYTljMGQ4ZTFj/YzcwNTIyYTU4ZDk4/ZTg5NTQ0NGQyYjQy/NzU3NTMxNDRjZGFi/NjFkMmRiNGE1MGE5/ZDhhOWMyZS93d3cu/YmJjLmNvbS8",
+          "path": "› news  › articles  › c75gvyk6d4yo"
+        },
+        "breaking": false,
+        "is_live": false,
+        "thumbnail": {
+          "src": "https://imgs.search.brave.com/ncGdBMnbdPF-QAB8KmZr2M_2JDA2bc0hEPNQgPR_ES8/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9pY2hl/Zi5iYmNpLmNvLnVr/L25ld3MvMTAyNC9i/cmFuZGVkX25ld3Mv/MWVhZC9saXZlLzVm/ZGY1YzUwLTkxOWUt/MTFmMS1iNmIwLWQ1/NjkwYWExN2RiMC5w/bmc",
+          "original": "https://ichef.bbci.co.uk/news/1024/branded_news/1ead/live/5fdf5c50-919e-11f1-b6b0-d5690aa17db0.png"
+        },
+        "age": "7 hours ago"
+      },
+      {
+        "title": "Nvidia Is a Massive Investor in the Genius Artificial Intelligence (AI) Stock Up 170% This Year",
+        "url": "https://finance.yahoo.com/markets/stocks/articles/nvidia-massive-investor-genius-artificial-042000074.html",
+        "is_source_local": false,
+        "is_source_both": false,
+        "description": "Nebius has crushed it so far in 2026, but this is just the beginning.",
+        "page_age": "2026-08-07T04:20:00",
+        "fetched_content_timestamp": 1786183404,
+        "family_friendly": true,
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "finance.yahoo.com",
+          "hostname": "finance.yahoo.com",
+          "favicon": "https://imgs.search.brave.com/ZxJbtHZiiBXciqcRfJn3XPiTEOf_XYrooAjrJf1rnag/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNjRkNjc1NWY5/MzM5ZjlkMWQyNjM5/OWNiMTQ4ZjcwNTQx/ZjA3ZDE4NDQ2M2Iw/MWZjZjVhOTFlM2Ji/NTE1NWRjZS9maW5h/bmNlLnlhaG9vLmNv/bS8",
+          "path": "› markets  › stocks  › articles  › nvidia-massive-investor-genius-artificial-042000074.html"
+        },
+        "breaking": false,
+        "is_live": false,
+        "thumbnail": {
+          "src": "https://imgs.search.brave.com/Kk9TXzW7IUzoucAni1MC-w-9c0wfGxq2BVZJfNgFkaE/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9zLnlp/bWcuY29tL2xvL215/c3RlcmlvL2FwaS9G/MDM3OUZBQTA5RDRB/NENFMTY4QzQxMjg0/MkY3QTMwMkQxRjY1/MjNFNEZDNzEzNTRC/RTc5OTMwMjgzMjcy/MUI4L3N1YmdyYXBo/bXlzdGVyaW8vcmVz/aXplZmlsbF93MTIw/MF9oODAwO3F1YWxp/dHlfODA7Zm9ybWF0/X3dlYnAvaHR0cHM6/JTJGJTJGbWVkaWEu/emVuZnMuY29tJTJG/ZW4lMkZtb3RsZXlm/b29sLmNvbSUyRjNm/Mjg1MmFlMGRjMzc4/NzAxZDJkZTUzOWUy/ZDE3ZmYx",
+          "original": "https://s.yimg.com/lo/mysterio/api/F0379FAA09D4A4CE168C412842F7A302D1F6523E4FC71354BE799302832721B8/subgraphmysterio/resizefill_w1200_h800;quality_80;format_webp/https:%2F%2Fmedia.zenfs.com%2Fen%2Fmotleyfool.com%2F3f2852ae0dc378701d2de539e2d17ff1"
+        },
+        "age": "1 day ago"
+      }
+    ],
+    "mutated_by_goggles": false
+  },
+  "videos": {
+    "type": "videos",
+    "results": [
+      {
+        "type": "video_result",
+        "url": "https://www.youtube.com/watch?v=-8Xw0F8IjKA",
+        "title": "ARTIFICIAL INTELLIGENCE explained in 12 Minutes",
+        "description": "",
+        "video": {},
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "youtube.com",
+          "hostname": "www.youtube.com",
+          "favicon": "https://imgs.search.brave.com/Wg4wjE5SHAargkzePU3eSLmWgVz84BEZk1SjSglJK_U/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOTkyZTZiMWU3/YzU3Nzc5YjExYzUy/N2VhZTIxOWNlYjM5/ZGVjN2MyZDY4Nzdh/ZDYzMTYxNmI5N2Rk/Y2Q3N2FkNy93d3cu/eW91dHViZS5jb20v",
+          "path": "› watch"
+        },
+        "thumbnail": {
+          "src": "https://imgs.search.brave.com/A2c4Um-WvpQrkyiLTs6yOhu87bCfyQvwqEaBsqdGXCs/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9pLnl0/aW1nLmNvbS92aS8t/OFh3MEY4SWpLQS9t/YXhyZXNkZWZhdWx0/LmpwZw",
+          "original": "https://i.ytimg.com/vi/-8Xw0F8IjKA/maxresdefault.jpg"
+        }
+      },
+      {
+        "type": "video_result",
+        "url": "https://www.youtube.com/watch?v=y6rz71ZBcrU&vl=en-US",
+        "title": "What Exactly Is Artificial Intelligence? (And How Does It Really ...",
+        "description": "Have you ever stopped mid-scroll and wondered how machines seem to understand you? From finishing your sentences to recommending exactly what you want to wat...",
+        "age": "April 7, 2026",
+        "page_age": "2026-04-07T21:00:58",
+        "fetched_content_timestamp": 1785445705,
+        "video": {
+          "duration": "08:17",
+          "creator": "History of Simple Things",
+          "publisher": "YouTube"
+        },
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "youtube.com",
+          "hostname": "www.youtube.com",
+          "favicon": "https://imgs.search.brave.com/Wg4wjE5SHAargkzePU3eSLmWgVz84BEZk1SjSglJK_U/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOTkyZTZiMWU3/YzU3Nzc5YjExYzUy/N2VhZTIxOWNlYjM5/ZGVjN2MyZDY4Nzdh/ZDYzMTYxNmI5N2Rk/Y2Q3N2FkNy93d3cu/eW91dHViZS5jb20v",
+          "path": "› watch"
+        },
+        "thumbnail": {
+          "src": "https://imgs.search.brave.com/ObMAn49LUmzsWKN183ssbeSaTZEowGJmVv_dJuNviSE/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9pLnl0/aW1nLmNvbS92aS95/NnJ6NzFaQmNyVS9t/YXhyZXNkZWZhdWx0/LmpwZw",
+          "original": "https://i.ytimg.com/vi/y6rz71ZBcrU/maxresdefault.jpg"
+        }
+      },
+      {
+        "type": "video_result",
+        "url": "https://www.youtube.com/watch?v=JcXKbUIebrU",
+        "title": "What Is AI? | Learn all about artificial intelligence - YouTube",
+        "description": "What exactly is artificial intelligence? Did you know there are different levels? This video for kids discusses how people use AI and outlines some of the th...",
+        "age": "December 5, 2024",
+        "page_age": "2024-12-05T16:00:26",
+        "fetched_content_timestamp": 1785349705,
+        "video": {
+          "duration": "05:21",
+          "creator": "Learn Bright",
+          "publisher": "YouTube"
+        },
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "youtube.com",
+          "hostname": "www.youtube.com",
+          "favicon": "https://imgs.search.brave.com/Wg4wjE5SHAargkzePU3eSLmWgVz84BEZk1SjSglJK_U/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOTkyZTZiMWU3/YzU3Nzc5YjExYzUy/N2VhZTIxOWNlYjM5/ZGVjN2MyZDY4Nzdh/ZDYzMTYxNmI5N2Rk/Y2Q3N2FkNy93d3cu/eW91dHViZS5jb20v",
+          "path": "› watch"
+        },
+        "thumbnail": {
+          "src": "https://imgs.search.brave.com/XTSsTRjYFXO_yZONRqvFXU2viwNSbysnljwVoSarFrA/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9pLnl0/aW1nLmNvbS92aS9K/Y1hLYlVJZWJyVS9t/YXhyZXNkZWZhdWx0/LmpwZw",
+          "original": "https://i.ytimg.com/vi/JcXKbUIebrU/maxresdefault.jpg"
+        }
+      },
+      {
+        "type": "video_result",
+        "url": "https://www.facebook.com/melrobbins/videos/what-is-artificial-intelligence-in-simple-words/1568825004145468/",
+        "title": "I'll be honest - I didn't know much about AI, and every time I ...",
+        "description": "",
+        "video": {},
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "facebook.com",
+          "hostname": "www.facebook.com",
+          "favicon": "https://imgs.search.brave.com/UPSLokJBKWPdNzHbqH5o3CgD13zMvR3pUTn8bk7hmPM/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOWM3NjZkMmE4/MTU1MTk4ZDU5YzU3/NjUxY2ExZTdjNWQx/NjJlNTY1Y2VlODM4/MmRmMDgzZDBiMmI3/YzU4NmU4ZS93d3cu/ZmFjZWJvb2suY29t/Lw",
+          "path": "› melrobbins  › videos  › what-is-artificial-intelligence-in-simple-words  › 1568825004145468"
+        }
+      },
+      {
+        "type": "video_result",
+        "url": "https://www.youtube.com/watch?v=V5zSFToG7eg",
+        "title": "Don’t Panic: A Guide to Artificial Intelligence - YouTube",
+        "description": "Artificial intelligence is changing the world, but not quite the way headlines suggest. Here’s a calmer look at AI’s risks, limits, and real potential.Get Ne...",
+        "age": "May 21, 2026",
+        "page_age": "2026-05-21T12:59:28",
+        "fetched_content_timestamp": 1785482827,
+        "video": {
+          "duration": "01:01:51",
+          "creator": "Isaac Arthur",
+          "publisher": "YouTube"
+        },
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "youtube.com",
+          "hostname": "www.youtube.com",
+          "favicon": "https://imgs.search.brave.com/Wg4wjE5SHAargkzePU3eSLmWgVz84BEZk1SjSglJK_U/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOTkyZTZiMWU3/YzU3Nzc5YjExYzUy/N2VhZTIxOWNlYjM5/ZGVjN2MyZDY4Nzdh/ZDYzMTYxNmI5N2Rk/Y2Q3N2FkNy93d3cu/eW91dHViZS5jb20v",
+          "path": "› watch"
+        },
+        "thumbnail": {
+          "src": "https://imgs.search.brave.com/2sPPyYLG6mDRsWEhxHHRMX6w0waFbG8vC28wSuaU-ew/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9pLnl0/aW1nLmNvbS92aS9W/NXpTRlRvRzdlZy9t/YXhyZXNkZWZhdWx0/LmpwZw",
+          "original": "https://i.ytimg.com/vi/V5zSFToG7eg/maxresdefault.jpg"
+        }
+      }
+    ],
+    "mutated_by_goggles": false
+  },
+  "web": {
+    "type": "search",
+    "results": [
+      {
+        "title": "Artificial intelligence - Wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Artificial_intelligence",
+        "is_source_local": false,
+        "is_source_both": false,
+        "description": "<strong>Artificial</strong> <strong>intelligence</strong> (AI) is the capability of computational systems to perform tasks typically associated with human <strong>intelligence</strong>, such as learning, reasoning, problem-solving, perception, and decision-making. It is a field of research in engineering, mathematics, and computer science that ...",
+        "page_age": "2026-08-04T10:47:21",
+        "profile": {
+          "name": "Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Artificial_intelligence",
+          "long_name": "en.wikipedia.org",
+          "img": "https://imgs.search.brave.com/m6XxME4ek8DGIUcEPCqjRoDjf2e54EwL9pQzyzogLYk/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNjQwNGZhZWY0/ZTQ1YWUzYzQ3MDUw/MmMzMGY3NTQ0ZjNj/NDUwMDk5ZTI3MWRk/NWYyNTM4N2UwOTE0/NTI3ZDQzNy9lbi53/aWtpcGVkaWEub3Jn/Lw"
+        },
+        "language": "en",
+        "family_friendly": true,
+        "type": "search_result",
+        "subtype": "generic",
+        "is_live": false,
+        "deep_results": {
+          "buttons": [
+            {
+              "type": "button_result",
+              "title": "Goals",
+              "url": "https://en.wikipedia.org/wiki/Artificial_intelligence#Goals"
+            },
+            {
+              "type": "button_result",
+              "title": "Techniques",
+              "url": "https://en.wikipedia.org/wiki/Artificial_intelligence#Techniques"
+            },
+            {
+              "type": "button_result",
+              "title": "Applications",
+              "url": "https://en.wikipedia.org/wiki/Artificial_intelligence#Applications"
+            },
+            {
+              "type": "button_result",
+              "title": "Ethics",
+              "url": "https://en.wikipedia.org/wiki/Artificial_intelligence#Ethics"
+            },
+            {
+              "type": "button_result",
+              "title": "History",
+              "url": "https://en.wikipedia.org/wiki/Artificial_intelligence#History"
+            },
+            {
+              "type": "button_result",
+              "title": "Philosophy",
+              "url": "https://en.wikipedia.org/wiki/Artificial_intelligence#Philosophy"
+            },
+            {
+              "type": "button_result",
+              "title": "Future",
+              "url": "https://en.wikipedia.org/wiki/Artificial_intelligence#Future"
+            },
+            {
+              "type": "button_result",
+              "title": "In fiction",
+              "url": "https://en.wikipedia.org/wiki/Artificial_intelligence#In_fiction"
+            },
+            {
+              "type": "button_result",
+              "title": "Explanatory notes",
+              "url": "https://en.wikipedia.org/wiki/Artificial_intelligence#Explanatory_notes"
+            },
+            {
+              "type": "button_result",
+              "title": "Further reading",
+              "url": "https://en.wikipedia.org/wiki/Artificial_intelligence#Further_reading"
+            }
+          ]
+        },
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "en.wikipedia.org",
+          "hostname": "en.wikipedia.org",
+          "favicon": "https://imgs.search.brave.com/m6XxME4ek8DGIUcEPCqjRoDjf2e54EwL9pQzyzogLYk/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNjQwNGZhZWY0/ZTQ1YWUzYzQ3MDUw/MmMzMGY3NTQ0ZjNj/NDUwMDk5ZTI3MWRk/NWYyNTM4N2UwOTE0/NTI3ZDQzNy9lbi53/aWtpcGVkaWEub3Jn/Lw",
+          "path": "› wiki  › Artificial_intelligence"
+        },
+        "age": "4 days ago"
+      },
+      {
+        "title": "What is Artificial Intelligence (AI)? | Google Cloud",
+        "url": "https://cloud.google.com/learn/what-is-artificial-intelligence",
+        "is_source_local": false,
+        "is_source_both": false,
+        "description": "Artificial intelligence (AI) is <strong>a set of technologies that empowers computers to learn, reason, and perform a variety of advanced tasks in ways that used to require human intelligence</strong>, such as understanding language, analyzing data, and even ...",
+        "profile": {
+          "name": "Google Cloud",
+          "url": "https://cloud.google.com/learn/what-is-artificial-intelligence",
+          "long_name": "cloud.google.com",
+          "img": "https://imgs.search.brave.com/4faLjwBnHrOY24ELi0qdmoDCRjUko8oKr_dfgTtbPA4/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNTI0Mjg3MThk/OWUxNWIwNTBhZDY0/YmZlNjQ3ZjI5MmNj/NDliNjFkM2ZlZWMx/NWIwNDVmMTAwYjVl/YjQyMjY3Mi9jbG91/ZC5nb29nbGUuY29t/Lw"
+        },
+        "language": "en",
+        "family_friendly": true,
+        "type": "search_result",
+        "subtype": "generic",
+        "is_live": false,
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "cloud.google.com",
+          "hostname": "cloud.google.com",
+          "favicon": "https://imgs.search.brave.com/4faLjwBnHrOY24ELi0qdmoDCRjUko8oKr_dfgTtbPA4/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNTI0Mjg3MThk/OWUxNWIwNTBhZDY0/YmZlNjQ3ZjI5MmNj/NDliNjFkM2ZlZWMx/NWIwNDVmMTAwYjVl/YjQyMjY3Mi9jbG91/ZC5nb29nbGUuY29t/Lw",
+          "path": "› learn  › what-is-artificial-intelligence"
+        },
+        "thumbnail": {
+          "src": "https://imgs.search.brave.com/KYCmPBnZ5Z8vVm099PxjJ0pSM5bUizyiKDGAnO1Laf0/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly93d3cu/Z3N0YXRpYy5jb20v/YnJpY2tzL2ltYWdl/L2Nsb3VkX2dvb2ds/ZV9jb21fX3N0YXRp/Y19jbG91ZF9pbWFn/ZXNfc29jaWFsX2lj/b25fZ29vZ2xlX2Ns/b3VkXzEyMDBfNjMw/X3BuZy5wbmc",
+          "original": "https://www.gstatic.com/bricks/image/cloud_google_com__static_cloud_images_social_icon_google_cloud_1200_630_png.png",
+          "logo": true
+        }
+      },
+      {
+        "title": "What Is Artificial Intelligence (AI)? | IBM",
+        "url": "https://www.ibm.com/think/topics/artificial-intelligence",
+        "is_source_local": false,
+        "is_source_both": false,
+        "description": "Artificial intelligence (AI) is <strong>technology that enables computers and machines to simulate human learning, comprehension, problem solving, decision making, creativity and autonomy</strong>.",
+        "profile": {
+          "name": "IBM",
+          "url": "https://www.ibm.com/think/topics/artificial-intelligence",
+          "long_name": "ibm.com",
+          "img": "https://imgs.search.brave.com/WtFphd-kJr-JtTbMqTUV8D4gBvSovY56CfvQYWvRbAw/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvMWI0MWQyYmEy/MTNmNWVkODQ2ODFj/ZjYxMjk4YjI3NmY5/Yjk5M2E0YjhjNWZi/OGUyODMzNzllOTQx/M2I4ZDc2My93d3cu/aWJtLmNvbS8"
+        },
+        "language": "en",
+        "family_friendly": true,
+        "type": "search_result",
+        "subtype": "generic",
+        "is_live": false,
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "ibm.com",
+          "hostname": "www.ibm.com",
+          "favicon": "https://imgs.search.brave.com/WtFphd-kJr-JtTbMqTUV8D4gBvSovY56CfvQYWvRbAw/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvMWI0MWQyYmEy/MTNmNWVkODQ2ODFj/ZjYxMjk4YjI3NmY5/Yjk5M2E0YjhjNWZi/OGUyODMzNzllOTQx/M2I4ZDc2My93d3cu/aWJtLmNvbS8",
+          "path": "› think  › topics  › artificial-intelligence"
+        },
+        "thumbnail": {
+          "src": "https://imgs.search.brave.com/buuUX-3MDEqtVQeMu5-mg5gNfstu7S4VrytO5hIxLqI/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly93d3cu/aWJtLmNvbS9jb250/ZW50L2RhbS93b3Js/ZHdpZGUtY29udGVu/dC9jcmVhdGl2ZS1h/c3NldHMvbWNjL3Vs/L2cvZmIvYjUvYWRv/YmVzdG9ja18yNzM0/MzE4NDIuanBnL19q/Y3JfY29udGVudC9y/ZW5kaXRpb25zL2Nx/NWRhbS53ZWIuMTI4/MC4xMjgwLmpwZWc",
+          "original": "https://www.ibm.com/content/dam/worldwide-content/creative-assets/mcc/ul/g/fb/b5/adobestock_273431842.jpg/_jcr_content/renditions/cq5dam.web.1280.1280.jpeg",
+          "logo": false
+        }
+      },
+      {
+        "title": "What is Artificial Intelligence? - NASA",
+        "url": "https://www.nasa.gov/what-is-artificial-intelligence/",
+        "is_source_local": false,
+        "is_source_both": false,
+        "description": "Artificial intelligence refers to <strong>computer systems that can perform complex tasks normally done by human-reasoning, decision making, creating, etc</strong>.",
+        "page_age": "2024-05-13T15:15:09",
+        "profile": {
+          "name": "NASA",
+          "url": "https://www.nasa.gov/what-is-artificial-intelligence/",
+          "long_name": "nasa.gov",
+          "img": "https://imgs.search.brave.com/BBFmCMg1UgOoUD0FzIwQhKfBIT1COEbSGDOOGQbY_i8/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNDNlNTRkMjE4/NjM5MTUzOGQ4ZDI2/ZjdiYjMyZTA5OGY2/NDhlOTBjNTY4MDk5/ZjVjZjkyOGZmZGRl/ZjFiYjlmZS93d3cu/bmFzYS5nb3Yv"
+        },
+        "language": "en",
+        "family_friendly": true,
+        "type": "search_result",
+        "subtype": "generic",
+        "is_live": false,
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "nasa.gov",
+          "hostname": "www.nasa.gov",
+          "favicon": "https://imgs.search.brave.com/BBFmCMg1UgOoUD0FzIwQhKfBIT1COEbSGDOOGQbY_i8/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNDNlNTRkMjE4/NjM5MTUzOGQ4ZDI2/ZjdiYjMyZTA5OGY2/NDhlOTBjNTY4MDk5/ZjVjZjkyOGZmZGRl/ZjFiYjlmZS93d3cu/bmFzYS5nb3Yv",
+          "path": "› what-is-artificial-intelligence"
+        },
+        "thumbnail": {
+          "src": "https://imgs.search.brave.com/NK3WXAjVHhoJk7AGdDMzEHs0nScrRQ9PRKov4JGxrTQ/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly93d3cu/bmFzYS5nb3Yvd3At/Y29udGVudC91cGxv/YWRzLzIwMjQvMDUv/YWktbWwtZGwtMDMu/cG5n",
+          "original": "https://www.nasa.gov/wp-content/uploads/2024/05/ai-ml-dl-03.png",
+          "logo": false
+        },
+        "age": "May 13, 2024"
+      },
+      {
+        "title": "Artificial Intelligence (AI): What it is and why it matters | SAS",
+        "url": "https://www.sas.com/en_us/insights/analytics/what-is-artificial-intelligence.html",
+        "is_source_local": false,
+        "is_source_both": false,
+        "description": "Artificial intelligence (AI) <strong>makes it possible for machines to learn from experience, adjust to new inputs and perform human-like tasks</strong>. Most AI examples that you hear about today – from chess-playing computers to self-driving cars – rely ...",
+        "profile": {
+          "name": "SAS",
+          "url": "https://www.sas.com/en_us/insights/analytics/what-is-artificial-intelligence.html",
+          "long_name": "sas.com",
+          "img": "https://imgs.search.brave.com/LZnQaQJ8cqb1lx0HpkyESqUnqIWJvbMItaM97IoASA4/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNWRjYmJiMmJk/MjBiNDBiYjdlYTQ4/Nzk5ZDkwNGM3OGU3/MDYyZTFlMmNiNmRm/MTAwZmMxMzk3ZGIy/N2U3NDA1Yi93d3cu/c2FzLmNvbS8"
+        },
+        "language": "en",
+        "family_friendly": true,
+        "type": "search_result",
+        "subtype": "generic",
+        "is_live": false,
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "sas.com",
+          "hostname": "www.sas.com",
+          "favicon": "https://imgs.search.brave.com/LZnQaQJ8cqb1lx0HpkyESqUnqIWJvbMItaM97IoASA4/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNWRjYmJiMmJk/MjBiNDBiYjdlYTQ4/Nzk5ZDkwNGM3OGU3/MDYyZTFlMmNiNmRm/MTAwZmMxMzk3ZGIy/N2U3NDA1Yi93d3cu/c2FzLmNvbS8",
+          "path": "  › artificial intelligence (ai): what it is and why it matters"
+        },
+        "thumbnail": {
+          "src": "https://imgs.search.brave.com/3U3mkwmvpfLFrAj6SdkDolY-IF1KYckDxDsOpYLdD5s/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly93d3cu/c2FzLmNvbS9lbl91/cy9pbnNpZ2h0cy9h/bmFseXRpY3Mvd2hh/dC1pcy1hcnRpZmlj/aWFsLWludGVsbGln/ZW5jZS9famNyX2Nv/bnRlbnQvc29jaWFs/U2hhcmVJbWFnZS5p/bWcuY2MxMDZkNDQ0/ZjUzYWZjOTBkZmZm/ODZlYzZkZTcyY2Eu/cG5n",
+          "original": "https://www.sas.com/en_us/insights/analytics/what-is-artificial-intelligence/_jcr_content/socialShareImage.img.cc106d444f53afc90dfff86ec6de72ca.png",
+          "logo": false
+        }
+      },
+      {
+        "title": "Artificial intelligence (AI) | Definition, Examples, Types, Applications, Companies, & Facts | Britannica",
+        "url": "https://www.britannica.com/technology/artificial-intelligence",
+        "is_source_local": false,
+        "is_source_both": false,
+        "description": "Artificial intelligence is <strong>the ability of a computer or computer-controlled robot to perform tasks that are commonly associated with the intellectual processes characteristic of humans</strong>, such as the ability to reason.",
+        "page_age": "2026-08-06T12:40:05",
+        "profile": {
+          "name": "Britannica",
+          "url": "https://www.britannica.com/technology/artificial-intelligence",
+          "long_name": "britannica.com",
+          "img": "https://imgs.search.brave.com/jMDHLEzOKBVbwQ7-d4wBSobNay75CY4fiZkxDsHYBkA/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNzJmYzgxOWRk/Y2FhNWI2MzQzMjQ4/MWVhZDZhNGY3ZjY0/MDgxZTM3YWU5MzYz/NGU2MzM3Y2Y2YTYz/M2IyM2Y0NC93d3cu/YnJpdGFubmljYS5j/b20v"
+        },
+        "language": "en",
+        "family_friendly": true,
+        "type": "search_result",
+        "subtype": "faq",
+        "is_live": false,
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "britannica.com",
+          "hostname": "www.britannica.com",
+          "favicon": "https://imgs.search.brave.com/jMDHLEzOKBVbwQ7-d4wBSobNay75CY4fiZkxDsHYBkA/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNzJmYzgxOWRk/Y2FhNWI2MzQzMjQ4/MWVhZDZhNGY3ZjY0/MDgxZTM3YWU5MzYz/NGU2MzM3Y2Y2YTYz/M2IyM2Y0NC93d3cu/YnJpdGFubmljYS5j/b20v",
+          "path": "  › technology  › computers"
+        },
+        "thumbnail": {
+          "src": "https://imgs.search.brave.com/YbitbByK_LqGCBEHivBxJpip2X41G7IMmEccEcEXdEo/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9jZG4u/YnJpdGFubmljYS5j/b20vNDcvMjQ2MjQ3/LTA1MC1GMTAyMURF/OS9BSS10ZXh0LXRv/LWltYWdlLXBob3Rv/LXJvYm90LXdpdGgt/Y29tcHV0ZXIuanBn",
+          "original": "https://cdn.britannica.com/47/246247-050-F1021DE9/AI-text-to-image-photo-robot-with-computer.jpg",
+          "logo": false
+        },
+        "age": "2 days ago"
+      },
+      {
+        "title": "Science 101: Artificial Intelligence | Argonne National Laboratory",
+        "url": "https://www.anl.gov/science-101/artificial-intelligence",
+        "is_source_local": false,
+        "is_source_both": false,
+        "description": "Artificial intelligence (AI) is ... learn. AI <strong>helps computers recognize patterns hidden within a lot of information, solve problems and adjust to changes in processes as they happen, much faster than humans can</strong>....",
+        "profile": {
+          "name": "Argonne National Laboratory",
+          "url": "https://www.anl.gov/science-101/artificial-intelligence",
+          "long_name": "anl.gov",
+          "img": "https://imgs.search.brave.com/kgs_zzyZwRAujPjsuq24F8_gVXKZ_FXrWR07-Jg9dVY/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvZTJmMDJkOThh/ODgyZmIwOWViM2Y4/NGNjNjdkODE2NTE5/ZWFhYThiODNiOWVj/MjU3ZjQwNTViYmI2/Mzk2OWMxZi93d3cu/YW5sLmdvdi8"
+        },
+        "language": "en",
+        "family_friendly": true,
+        "type": "search_result",
+        "subtype": "generic",
+        "is_live": false,
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "anl.gov",
+          "hostname": "www.anl.gov",
+          "favicon": "https://imgs.search.brave.com/kgs_zzyZwRAujPjsuq24F8_gVXKZ_FXrWR07-Jg9dVY/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvZTJmMDJkOThh/ODgyZmIwOWViM2Y4/NGNjNjdkODE2NTE5/ZWFhYThiODNiOWVj/MjU3ZjQwNTViYmI2/Mzk2OWMxZi93d3cu/YW5sLmdvdi8",
+          "path": "› science-101  › artificial-intelligence"
+        },
+        "thumbnail": {
+          "src": "https://imgs.search.brave.com/zDjlI0G4KSVcBqQNmNnDylLg6ciYdLXyO1kwDnV1N5Y/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly93d3cu/YW5sLmdvdi9zaXRl/cy93d3cvZmlsZXMv/U2NpZW5jZSUyMDEw/MV9BSV9QT0xBUklT/XzE5MjB4MTA4MC5q/cGc",
+          "original": "https://www.anl.gov/sites/www/files/Science%20101_AI_POLARIS_1920x1080.jpg",
+          "logo": false
+        }
+      },
+      {
+        "title": "What is Artificial intelligence (AI)?",
+        "url": "https://www.mtu.edu/data-science/undergraduate/ai/what-is/",
+        "is_source_local": false,
+        "is_source_both": false,
+        "description": "Artificial intelligence (AI) <strong>encompasses the fields of computer and data science focused on building machines with human intelligence to perform tasks like learning, reasoning, problem-solving, perception, and language understanding</strong>.",
+        "page_age": "2024-12-19T04:50:00",
+        "profile": {
+          "name": "Michigan Tech",
+          "url": "https://www.mtu.edu/data-science/undergraduate/ai/what-is/",
+          "long_name": "mtu.edu",
+          "img": "https://imgs.search.brave.com/MhNrEKO3zW4Vs6EHSYFVTfJm83_vEdWb7hOEXJ6vB-g/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvODkxYjBjMDNj/ZWM1YWUzNDBmYjI2/NzJiOTM3MDgzNzI0/MzIwYzNmNzE5Yjcx/YmYxMzJmNTBmZDg1/MzMzMjhkNy93d3cu/bXR1LmVkdS8"
+        },
+        "language": "en",
+        "family_friendly": true,
+        "type": "search_result",
+        "subtype": "generic",
+        "is_live": false,
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "mtu.edu",
+          "hostname": "www.mtu.edu",
+          "favicon": "https://imgs.search.brave.com/MhNrEKO3zW4Vs6EHSYFVTfJm83_vEdWb7hOEXJ6vB-g/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvODkxYjBjMDNj/ZWM1YWUzNDBmYjI2/NzJiOTM3MDgzNzI0/MzIwYzNmNzE5Yjcx/YmYxMzJmNTBmZDg1/MzMzMjhkNy93d3cu/bXR1LmVkdS8",
+          "path": "› data-science  › undergraduate  › ai  › what-is"
+        },
+        "thumbnail": {
+          "src": "https://imgs.search.brave.com/xMEHu-87yyrBvasTB3lHTQ3RigRH_W19ljKxPeQVtJo/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly93d3cu/bXR1LmVkdS9kYXRh/LXNjaWVuY2UvdW5k/ZXJncmFkdWF0ZS9h/aS93aGF0LWlzL2lt/YWdlcy9uZXR3b3Jr/LXN0b3JhZ2UtMTAx/OC1iYW5uZXI0NTAu/anBn",
+          "original": "https://www.mtu.edu/data-science/undergraduate/ai/what-is/images/network-storage-1018-banner450.jpg",
+          "logo": false
+        },
+        "age": "December 19, 2024"
+      },
+      {
+        "title": "Artificial intelligence | NIST",
+        "url": "https://www.nist.gov/artificial-intelligence",
+        "is_source_local": false,
+        "is_source_both": false,
+        "description": "NIST promotes innovation and cultivates trust in the design, development, use and governance of <strong>artificial intelligence</strong> (AI) technologies and systems in ways that enhance economic security, competitiveness, and quality of life.",
+        "page_age": "2026-08-03T02:29:23",
+        "profile": {
+          "name": "National Institute of Standards and Technology",
+          "url": "https://www.nist.gov/artificial-intelligence",
+          "long_name": "nist.gov",
+          "img": "https://imgs.search.brave.com/-ggqMO4lo-qDjseBV5Q7IQV2slP7pLHA2grNsrSaDiQ/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNGY0NTIyYjE0/MGE2YzdhYjhhYWVl/YjQwNjI5ZDA0Nzlj/NzRmYzdiZWQ2NWU1/ODgxZTcxMmZhNWEx/ZDk2YjNhMy93d3cu/bmlzdC5nb3Yv"
+        },
+        "language": "en",
+        "family_friendly": true,
+        "type": "search_result",
+        "subtype": "generic",
+        "is_live": false,
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "nist.gov",
+          "hostname": "www.nist.gov",
+          "favicon": "https://imgs.search.brave.com/-ggqMO4lo-qDjseBV5Q7IQV2slP7pLHA2grNsrSaDiQ/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNGY0NTIyYjE0/MGE2YzdhYjhhYWVl/YjQwNjI5ZDA0Nzlj/NzRmYzdiZWQ2NWU1/ODgxZTcxMmZhNWEx/ZDk2YjNhMy93d3cu/bmlzdC5nb3Yv",
+          "path": "› artificial-intelligence"
+        },
+        "thumbnail": {
+          "src": "https://imgs.search.brave.com/pP3iLSI94IDRMTmWsQA6PXbF5Djo81w5IGvfgIHem_w/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly93d3cu/bmlzdC5nb3YvdGhl/bWVzL2N1c3RvbS9u/aXN0X3d3dy9pbWcv/aG9tZXBhZ2Uvbmlz/dF9tYXJrLnBuZw",
+          "original": "https://www.nist.gov/themes/custom/nist_www/img/homepage/nist_mark.png",
+          "logo": false
+        },
+        "age": "5 days ago"
+      },
+      {
+        "title": "What Is Artificial Intelligence (AI)? | Built In",
+        "url": "https://builtin.com/artificial-intelligence",
+        "is_source_local": false,
+        "is_source_both": false,
+        "description": "Artificial intelligence refers to <strong>computer systems that are capable of performing tasks traditionally associated with human intelligence</strong> — such as making predictions, identifying objects, interpreting speech and generating natural language.",
+        "profile": {
+          "name": "Built In",
+          "url": "https://builtin.com/artificial-intelligence",
+          "long_name": "builtin.com",
+          "img": "https://imgs.search.brave.com/vJRqbEbBgIVhcn7VjIAVFouNy78uT9-Sb8H8jIJO3Yo/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvMzlhMWMxZWMw/MmY5NDE1NDk3NzFl/ZmNmYTg0ZTYxZWNk/MzcxNmEwYjY0MzZl/NzQ0NDlkYzNhMTgy/NzdlMmI1OS9idWls/dGluLmNvbS8"
+        },
+        "language": "en",
+        "family_friendly": true,
+        "type": "search_result",
+        "subtype": "generic",
+        "is_live": false,
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "builtin.com",
+          "hostname": "builtin.com",
+          "favicon": "https://imgs.search.brave.com/vJRqbEbBgIVhcn7VjIAVFouNy78uT9-Sb8H8jIJO3Yo/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvMzlhMWMxZWMw/MmY5NDE1NDk3NzFl/ZmNmYTg0ZTYxZWNk/MzcxNmEwYjY0MzZl/NzQ0NDlkYzNhMTgy/NzdlMmI1OS9idWls/dGluLmNvbS8",
+          "path": "› artificial-intelligence"
+        },
+        "thumbnail": {
+          "src": "https://imgs.search.brave.com/qpNZp4kI_eqMuG-T-nG_40C-C-iODsrAkskMxZ63lZc/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9jZG4u/YnVpbHRpbi5jb20v/Y2RuLWNnaS9pbWFn/ZS9mPWF1dG8sZml0/PWNvdmVyLHc9MTIw/MCxoPTYzNSxxPTgw/L3NpdGVzL3d3dy5i/dWlsdGluLmNvbS9m/aWxlcy8yMDI0LTEw/L2FydGlmaWNpYWwt/aW50ZWxsaWdlbmNl/LmpwZw",
+          "original": "https://cdn.builtin.com/cdn-cgi/image/f=auto,fit=cover,w=1200,h=635,q=80/sites/www.builtin.com/files/2024-10/artificial-intelligence.jpg",
+          "logo": false
+        }
+      },
+      {
+        "title": "ARTIFICIAL INTELLIGENCE Definition & Meaning - Merriam-Webster",
+        "url": "https://www.merriam-webster.com/dictionary/artificial%20intelligence",
+        "is_source_local": false,
+        "is_source_both": false,
+        "description": "The meaning of ARTIFICIAL INTELLIGENCE is <strong>the capability of computer systems or algorithms to imitate intelligent human behavior</strong>; also, pluralartificial intelligences : a computer, computer system, or set of algorithms having this capability.",
+        "page_age": "2026-07-31T03:30:04",
+        "profile": {
+          "name": "Merriam-Webster",
+          "url": "https://www.merriam-webster.com/dictionary/artificial%20intelligence",
+          "long_name": "merriam-webster.com",
+          "img": "https://imgs.search.brave.com/bi9FmWof5TzSvP5tKxg_pdJSHXMziocpI7_cq6ov5r0/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNzYwYjQ3N2Jj/NTBhNDkxYTExNjU0/NTFhZDdlMGI0NjJh/Y2M1ODcwOWQwYzc5/YTI2MmZkZjIxMGFk/N2NkZWMzYy93d3cu/bWVycmlhbS13ZWJz/dGVyLmNvbS8"
+        },
+        "language": "en",
+        "family_friendly": true,
+        "type": "search_result",
+        "subtype": "generic",
+        "is_live": false,
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "merriam-webster.com",
+          "hostname": "www.merriam-webster.com",
+          "favicon": "https://imgs.search.brave.com/bi9FmWof5TzSvP5tKxg_pdJSHXMziocpI7_cq6ov5r0/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNzYwYjQ3N2Jj/NTBhNDkxYTExNjU0/NTFhZDdlMGI0NjJh/Y2M1ODcwOWQwYzc5/YTI2MmZkZjIxMGFk/N2NkZWMzYy93d3cu/bWVycmlhbS13ZWJz/dGVyLmNvbS8",
+          "path": "› dictionary  › artificial intelligence"
+        },
+        "thumbnail": {
+          "src": "https://imgs.search.brave.com/QrBJO2o22TmLDA2gHSVGEnAur9le424QzfRdvtijiPw/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9wcm9k/LmNkbi1tdy5jb20v/YXNzZXRzL213L3N0/YXRpYy9zb2NpYWwt/bWVkaWEtc2hhcmUv/bXctbG9nby0yNDV4/MjQ1QDF4LnBuZw",
+          "original": "https://prod.cdn-mw.com/assets/mw/static/social-media-share/mw-logo-245x245@1x.png",
+          "logo": true
+        },
+        "age": "1 week ago"
+      },
+      {
+        "title": "What is (AI) Artificial Intelligence? | UIC Online MEng",
+        "url": "https://meng.uic.edu/news-stories/ai-artificial-intelligence-what-is-the-definition-of-ai-and-how-does-ai-work/",
+        "is_source_local": false,
+        "is_source_both": false,
+        "description": "Artificial intelligence represents <strong>a branch of computer science that aims to create machines capable of performing tasks that typically require human intelligence</strong>. These tasks include learning from experience (machine learning), understanding ...",
+        "page_age": "2026-02-23T00:00:00",
+        "profile": {
+          "name": "Uic",
+          "url": "https://meng.uic.edu/news-stories/ai-artificial-intelligence-what-is-the-definition-of-ai-and-how-does-ai-work/",
+          "long_name": "meng.uic.edu",
+          "img": "https://imgs.search.brave.com/1N8TMZVmAU-gXgJy5QeEIzM3BXNpl-RnQ_r7FTBZnTg/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNjJjMGQzZWJl/MTFlMDlmZmJlMTY2/MDI3YzIxY2E4Yzc2/ZGQ5YjAwYTYyNjg1/Mzk3MTM0ZTFmZDVk/MmYzZjQzOC9tZW5n/LnVpYy5lZHUv"
+        },
+        "language": "en",
+        "family_friendly": true,
+        "type": "search_result",
+        "subtype": "generic",
+        "is_live": false,
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "meng.uic.edu",
+          "hostname": "meng.uic.edu",
+          "favicon": "https://imgs.search.brave.com/1N8TMZVmAU-gXgJy5QeEIzM3BXNpl-RnQ_r7FTBZnTg/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNjJjMGQzZWJl/MTFlMDlmZmJlMTY2/MDI3YzIxY2E4Yzc2/ZGQ5YjAwYTYyNjg1/Mzk3MTM0ZTFmZDVk/MmYzZjQzOC9tZW5n/LnVpYy5lZHUv",
+          "path": "› news-stories  › ai-artificial-intelligence-what-is-the-definition-of-ai-and-how-does-ai-work"
+        },
+        "thumbnail": {
+          "src": "https://imgs.search.brave.com/MhgCcTo2WnyAO20B_9sFQ5vlHnyo94WHCSJTaqS8mx4/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9tZW5n/LnVpYy5lZHUvd3At/Y29udGVudC91cGxv/YWRzL3NpdGVzLzEw/MTkvMjAyMy8xMi9V/SUMtTUVORy1BSS1H/cmFwaGljLXNjYWxl/ZC5qcGc",
+          "original": "https://meng.uic.edu/wp-content/uploads/sites/1019/2023/12/UIC-MENG-AI-Graphic-scaled.jpg",
+          "logo": false
+        },
+        "age": "February 23, 2026"
+      },
+      {
+        "title": "ISO - What is artificial intelligence (AI)?",
+        "url": "https://www.iso.org/artificial-intelligence/what-is-ai",
+        "is_source_local": false,
+        "is_source_both": false,
+        "description": "Artificial intelligence (AI) is <strong>a branch of computer science that creates systems and software capable of tasks once thought to be uniquely human</strong>. It enables machines to learn from experience, adapt to new information, and uses data, algorithms ...",
+        "profile": {
+          "name": "ISO",
+          "url": "https://www.iso.org/artificial-intelligence/what-is-ai",
+          "long_name": "iso.org",
+          "img": "https://imgs.search.brave.com/Wl-rfa10zxqRBqLoIVdYur8A7VpCRlCe61RgXJwPoPw/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvM2EzZGNkMzUy/NTIwOWMwNmVkYTg2/YjVmNGNmYmIwODY4/YmQwZGE5M2JlMjVi/OTI3ODA3N2U0YWVi/ZDJmYzExOS93d3cu/aXNvLm9yZy8"
+        },
+        "language": "en",
+        "family_friendly": true,
+        "type": "search_result",
+        "subtype": "article",
+        "is_live": false,
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "iso.org",
+          "hostname": "www.iso.org",
+          "favicon": "https://imgs.search.brave.com/Wl-rfa10zxqRBqLoIVdYur8A7VpCRlCe61RgXJwPoPw/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvM2EzZGNkMzUy/NTIwOWMwNmVkYTg2/YjVmNGNmYmIwODY4/YmQwZGE5M2JlMjVi/OTI3ODA3N2U0YWVi/ZDJmYzExOS93d3cu/aXNvLm9yZy8",
+          "path": "› artificial-intelligence  › what-is-ai"
+        },
+        "thumbnail": {
+          "src": "https://imgs.search.brave.com/qu7C2LCjbk-lDH5QhGfBnk-MYMhyP-fZ_1EoQFWy7Mc/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly93d3cu/aXNvLm9yZy9maWxl/cy9saXZlL3NpdGVz/L2lzb29yZy9maWxl/cy9uZXdzL2luc2ln/aHRzL2FpL0FJX0V2/ZXJncmVlbl9iYW5u/ZXJzXzEwMjB4NDQw/LXYyX1doYXRfc19B/SS5wbmcvdGh1bWJu/YWlscy8xMjAweDYw/MA",
+          "original": "https://www.iso.org/files/live/sites/isoorg/files/news/insights/ai/AI_Evergreen_banners_1020x440-v2_What_s_AI.png/thumbnails/1200x600",
+          "logo": false
+        }
+      },
+      {
+        "title": "What is Artificial Intelligence (AI)? - Stanford HAI",
+        "url": "https://hai.stanford.edu/ai-definitions/what-is-artificial-intelligence-ai",
+        "is_source_local": false,
+        "is_source_both": false,
+        "description": "Artificial Intelligence (AI) is a term coined in 1955 by John McCarthy, Stanford&#x27;s first faculty member in AI, who described it as &quot;<strong>the science and engineering of making intelligent machines</strong>.&quot; Today it is a broad term for computer systems that can perform tasks with human-like intelligence, ...",
+        "page_age": "2026-06-14T20:49:52",
+        "profile": {
+          "name": "Stanford",
+          "url": "https://hai.stanford.edu/ai-definitions/what-is-artificial-intelligence-ai",
+          "long_name": "hai.stanford.edu",
+          "img": "https://imgs.search.brave.com/TyNkdMXYq3tqOhc1hmTdz0yFvxid9VOqU6dD-pnXvxM/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNWM5OWEwNWRl/OTNhNzkzMTc1ODQz/MmQ2YTJiOTM1MmJk/NTg5MzEwYmNiMThh/OGM0ZTk0ODMyMTc3/ODY2MzMwYS9oYWku/c3RhbmZvcmQuZWR1/Lw"
+        },
+        "language": "en",
+        "family_friendly": true,
+        "type": "search_result",
+        "subtype": "generic",
+        "is_live": false,
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "hai.stanford.edu",
+          "hostname": "hai.stanford.edu",
+          "favicon": "https://imgs.search.brave.com/TyNkdMXYq3tqOhc1hmTdz0yFvxid9VOqU6dD-pnXvxM/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNWM5OWEwNWRl/OTNhNzkzMTc1ODQz/MmQ2YTJiOTM1MmJk/NTg5MzEwYmNiMThh/OGM0ZTk0ODMyMTc3/ODY2MzMwYS9oYWku/c3RhbmZvcmQuZWR1/Lw",
+          "path": "› ai-definitions  › what-is-artificial-intelligence-ai"
+        },
+        "age": "June 14, 2026"
+      },
+      {
+        "title": "NIH / NIBIB: Artificial Intelligence (AI)",
+        "url": "https://www.nibib.nih.gov/science-education/science-topics/artificial-intelligence-ai",
+        "is_source_local": false,
+        "is_source_both": false,
+        "description": "Artificial Intelligence: <strong>The ability of machines to learn through experience and gain proficiency through examples, not just by carrying out computations as instructed by human users</strong>.",
+        "profile": {
+          "name": "National Institute of Biomedical Imaging and Bioengineering",
+          "url": "https://www.nibib.nih.gov/science-education/science-topics/artificial-intelligence-ai",
+          "long_name": "nibib.nih.gov",
+          "img": "https://imgs.search.brave.com/fQtvdb7dhsdmv8YKqIHKEcWSZzKbZtdnPpWLchD4x_8/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOTFlOGNlZThm/ZjkxYTcxNzM5NTBl/MGRhMGQ5NjdiNWVk/Nzg2MWFhNmNiMDBm/YzczZmI1ZmQ0ZTFj/OThhM2E3NS93d3cu/bmliaWIubmloLmdv/di8"
+        },
+        "language": "en",
+        "family_friendly": true,
+        "type": "search_result",
+        "subtype": "generic",
+        "is_live": false,
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "nibib.nih.gov",
+          "hostname": "www.nibib.nih.gov",
+          "favicon": "https://imgs.search.brave.com/fQtvdb7dhsdmv8YKqIHKEcWSZzKbZtdnPpWLchD4x_8/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOTFlOGNlZThm/ZjkxYTcxNzM5NTBl/MGRhMGQ5NjdiNWVk/Nzg2MWFhNmNiMDBm/YzczZmI1ZmQ0ZTFj/OThhM2E3NS93d3cu/bmliaWIubmloLmdv/di8",
+          "path": "› science-education  › science-topics  › artificial-intelligence-ai"
+        }
+      },
+      {
+        "title": "Artificial Intelligence (AI) | United Nations",
+        "url": "https://www.un.org/en/global-issues/artificial-intelligence",
+        "is_source_local": false,
+        "is_source_both": false,
+        "description": "Artificial intelligence is profoundly transforming various aspects of our lives, providing valuable services through capabilities such as perception, problem-solving, and creativity. While these advancements contribute positively to global initiatives like the 2030 Agenda for Sustainable Development, they also raise significant ethical concerns.",
+        "page_age": "2026-08-03T04:29:23",
+        "profile": {
+          "name": "United Nations",
+          "url": "https://www.un.org/en/global-issues/artificial-intelligence",
+          "long_name": "un.org",
+          "img": "https://imgs.search.brave.com/BwZEwLu8VFg7V4ZTpuXzNVKQuAAS8Ek2lQX5zopc-Ag/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvMjQzYzkyZDI4/YWU3MWYyZTU4N2U5/ODIzZTgzN2ZmMzZm/Y2RhYmQ5OTc1MzFl/MjQ3YzU3NmI5ODY1/OWYwMDhjNS93d3cu/dW4ub3JnLw"
+        },
+        "language": "en",
+        "family_friendly": true,
+        "type": "search_result",
+        "subtype": "generic",
+        "is_live": false,
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "un.org",
+          "hostname": "www.un.org",
+          "favicon": "https://imgs.search.brave.com/BwZEwLu8VFg7V4ZTpuXzNVKQuAAS8Ek2lQX5zopc-Ag/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvMjQzYzkyZDI4/YWU3MWYyZTU4N2U5/ODIzZTgzN2ZmMzZm/Y2RhYmQ5OTc1MzFl/MjQ3YzU3NmI5ODY1/OWYwMDhjNS93d3cu/dW4ub3JnLw",
+          "path": "› en  › global-issues  › artificial-intelligence"
+        },
+        "thumbnail": {
+          "src": "https://imgs.search.brave.com/mZbXMTYBUgxupUMKCVbudfA2mylsQtVjpNdGlQdLw10/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly93d3cu/dW4ub3JnL3NpdGVz/L3VuMi51bi5vcmcv/ZmlsZXMvZmllbGQv/aW1hZ2UvMjAyNS8w/NC9naS1haS1oZXJv/LTIuanBn",
+          "original": "https://www.un.org/sites/un2.un.org/files/field/image/2025/04/gi-ai-hero-2.jpg",
+          "logo": false
+        },
+        "age": "5 days ago"
+      },
+      {
+        "title": "The Evolution and Future of Artificial Intelligence | CMU",
+        "url": "https://www.calmu.edu/news/future-of-artificial-intelligence",
+        "is_source_local": false,
+        "is_source_both": false,
+        "description": "His famous Turing Test, proposed in the 1950s, was a fundamental contribution to the field of AI, challenging whether machines could mimic human intelligence. However, it wasn’t until 1955 that John McCarthy founded AI as an academic discipline and called it “<strong>artificial intelligence</strong>.” He also developed a programming language called LISP in the late 1950s, which became crucial to AI development.",
+        "page_age": "2025-07-24T19:20:23",
+        "profile": {
+          "name": "California Miramar University",
+          "url": "https://www.calmu.edu/news/future-of-artificial-intelligence",
+          "long_name": "calmu.edu",
+          "img": "https://imgs.search.brave.com/BixUbhDGVLfGHE1B7R7je1fx3SEHiRoJZEbT60Cm458/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNmQwNjg5ZDRh/ZmM4MzBlYTMwM2Zl/YTU5OTlkNjE4Zjhi/NmE4NTY3YjAyNmY5/OWZmYjdjODE1ZWRm/NjRkYWM4MS93d3cu/Y2FsbXUuZWR1Lw"
+        },
+        "language": "en",
+        "family_friendly": true,
+        "type": "search_result",
+        "subtype": "generic",
+        "is_live": false,
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "calmu.edu",
+          "hostname": "www.calmu.edu",
+          "favicon": "https://imgs.search.brave.com/BixUbhDGVLfGHE1B7R7je1fx3SEHiRoJZEbT60Cm458/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNmQwNjg5ZDRh/ZmM4MzBlYTMwM2Zl/YTU5OTlkNjE4Zjhi/NmE4NTY3YjAyNmY5/OWZmYjdjODE1ZWRm/NjRkYWM4MS93d3cu/Y2FsbXUuZWR1Lw",
+          "path": "› news  › future-of-artificial-intelligence"
+        },
+        "thumbnail": {
+          "src": "https://imgs.search.brave.com/UkCX15oWXtCiz3l6YXhO1rqqnoZeXRGRPBfvM5p6vN8/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly93d3cu/Y2FsbXUuZWR1L2h1/YmZzL0FJLUdlbmVy/YXRlZCUyME1lZGlh/L0ltYWdlcy9BcnRp/ZmljaWFsJTIwSW50/ZWxsaWdlbmNlLTIu/anBlZw",
+          "original": "https://www.calmu.edu/hubfs/AI-Generated%20Media/Images/Artificial%20Intelligence-2.jpeg",
+          "logo": false
+        },
+        "age": "July 24, 2025"
+      },
+      {
+        "title": "Artificial Intelligence (AI) | EDUCAUSE Library",
+        "url": "https://library.educause.edu/topics/infrastructure-and-research-technologies/artificial-intelligence-ai",
+        "is_source_local": false,
+        "is_source_both": false,
+        "description": "Artificial Intelligence or AI refers to the <strong>simulated human intelligence in machines or computers that are programmed to undertake tasks usually thought to require human cognitive processes and decision-making capabilities</strong>.",
+        "profile": {
+          "name": "EDUCAUSE Library",
+          "url": "https://library.educause.edu/topics/infrastructure-and-research-technologies/artificial-intelligence-ai",
+          "long_name": "library.educause.edu",
+          "img": "https://imgs.search.brave.com/T7E4zL-JPHp08-6CRs2pums_wO5coIemyefBmEILzAY/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvY2E0NDU5YTdh/ZGNjMDNhZDYxNThi/NmU0YjRiNzlmNzRm/YmE2MzNhNTc3MGMw/OWFkY2Q1YjcyMDA0/ZGVkZDhkMC9saWJy/YXJ5LmVkdWNhdXNl/LmVkdS8"
+        },
+        "language": "en",
+        "family_friendly": true,
+        "type": "search_result",
+        "subtype": "generic",
+        "is_live": false,
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "library.educause.edu",
+          "hostname": "library.educause.edu",
+          "favicon": "https://imgs.search.brave.com/T7E4zL-JPHp08-6CRs2pums_wO5coIemyefBmEILzAY/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvY2E0NDU5YTdh/ZGNjMDNhZDYxNThi/NmU0YjRiNzlmNzRm/YmE2MzNhNTc3MGMw/OWFkY2Q1YjcyMDA0/ZGVkZDhkMC9saWJy/YXJ5LmVkdWNhdXNl/LmVkdS8",
+          "path": "› topics  › infrastructure-and-research-technologies  › artificial-intelligence-ai"
+        },
+        "thumbnail": {
+          "src": "https://imgs.search.brave.com/-YrzaHNvorn7b1yv7oSJ8ejoYq9itB3zeN4FdJmXfwI/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9saWJy/YXJ5LmVkdWNhdXNl/LmVkdS8tL21lZGlh/L2ltYWdlcy9saWJy/YXJ5LzIwMjMvOS9y/b2JvdC5wbmc",
+          "original": "https://library.educause.edu/-/media/images/library/2023/9/robot.png",
+          "logo": false
+        }
+      },
+      {
+        "title": "What is AI? - Artificial Intelligence Explained - AWS",
+        "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+        "is_source_local": false,
+        "is_source_both": false,
+        "description": "Learn more about <strong>artificial</strong> <strong>intelligence</strong> (AI), the history of AI and the use cases and real world applications AI has.",
+        "page_age": "2026-07-15T22:40:09",
+        "profile": {
+          "name": "AWS",
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "long_name": "aws.amazon.com",
+          "img": "https://imgs.search.brave.com/w1pARvp0PsgKW9VIQkl3hv9-fqD3BFvfwsgJeUDHdUQ/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOWFkODM4NDk0/MTRjNzUyMTM3OTQ5/MmI4MjRkZjFhNDcw/MTIxYzI3NmZmMmNm/MDFkZWRjNmFkZjYz/NzVhZmIzMC9hd3Mu/YW1hem9uLmNvbS8"
+        },
+        "language": "en",
+        "family_friendly": true,
+        "type": "search_result",
+        "subtype": "article",
+        "is_live": false,
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "aws.amazon.com",
+          "hostname": "aws.amazon.com",
+          "favicon": "https://imgs.search.brave.com/w1pARvp0PsgKW9VIQkl3hv9-fqD3BFvfwsgJeUDHdUQ/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOWFkODM4NDk0/MTRjNzUyMTM3OTQ5/MmI4MjRkZjFhNDcw/MTIxYzI3NmZmMmNm/MDFkZWRjNmFkZjYz/NzVhZmIzMC9hd3Mu/YW1hem9uLmNvbS8",
+          "path": "  › what is cloud computing  › cloud computing concepts hub  › artificial intelligence  › what is artificial intelligence (ai)?"
+        },
+        "age": "3 weeks ago"
+      },
+      {
+        "title": "ISO - Artificial intelligence: What it is, how it works and why it matters",
+        "url": "https://www.iso.org/artificial-intelligence",
+        "is_source_local": false,
+        "is_source_both": false,
+        "description": "For those unfamiliar with computer science, it can be overwhelming to try and grasp the many facets of <strong>artificial intelligence</strong> and their implications. Here, we break down what <strong>artificial intelligence</strong> is, how it works, the difference between machine learning, deep learning, natural language processing …",
+        "profile": {
+          "name": "ISO",
+          "url": "https://www.iso.org/artificial-intelligence",
+          "long_name": "iso.org",
+          "img": "https://imgs.search.brave.com/Wl-rfa10zxqRBqLoIVdYur8A7VpCRlCe61RgXJwPoPw/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvM2EzZGNkMzUy/NTIwOWMwNmVkYTg2/YjVmNGNmYmIwODY4/YmQwZGE5M2JlMjVi/OTI3ODA3N2U0YWVi/ZDJmYzExOS93d3cu/aXNvLm9yZy8"
+        },
+        "language": "en",
+        "family_friendly": true,
+        "type": "search_result",
+        "subtype": "article",
+        "is_live": false,
+        "meta_url": {
+          "scheme": "https",
+          "netloc": "iso.org",
+          "hostname": "www.iso.org",
+          "favicon": "https://imgs.search.brave.com/Wl-rfa10zxqRBqLoIVdYur8A7VpCRlCe61RgXJwPoPw/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvM2EzZGNkMzUy/NTIwOWMwNmVkYTg2/YjVmNGNmYmIwODY4/YmQwZGE5M2JlMjVi/OTI3ODA3N2U0YWVi/ZDJmYzExOS93d3cu/aXNvLm9yZy8",
+          "path": "› artificial-intelligence"
+        },
+        "thumbnail": {
+          "src": "https://imgs.search.brave.com/z9tD6w35dXeZdoHuNraSr8ysrQmM5OeBiwPeUCfPJrg/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly93d3cu/aXNvLm9yZy9maWxl/cy9saXZlL3NpdGVz/L2lzb29yZy9maWxl/cy9uZXdzL2luc2ln/aHRzL2FpL0FJX0V2/ZXJncmVlbl9iYW5u/ZXJzXzEwMjB4NDQw/LXYyLVBJTExBUi5w/bmcvdGh1bWJuYWls/cy8xMjAweDYwMA",
+          "original": "https://www.iso.org/files/live/sites/isoorg/files/news/insights/ai/AI_Evergreen_banners_1020x440-v2-PILLAR.png/thumbnails/1200x600",
+          "logo": false
+        }
+      }
+    ],
+    "family_friendly": true
+  }
+}

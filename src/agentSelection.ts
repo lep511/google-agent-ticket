@@ -5,7 +5,7 @@
 /*  lectura y escritura de la selección persistida y resolución */
 /*  del agente activo contra el catálogo recibido.              */
 /*                                                              */
-/*  Requirements: 11.8, 12.1, 12.2, 12.3, 12.5, 12.6           */
+
 /* ──────────────────────────────────────────────────────────── */
 
 import type { AgentCatalogEntry, AgentCatalogResponse } from './types';

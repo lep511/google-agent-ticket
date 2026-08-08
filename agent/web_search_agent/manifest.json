@@ -1,0 +1,58 @@
+{
+  "id": "web_search_agent",
+  "name": "Web Search",
+  "tagline": "Searches the web and synthesizes findings into a clear report.",
+  "description": "Takes a query, searches the web using Brave Search, and produces a structured report with the most relevant information found.",
+  "icon": "Globe",
+  "accentColor": "#F97316",
+  "order": 10,
+  "isDefault": true,
+  "inputMode": "text",
+  "inputPlaceholder": "What do you want to search for?",
+  "actionLabel": "Search",
+  "supportsInstruction": true,
+  "outputRenderer": "simple_report",
+  "landing": {
+    "title": "Web Search, find and synthesize information from the web",
+    "subtitle": "Ask any question and get a structured report with sources from across the web.",
+    "highlights": [
+      {
+        "title": "Powered by Brave Search.",
+        "items": [
+          {
+            "title": "Real-time results",
+            "subtitle": "Access current web content and news",
+            "icon": "Globe"
+          },
+          {
+            "title": "News coverage",
+            "subtitle": "Latest articles from top sources",
+            "icon": "Newspaper"
+          },
+          {
+            "title": "Multiple sources",
+            "subtitle": "Cross-reference information automatically",
+            "icon": "Search"
+          }
+        ]
+      },
+      {
+        "title": "Structured, sourced output.",
+        "items": [
+          {
+            "title": "Key findings with source links",
+            "icon": "CheckCircle2"
+          },
+          {
+            "title": "Organized by relevance and topic",
+            "icon": "CheckCircle2"
+          },
+          {
+            "title": "Full source attribution",
+            "icon": "CheckCircle2"
+          }
+        ]
+      }
+    ]
+  }
+}

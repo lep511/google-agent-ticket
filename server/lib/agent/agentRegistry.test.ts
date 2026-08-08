@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-import { createTempCatalog, validManifest } from '../../tests/helpers/tempCatalog.ts';
+import { createTempCatalog, validManifest } from '../../../tests/helpers/tempCatalog.ts';
 import { MAX_MANIFEST_BYTES, MAX_PROMPT_BYTES } from './agentTypes.ts';
 import {
   AgentSourceError,

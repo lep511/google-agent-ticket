@@ -5,7 +5,7 @@
  * valida manifiestos. Lo consumen `agentRegistry.ts`, `promptBuilder.ts` y los
  * endpoints de `server.ts`.
  *
- * Requirements: 2.1, 2.2, 2.3, 2.6, 4.2, 6.1, 16.4
+ 
  */
 
 /* ────────────────────────────────────────────────────────── */

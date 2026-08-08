@@ -1,0 +1,16 @@
+{
+  "summary": "A 2-4 sentence overview of what was found",
+  "key_points": ["First key finding", "Second key finding"],
+  "sections": [
+    {
+      "title": "Topic or theme title",
+      "body": "Detailed information about this topic"
+    }
+  ],
+  "sources": [
+    {
+      "title": "Source title",
+      "url": "https://example.com/article"
+    }
+  ]
+}

@@ -12,7 +12,7 @@
 /*  ni el HTML ni los scripts que devuelva un agente llegan a     */
 /*  ejecutarse; las URLs se filtran a `http` y `https`.           */
 /*                                                              */
-/*  Requirements: 14.3, 14.7                                     */
+
 /* ──────────────────────────────────────────────────────────── */
 
 import type { ReactNode } from 'react';

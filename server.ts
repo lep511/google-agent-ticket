@@ -7,18 +7,19 @@ import { createServer as createViteServer } from "vite";
 import path from "path";
 import fs from "fs";
 
-import type { AgentEvent } from "./server/lib/agentEvents.ts";
-import { buildAgentCatalogHttpResult } from "./server/lib/agentCatalog.ts";
+import type { AgentEvent } from "./server/lib/agent/agentEvents.ts";
+import { buildAgentCatalogHttpResult } from "./server/lib/agent/agentCatalog.ts";
 import { subAgentsDebugFileName, writeDebugFile } from "./server/lib/debugFiles.ts";
-import { agentRegistry } from "./server/lib/agentRegistry.ts";
-import { createCalculatorTool } from "./server/lib/calculatorTool.ts";
+import { agentRegistry } from "./server/lib/agent/agentRegistry.ts";
+import { createCalculatorTool } from "./server/lib/tools/calculatorTool.ts";
+import { createBraveSearchTool } from "./server/lib/tools/braveSearchTool.ts";
 import {
   classifyAgentFailureStatus,
   createStrandsAgent,
   isStrandsConfigured,
   loadMcpClients,
   streamStrandsAgent,
-} from "./server/lib/strandsAgent.ts";
+} from "./server/lib/model/strandsAgent.ts";
 import {
   buildAgentInfoEvent,
   buildStreamFailureEvents,
@@ -236,7 +237,9 @@ async function startServer() {
       res.on('close', () => runAbort.abort());
 
       const mcpClients = await loadMcpClients();
-      const agentTools = agent.agentId === 'calculator_agent' ? [createCalculatorTool()] : [];
+      const agentTools = [];
+      if (agent.agentId === 'calculator_agent') agentTools.push(createCalculatorTool());
+      if (agent.agentId === 'web_search_agent') agentTools.push(createBraveSearchTool());
       const strandsAgent = createStrandsAgent({
         systemPrompt,
         modelId: effectiveModel,
@@ -326,7 +329,9 @@ async function startServer() {
               }
           }
 
-          appendJsonlLog(event);
+          if (event.type !== 'text' && event.type !== 'thinking') {
+            appendJsonlLog(event);
+          }
 
           if (event.type === 'error') {
             // El cliente remoto informó un fallo: el flujo se cierra con `done`

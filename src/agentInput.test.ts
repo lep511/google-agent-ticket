@@ -2,7 +2,7 @@
  * Reglas de la barra de entrada adaptativa: presentación derivada del
  * manifiesto y validación previa que gobierna el botón de ejecución.
  *
- * Requirements: 8.7, 8.8, 13.3, 13.4, 13.5, 13.6, 13.7
+ 
  */
 
 import { describe, expect, it } from 'vitest';

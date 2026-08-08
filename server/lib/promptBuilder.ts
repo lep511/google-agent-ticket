@@ -25,7 +25,7 @@
  * `financial_analyst_agent` con el prompt embebido en la versión previa de
  * `server.ts`, cuya plantilla ya contiene esas reglas (Requirement 7.8).
  *
- * Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7, 7.9, 7.10
+ 
  */
 
 import {
@@ -33,8 +33,8 @@ import {
   readAgentSchema,
   type AgentSchemaSource,
   type AgentSourceFile,
-} from './agentRegistry.ts';
-import type { ResolvedAgentDefinition } from './agentTypes.ts';
+} from './agent/agentRegistry.ts';
+import type { ResolvedAgentDefinition } from './agent/agentTypes.ts';
 
 /* ────────────────────────────────────────────────────────── */
 /*  Marcadores soportados                                      */

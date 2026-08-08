@@ -21,10 +21,10 @@
  * antes de cargar las fuentes inline, de ensamblar el prompt y de escribir las
  * cabeceras SSE (Requirements 8.3, 8.4, 8.5).
  *
- * Requirements: 5.9, 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 9.2, 9.3, 9.4, 9.5
+ 
  */
 
-import type { InputMode } from './agentTypes.ts';
+import type { InputMode } from './agent/agentTypes.ts';
 
 /* ────────────────────────────────────────────────────────── */
 /*  Campos y límites                                           */

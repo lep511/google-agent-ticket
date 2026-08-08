@@ -7,7 +7,7 @@
 /*  backend (`server/lib/analyzeInput.ts`) para que el cliente   */
 /*  no ofrezca ejecuciones que el servidor va a rechazar.        */
 /*                                                              */
-/*  Requirements: 8.7, 8.8, 13.3, 13.4, 13.5, 13.6, 13.7        */
+
 /* ──────────────────────────────────────────────────────────── */
 
 import type { AgentCatalogEntry, InputMode } from './types';
@@ -96,7 +96,7 @@ export function inputMaxLength(inputMode: InputMode): number {
  * caracteres `A`-`Z` y `0`-`9` tras recortar y pasar a mayúsculas; en modo
  * `text`, de 1 a 2.000 caracteres tras recortar.
  *
- * Requirements: 8.1, 8.2, 8.7, 8.8
+ 
  */
 export function isInputValid(value: string, inputMode: InputMode): boolean {
   const trimmed = typeof value === 'string' ? value.trim() : '';

@@ -3,7 +3,7 @@
  * event, the HTTP answer of a run that never starts, and the sequence that
  * closes the stream when a run fails midway.
  *
- * Requirements: 5.3, 5.4, 5.10
+ 
  */
 
 import { describe, expect, it } from 'vitest';
@@ -16,7 +16,7 @@ import {
   describeAgentStartFailure,
   describeStreamFailure,
 } from './analyzeExecution.ts';
-import type { ResolvedAgentDefinition } from './agentTypes.ts';
+import type { ResolvedAgentDefinition } from './agent/agentTypes.ts';
 
 function definition(
   overrides: Partial<ResolvedAgentDefinition['manifest']> = {},

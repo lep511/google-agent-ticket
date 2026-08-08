@@ -1033,7 +1033,7 @@ export default function App() {
                     panel y el nombre del modelo queda como texto secundario.
                   */}
                   <div className="flex items-center gap-2 min-w-0">
-                    <img src="https://asset.brandfetch.io/idmHERnQ_v/idLQy1TAJE.png" alt="NVIDIA" className="w-5 h-5 shrink-0" />
+                    <img src="/deepseek-logo.svg" alt="DeepSeek" className="w-5 h-5 shrink-0" />
                     <span className="truncate">{executionPanelAgentName}</span>
                     <span className="text-xs font-normal text-stone-400 shrink-0">{MODEL_DISPLAY_NAME}</span>
                   </div>

@@ -37,7 +37,7 @@ export interface RawAnalysisReport {
 /*  propósito: el bundle del navegador no debe importar código  */
 /*  de servidor.                                                */
 /*                                                              */
-/*  Requirements: 4.2, 14.3                                     */
+
 /* ──────────────────────────────────────────────────────────── */
 
 /** Tipos de entrada principal que puede declarar un agente. */

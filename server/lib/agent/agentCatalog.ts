@@ -14,7 +14,7 @@
  * resolvió el registro, de modo que exactamente una entrada lo lleve verdadero
  * aunque varios manifiestos lo declaren (Requirement 3.7).
  *
- * Requirements: 2.9, 3.7, 3.8, 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.8, 16.3
+ 
  */
 
 import type { AgentCatalogSnapshot, AgentRegistry } from './agentRegistry.ts';

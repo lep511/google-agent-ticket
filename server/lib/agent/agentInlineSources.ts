@@ -27,7 +27,7 @@
  *  - Si el conjunto queda vacío tras las exclusiones y los límites, se falla
  *    con un error explícito que nombra el agentId (Requirement 6.7).
  *
- * Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7
+ 
  */
 
 import fs from 'node:fs';

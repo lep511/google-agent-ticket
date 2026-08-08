@@ -13,7 +13,7 @@ import {
   type AnalyzeRequestBody,
   type ValidatedAnalyzeInput,
 } from './analyzeInput.ts';
-import type { InputMode } from './agentTypes.ts';
+import type { InputMode } from './agent/agentTypes.ts';
 
 /** Valida contra un agente de tipo `ticker` que admite instrucción. */
 function validateTicker(

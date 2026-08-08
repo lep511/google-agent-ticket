@@ -12,11 +12,11 @@
  *  - The HTTP answer that rejects a run which never starts, that is, before
  *    those headers are written.
  *
- * Requirements: 5.3, 5.4, 5.6, 5.10
+ 
  */
 
-import type { AgentEvent } from './agentEvents.ts';
-import type { OutputRenderer, ResolvedAgentDefinition } from './agentTypes.ts';
+import type { AgentEvent } from './agent/agentEvents.ts';
+import type { OutputRenderer, ResolvedAgentDefinition } from './agent/agentTypes.ts';
 
 /* ────────────────────────────────────────────────────────── */
 /*  Evento `agent_info`                                        */

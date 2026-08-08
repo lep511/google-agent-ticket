@@ -10,7 +10,7 @@
  * El módulo es puro: no toca el sistema de archivos ni el flujo SSE, para que
  * el patrón pueda comprobarse por sí solo.
  *
- * Requirements: 10.1, 10.2
+ 
  */
 
 /** Prefijo común de todos los nombres de log, nuevo y heredado. */

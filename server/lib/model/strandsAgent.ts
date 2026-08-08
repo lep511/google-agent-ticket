@@ -22,7 +22,7 @@ import {
 import { OpenAIModel } from '@strands-agents/sdk/models/openai';
 import type { ZodType } from 'zod';
 
-import type { AgentEvent, AgentUsage } from './agentEvents.ts';
+import type { AgentEvent, AgentUsage } from '../agent/agentEvents.ts';
 import {
   NVIDIA_BASE_URL,
   isNvidiaConfigured,
