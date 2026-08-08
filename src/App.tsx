@@ -37,6 +37,7 @@ import {
 } from './agentInput';
 import { FALLBACK_OUTPUT_RENDERER, extractReport } from './resultExtraction';
 import { HistoryPanel } from './components/HistoryPanel';
+import { CookieConsent } from './components/CookieConsent';
 import {
   HistoryEntryDraft,
   InteractionHistoryEntry,
@@ -210,12 +211,12 @@ export default function App() {
    */
   const [restoredReport, setRestoredReport] = useState<RestoredReport | null>(null);
 
-  /** Requirement 6.2: initial history load. */
+  /** Requirement 6.2: load history scoped to the current user. */
   useEffect(() => {
-    const stored = readHistory();
+    const stored = readHistory(user?.userId);
     historyRef.current = stored;
     setHistoryEntries(stored);
-  }, []);
+  }, [user?.userId]);
 
   /**
    * Single write gate: persists the list and publishes the effective one, which
@@ -223,10 +224,10 @@ export default function App() {
    * 7.5). Every history mutation goes through here.
    */
   const applyHistory = useCallback((next: InteractionHistoryEntry[]) => {
-    const { entries } = persistHistory(next);
+    const { entries } = persistHistory(next, user?.userId);
     historyRef.current = entries;
     setHistoryEntries(entries);
-  }, []);
+  }, [user?.userId]);
 
   /**
    * Requirements 10.3, 10.4: only the entry with that `id` disappears, the
@@ -993,6 +994,7 @@ export default function App() {
             Sign In
           </button>
         </div>
+        <CookieConsent />
       </div>
     );
   }

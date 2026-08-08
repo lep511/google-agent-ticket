@@ -18,6 +18,10 @@ import { FALLBACK_OUTPUT_RENDERER } from './resultExtraction';
 /** History `localStorage` key (Requirement 6.1). */
 export const HISTORY_STORAGE_KEY = 'tickr.interactionHistory';
 
+export function userHistoryKey(userId?: string | null): string {
+  return userId ? `${HISTORY_STORAGE_KEY}.${userId}` : HISTORY_STORAGE_KEY;
+}
+
 /** History Limit (Requirements 7.1, 7.2). */
 export const HISTORY_LIMIT = 20;
 
@@ -306,9 +310,9 @@ function isQuotaExceeded(error: unknown): boolean {
 }
 
 /** Single write attempt; classifies the failure instead of propagating it. */
-function writeRaw(entries: InteractionHistoryEntry[]): WriteOutcome {
+function writeRaw(entries: InteractionHistoryEntry[], key = HISTORY_STORAGE_KEY): WriteOutcome {
   try {
-    window.localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(entries));
+    window.localStorage.setItem(key, JSON.stringify(entries));
     return 'ok';
   } catch (err) {
     return isQuotaExceeded(err) ? 'quota' : 'unavailable';
@@ -320,18 +324,19 @@ function writeRaw(entries: InteractionHistoryEntry[]): WriteOutcome {
  * Unavailable, invalid JSON or non-array content, and in those last two cases
  * overwrites the key with `[]` (Requirements 6.2, 6.3, 6.4, 6.5).
  */
-export function readHistory(): InteractionHistoryEntry[] {
+export function readHistory(userId?: string | null): InteractionHistoryEntry[] {
+  const key = userHistoryKey(userId);
   let raw: string | null;
   try {
-    raw = window.localStorage.getItem(HISTORY_STORAGE_KEY);
+    raw = window.localStorage.getItem(key);
   } catch {
-    return []; // Requirement 6.5: Storage Unavailable, the interface stays alive
+    return [];
   }
 
   const { entries, needsRepair } = parseHistoryPayload(raw);
   if (needsRepair) {
     try {
-      window.localStorage.setItem(HISTORY_STORAGE_KEY, '[]'); // Requirement 6.4
+      window.localStorage.setItem(key, '[]');
     } catch {
       /* the repair is best effort: an unwritable key does not break the read */
     }
@@ -344,22 +349,21 @@ export function readHistory(): InteractionHistoryEntry[] {
  * and retries until the write succeeds or a single entry remains
  * (Requirements 6.1, 6.6, 7.3, 7.4, 7.5).
  */
-export function persistHistory(entries: InteractionHistoryEntry[]): HistoryPersistResult {
-  let candidate = capHistory(entries); // Requirements 7.1, 7.2, 7.6
+export function persistHistory(entries: InteractionHistoryEntry[], userId?: string | null): HistoryPersistResult {
+  const key = userHistoryKey(userId);
+  let candidate = capHistory(entries);
 
-  // The loop always terminates: every quota iteration drops one entry and the
-  // `length <= 1` guard cuts in before the list is emptied.
   for (;;) {
-    const outcome = writeRaw(candidate);
+    const outcome = writeRaw(candidate, key);
     if (outcome === 'ok') {
-      return { entries: candidate, persisted: true }; // Requirement 7.5
+      return { entries: candidate, persisted: true };
     }
     if (outcome === 'unavailable') {
-      return { entries: candidate, persisted: false }; // Requirement 6.6
+      return { entries: candidate, persisted: false };
     }
     if (candidate.length <= 1) {
-      return { entries: candidate, persisted: false }; // Requirement 7.4
+      return { entries: candidate, persisted: false };
     }
-    candidate = dropOldest(candidate); // Requirement 7.3
+    candidate = dropOldest(candidate);
   }
 }
