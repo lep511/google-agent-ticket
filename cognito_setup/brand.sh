@@ -144,15 +144,24 @@ fi
 
 info "Using settings: $SETTINGS_FILE"
 
-# Build assets array if logo is provided
-ASSETS_ARG=""
+# Build assets array — always include the page background SVG
+BG_SVG="$SCRIPT_DIR/page-background.svg"
+ASSETS=()
+
+if [[ -f "$BG_SVG" ]]; then
+  BG_B64=$(base64 -w0 "$BG_SVG")
+  ASSETS+=("{\"Category\":\"PAGE_BACKGROUND\",\"ColorMode\":\"LIGHT\",\"Extension\":\"SVG\",\"Bytes\":\"$BG_B64\"}")
+  ASSETS+=("{\"Category\":\"PAGE_BACKGROUND\",\"ColorMode\":\"DARK\",\"Extension\":\"SVG\",\"Bytes\":\"$BG_B64\"}")
+  info "Using page background: $BG_SVG"
+fi
+
+# Add logo if provided
 if [[ -n "$LOGO_FILE" ]]; then
   if [[ ! -f "$LOGO_FILE" ]]; then
     error "Logo file not found: $LOGO_FILE"
     exit 1
   fi
 
-  # Determine extension
   EXTENSION=$(echo "${LOGO_FILE##*.}" | tr '[:lower:]' '[:upper:]')
   case "$EXTENSION" in
     PNG)  EXTENSION="PNG" ;;
@@ -166,8 +175,17 @@ if [[ -n "$LOGO_FILE" ]]; then
   esac
 
   LOGO_B64=$(base64 -w0 "$LOGO_FILE")
-  ASSETS_ARG="--assets [{\"Category\":\"FORM_LOGO\",\"ColorMode\":\"LIGHT\",\"Extension\":\"$EXTENSION\",\"Bytes\":\"$LOGO_B64\"},{\"Category\":\"FORM_LOGO\",\"ColorMode\":\"DARK\",\"Extension\":\"$EXTENSION\",\"Bytes\":\"$LOGO_B64\"}]"
+  ASSETS+=("{\"Category\":\"FORM_LOGO\",\"ColorMode\":\"LIGHT\",\"Extension\":\"$EXTENSION\",\"Bytes\":\"$LOGO_B64\"}")
+  ASSETS+=("{\"Category\":\"FORM_LOGO\",\"ColorMode\":\"DARK\",\"Extension\":\"$EXTENSION\",\"Bytes\":\"$LOGO_B64\"}")
   info "Using logo: $LOGO_FILE ($EXTENSION)"
+fi
+
+# Write assets to a temp file (base64 payloads are too large for inline args)
+ASSETS_FILE=""
+if [[ ${#ASSETS[@]} -gt 0 ]]; then
+  ASSETS_FILE=$(mktemp)
+  JOINED=$(IFS=,; echo "${ASSETS[*]}")
+  echo "[$JOINED]" > "$ASSETS_FILE"
 fi
 
 # Create or update branding
@@ -189,19 +207,21 @@ else
     --output json"
 fi
 
-if [[ -n "$ASSETS_ARG" ]]; then
-  CMD="$CMD $ASSETS_ARG"
+if [[ -n "$ASSETS_FILE" ]]; then
+  CMD="$CMD --assets file://$ASSETS_FILE"
 fi
 
 eval "$CMD" >/dev/null 2>&1
 RESULT=$?
 
 if [[ $RESULT -ne 0 ]]; then
-  error "Failed to apply branding. Run with AWS_DEBUG=1 for details."
+  error "Failed to apply branding. Showing error details:"
   eval "$CMD" 2>&1
+  [[ -n "$ASSETS_FILE" ]] && rm -f "$ASSETS_FILE"
   exit 1
 fi
 
+[[ -n "$ASSETS_FILE" ]] && rm -f "$ASSETS_FILE"
 success "Managed Login branding applied!"
 
 # Get the domain for preview
