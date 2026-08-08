@@ -94,6 +94,39 @@ VITE_COGNITO_DOMAIN=tickr-123456
 | `--create-test-user` | Off | Interactively create a confirmed test user |
 | `--output-env FILE` | Stdout only | Write env vars to a file |
 
+### `brand.sh`
+
+Applies custom CSS (and optionally a logo) to the Cognito Hosted UI so the login page matches the app's visual design.
+
+```bash
+# Apply the default Tickr theme
+./brand.sh
+
+# Apply with a custom logo
+./brand.sh --logo ../public/tickr-logo.png
+
+# Reset to Cognito defaults
+./brand.sh --reset
+```
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--region` | `us-east-1` | AWS region |
+| `--pool-id` | Auto-detected | User pool ID (reads from cognito-config.json) |
+| `--client-id` | Auto-detected | App client ID (reads from cognito-config.json) |
+| `--css FILE` | `hosted-ui.css` | Custom CSS file to upload |
+| `--logo FILE` | None | Logo image (PNG/JPG, max 100KB) |
+| `--reset` | Off | Remove all customizations |
+
+The CSS file (`hosted-ui.css`) is pre-configured to match Tickr's design:
+- Warm cream background (`#F6F4F0`)
+- Dark teal primary buttons (`#0b5a4b`)
+- System sans-serif font stack
+- Rounded inputs with subtle borders
+- Error messages in the app's red (`#CC3131`)
+
+Edit `hosted-ui.css` and re-run `./brand.sh` to update styles.
+
 ### `teardown.sh`
 
 Removes all Cognito resources created by `deploy.sh`.
