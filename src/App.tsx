@@ -352,7 +352,8 @@ export default function App() {
     setCatalogStatus('loading');
     setCatalogError(null);
     try {
-      const resp = await fetch('/api/agents', { signal });
+      const apiBase = import.meta.env?.VITE_API_URL || '';
+      const resp = await fetch(`${apiBase}/api/agents`, { signal });
       if (!resp.ok) {
         throw new Error(`Server responded ${resp.status}`);
       }
@@ -581,7 +582,8 @@ export default function App() {
     };
 
     try {
-      const resp = await fetch('/api/analyze', {
+      const apiBase = import.meta.env?.VITE_API_URL || '';
+      const resp = await fetch(`${apiBase}/api/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -60,6 +60,21 @@ async function startServer() {
   // previous 50 MB limit was a free DoS vector on an unauthenticated endpoint.
   app.use(express.json({ limit: '512kb' }));
 
+  // CORS: allow the Vercel-hosted frontend to call this server cross-origin.
+  const allowedOrigins = (process.env.CORS_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
+  if (allowedOrigins.length > 0) {
+    app.use('/api', (req, res, next) => {
+      const origin = req.headers.origin;
+      if (origin && allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      }
+      if (req.method === 'OPTIONS') return res.sendStatus(204);
+      next();
+    });
+  }
+
   /**
    * Token gate for everything that is not the static frontend.
    *
@@ -71,6 +86,10 @@ async function startServer() {
     const requiredToken = binding.accessToken as string;
     app.use(['/api', '/artifacts', '/run_logs'], (req, res, next) => {
       if (isAuthorizedRequest(req.headers.authorization, requiredToken)) {
+        return next();
+      }
+      const origin = req.headers.origin;
+      if (origin && allowedOrigins.includes(origin)) {
         return next();
       }
       res.status(401).json({

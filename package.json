@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit",
-    "build:vercel": "vite build && node build-api.mjs",
+    "build:vercel": "vite build",
     "test": "vitest --run",
     "test:watch": "vitest"
   },

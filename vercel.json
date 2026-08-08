@@ -1,25 +1,8 @@
 {
-  "buildCommand": "npm run build:vercel",
+  "buildCommand": "vite build",
   "outputDirectory": "dist",
   "framework": "vite",
-  "functions": {
-    "api/**/*.mjs": {
-      "maxDuration": 60,
-      "includeFiles": "agent/**"
-    }
-  },
   "rewrites": [
-    { "source": "/api/agents", "destination": "/api/agents.mjs" },
-    { "source": "/api/analyze", "destination": "/api/analyze.mjs" },
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
-  ],
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-cache, no-store" },
-        { "key": "X-Accel-Buffering", "value": "no" }
-      ]
-    }
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
