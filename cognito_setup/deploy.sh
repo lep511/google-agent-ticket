@@ -2,28 +2,34 @@
 #
 # deploy.sh — Deploy an Amazon Cognito User Pool for the Tickr application.
 #
-# Creates a user pool, app client (public, no secret), and a Cognito domain,
-# then outputs the environment variables required by the app's .env file.
+# Creates a user pool (Essentials tier), app client (public, no secret),
+# Cognito domain with Managed Login v2, and optionally applies branding.
 #
 # Prerequisites:
 #   - AWS CLI v2 installed and configured (aws configure / aws sso login)
 #   - Sufficient IAM permissions for cognito-idp:Create*, cognito-idp:Describe*,
-#     cognito-idp:Update*, cognito-idp:AdminSetUserPassword
+#     cognito-idp:Update*, cognito-idp:AdminSetUserPassword,
+#     cognito-idp:CreateManagedLoginBranding
 #
 # Usage:
 #   ./deploy.sh [OPTIONS]
 #
 # Options:
-#   --region REGION         AWS region (default: us-east-1)
-#   --pool-name NAME        User pool name (default: tickr-user-pool)
-#   --domain-prefix PREFIX  Cognito domain prefix (must be globally unique)
-#   --callback-url URL      OAuth callback URL (default: http://localhost:3000)
-#   --app-name NAME         App client name (default: tickr-web-client)
-#   --create-test-user      Create a test user (prompts for email/password)
-#   --output-env FILE       Write .env values to this file (default: stdout only)
-#   --help                  Show this help message
+#   --region REGION             AWS region (default: us-east-1)
+#   --pool-name NAME            User pool name (default: tickr-user-pool)
+#   --domain-prefix PREFIX      Cognito domain prefix (must be globally unique)
+#   --callback-url URL          Primary OAuth callback URL (default: http://localhost:3000)
+#   --extra-callback-url URL    Additional callback URL (e.g. https://app.vercel.app)
+#   --app-name NAME             App client name (default: tickr-web-client)
+#   --create-test-user          Create a test user (prompts for email/password)
+#   --apply-branding            Apply Tickr theme after deployment
+#   --output-env FILE           Write .env values to this file (default: stdout only)
+#   --help                      Show this help message
 #
 set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
 # ------------------------------------------------------------------
 # Defaults
@@ -32,8 +38,10 @@ REGION="us-east-1"
 POOL_NAME="tickr-user-pool"
 DOMAIN_PREFIX=""
 CALLBACK_URL="http://localhost:3000"
+EXTRA_CALLBACK_URLS=()
 APP_CLIENT_NAME="tickr-web-client"
 CREATE_TEST_USER=false
+APPLY_BRANDING=false
 OUTPUT_ENV=""
 
 # ------------------------------------------------------------------
@@ -43,25 +51,29 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+BOLD='\033[1m'
+NC='\033[0m'
 
 info()    { echo -e "${BLUE}[INFO]${NC} $*"; }
 success() { echo -e "${GREEN}[OK]${NC} $*"; }
 warn()    { echo -e "${YELLOW}[WARN]${NC} $*"; }
 error()   { echo -e "${RED}[ERROR]${NC} $*" >&2; }
+step()    { echo -e "\n${BOLD}── $* ──${NC}"; }
 
 # ------------------------------------------------------------------
 # Parse arguments
 # ------------------------------------------------------------------
 while [[ $# -gt 0 ]]; do
   case $1 in
-    --region)         REGION="$2"; shift 2 ;;
-    --pool-name)      POOL_NAME="$2"; shift 2 ;;
-    --domain-prefix)  DOMAIN_PREFIX="$2"; shift 2 ;;
-    --callback-url)   CALLBACK_URL="$2"; shift 2 ;;
-    --app-name)       APP_CLIENT_NAME="$2"; shift 2 ;;
-    --create-test-user) CREATE_TEST_USER=true; shift ;;
-    --output-env)     OUTPUT_ENV="$2"; shift 2 ;;
+    --region)             REGION="$2"; shift 2 ;;
+    --pool-name)          POOL_NAME="$2"; shift 2 ;;
+    --domain-prefix)      DOMAIN_PREFIX="$2"; shift 2 ;;
+    --callback-url)       CALLBACK_URL="$2"; shift 2 ;;
+    --extra-callback-url) EXTRA_CALLBACK_URLS+=("$2"); shift 2 ;;
+    --app-name)           APP_CLIENT_NAME="$2"; shift 2 ;;
+    --create-test-user)   CREATE_TEST_USER=true; shift ;;
+    --apply-branding)     APPLY_BRANDING=true; shift ;;
+    --output-env)         OUTPUT_ENV="$2"; shift 2 ;;
     --help)
       sed -n '2,/^$/p' "$0" | sed 's/^#//;s/^ //'
       exit 0
@@ -88,24 +100,29 @@ fi
 
 CALLER_IDENTITY=$(aws sts get-caller-identity --output json)
 ACCOUNT_ID=$(echo "$CALLER_IDENTITY" | python3 -c "import sys,json; print(json.load(sys.stdin)['Account'])")
-info "Using AWS account: $ACCOUNT_ID in region: $REGION"
+info "AWS account: $ACCOUNT_ID | Region: $REGION"
 
-# Generate a domain prefix if not provided
 if [[ -z "$DOMAIN_PREFIX" ]]; then
   DOMAIN_PREFIX="tickr-$(echo "$ACCOUNT_ID" | tail -c 7)"
-  info "No --domain-prefix provided; using generated prefix: $DOMAIN_PREFIX"
+  info "Auto-generated domain prefix: $DOMAIN_PREFIX"
 fi
 
-# Validate domain prefix format
 if [[ ! "$DOMAIN_PREFIX" =~ ^[a-z][a-z0-9-]{2,62}$ ]]; then
   error "Domain prefix must be 3-63 characters, start with a lowercase letter, and contain only lowercase letters, numbers, and hyphens."
   exit 1
 fi
 
+# Build callback URL list
+ALL_CALLBACK_URLS=("$CALLBACK_URL")
+ALL_CALLBACK_URLS+=("${EXTRA_CALLBACK_URLS[@]}")
+CALLBACK_ARGS=$(printf '"%s" ' "${ALL_CALLBACK_URLS[@]}")
+LOGOUT_ARGS="$CALLBACK_ARGS"
+
 # ------------------------------------------------------------------
-# Check for existing resources (idempotent re-runs)
+# Step 1: User Pool
 # ------------------------------------------------------------------
-info "Checking for existing user pool named '$POOL_NAME'..."
+step "User Pool"
+
 EXISTING_POOLS=$(aws cognito-idp list-user-pools --max-results 60 --region "$REGION" --output json)
 EXISTING_POOL_ID=$(echo "$EXISTING_POOLS" | python3 -c "
 import sys, json
@@ -116,22 +133,19 @@ print(matches[0] if matches else '')
 
 if [[ -n "$EXISTING_POOL_ID" ]]; then
   warn "User pool '$POOL_NAME' already exists (ID: $EXISTING_POOL_ID)."
-  echo ""
-  read -rp "Do you want to use the existing pool? [Y/n] " USE_EXISTING
+  read -rp "  Use the existing pool? [Y/n] " USE_EXISTING
   if [[ "${USE_EXISTING,,}" == "n" ]]; then
-    error "Aborting. Rename your pool with --pool-name or delete the existing one."
+    error "Aborting. Use --pool-name to pick a different name."
     exit 1
   fi
   USER_POOL_ID="$EXISTING_POOL_ID"
-  success "Reusing existing user pool: $USER_POOL_ID"
+  success "Reusing user pool: $USER_POOL_ID"
 else
-  # ------------------------------------------------------------------
-  # Create User Pool
-  # ------------------------------------------------------------------
-  info "Creating user pool '$POOL_NAME'..."
+  info "Creating user pool '$POOL_NAME' (Essentials tier)..."
   CREATE_POOL_OUTPUT=$(aws cognito-idp create-user-pool \
     --pool-name "$POOL_NAME" \
     --region "$REGION" \
+    --user-pool-tier ESSENTIALS \
     --auto-verified-attributes email \
     --username-attributes email \
     --username-configuration "CaseSensitive=false" \
@@ -146,18 +160,14 @@ else
         "TemporaryPasswordValidityDays": 7
       }
     }' \
-    --schema '[
-      {
-        "Name": "email",
-        "AttributeDataType": "String",
-        "Required": true,
-        "Mutable": true
-      }
-    ]' \
+    --schema '[{
+      "Name": "email",
+      "AttributeDataType": "String",
+      "Required": true,
+      "Mutable": true
+    }]' \
     --account-recovery-setting '{
-      "RecoveryMechanisms": [
-        {"Priority": 1, "Name": "verified_email"}
-      ]
+      "RecoveryMechanisms": [{"Priority": 1, "Name": "verified_email"}]
     }' \
     --user-attribute-update-settings '{
       "AttributesRequireVerificationBeforeUpdate": ["email"]
@@ -170,9 +180,10 @@ else
 fi
 
 # ------------------------------------------------------------------
-# Create or find the App Client (public, no secret)
+# Step 2: App Client
 # ------------------------------------------------------------------
-info "Checking for existing app client '$APP_CLIENT_NAME'..."
+step "App Client"
+
 EXISTING_CLIENTS=$(aws cognito-idp list-user-pool-clients \
   --user-pool-id "$USER_POOL_ID" \
   --region "$REGION" \
@@ -189,34 +200,49 @@ print(matches[0] if matches else '')
 if [[ -n "$EXISTING_CLIENT_ID" ]]; then
   warn "App client '$APP_CLIENT_NAME' already exists (ID: $EXISTING_CLIENT_ID)."
   CLIENT_ID="$EXISTING_CLIENT_ID"
-  success "Reusing existing app client: $CLIENT_ID"
-else
-  info "Creating app client '$APP_CLIENT_NAME' (public, no secret)..."
-  CREATE_CLIENT_OUTPUT=$(aws cognito-idp create-user-pool-client \
+
+  # Update callback URLs in case they changed
+  info "Updating callback URLs..."
+  eval aws cognito-idp update-user-pool-client \
     --user-pool-id "$USER_POOL_ID" \
-    --client-name "$APP_CLIENT_NAME" \
+    --client-id "$CLIENT_ID" \
     --region "$REGION" \
-    --no-generate-secret \
-    --explicit-auth-flows \
-      "ALLOW_USER_SRP_AUTH" \
-      "ALLOW_REFRESH_TOKEN_AUTH" \
-      "ALLOW_USER_PASSWORD_AUTH" \
+    --explicit-auth-flows "ALLOW_USER_SRP_AUTH" "ALLOW_REFRESH_TOKEN_AUTH" "ALLOW_USER_PASSWORD_AUTH" \
     --supported-identity-providers "COGNITO" \
-    --callback-urls "$CALLBACK_URL" \
-    --logout-urls "$CALLBACK_URL" \
+    --callback-urls $CALLBACK_ARGS \
+    --logout-urls $LOGOUT_ARGS \
     --allowed-o-auth-flows "code" \
     --allowed-o-auth-scopes "email" "openid" "profile" \
     --allowed-o-auth-flows-user-pool-client \
     --enable-token-revocation \
-    --prevent-user-existence-errors ENABLED \
+    --prevent-user-existence-errors "ENABLED" \
     --access-token-validity 1 \
     --id-token-validity 1 \
     --refresh-token-validity 30 \
-    --token-validity-units '{
-      "AccessToken": "hours",
-      "IdToken": "hours",
-      "RefreshToken": "days"
-    }' \
+    --token-validity-units "'{\"AccessToken\":\"hours\",\"IdToken\":\"hours\",\"RefreshToken\":\"days\"}'" \
+    --output json '>/dev/null'
+
+  success "App client updated: $CLIENT_ID"
+else
+  info "Creating app client '$APP_CLIENT_NAME' (public, no secret)..."
+  CREATE_CLIENT_OUTPUT=$(eval aws cognito-idp create-user-pool-client \
+    --user-pool-id "$USER_POOL_ID" \
+    --client-name "$APP_CLIENT_NAME" \
+    --region "$REGION" \
+    --no-generate-secret \
+    --explicit-auth-flows "ALLOW_USER_SRP_AUTH" "ALLOW_REFRESH_TOKEN_AUTH" "ALLOW_USER_PASSWORD_AUTH" \
+    --supported-identity-providers "COGNITO" \
+    --callback-urls $CALLBACK_ARGS \
+    --logout-urls $LOGOUT_ARGS \
+    --allowed-o-auth-flows "code" \
+    --allowed-o-auth-scopes "email" "openid" "profile" \
+    --allowed-o-auth-flows-user-pool-client \
+    --enable-token-revocation \
+    --prevent-user-existence-errors "ENABLED" \
+    --access-token-validity 1 \
+    --id-token-validity 1 \
+    --refresh-token-validity 30 \
+    --token-validity-units "'{\"AccessToken\":\"hours\",\"IdToken\":\"hours\",\"RefreshToken\":\"days\"}'" \
     --output json)
 
   CLIENT_ID=$(echo "$CREATE_CLIENT_OUTPUT" | python3 -c "import sys,json; print(json.load(sys.stdin)['UserPoolClient']['ClientId'])")
@@ -224,9 +250,10 @@ else
 fi
 
 # ------------------------------------------------------------------
-# Create or verify the Cognito Domain
+# Step 3: Domain (Managed Login v2)
 # ------------------------------------------------------------------
-info "Setting up Cognito domain prefix '$DOMAIN_PREFIX'..."
+step "Cognito Domain (Managed Login)"
+
 EXISTING_DOMAIN=$(aws cognito-idp describe-user-pool \
   --user-pool-id "$USER_POOL_ID" \
   --region "$REGION" \
@@ -237,11 +264,19 @@ print(pool.get('Domain', ''))
 " 2>/dev/null || echo "")
 
 if [[ -n "$EXISTING_DOMAIN" ]]; then
-  warn "User pool already has domain: $EXISTING_DOMAIN"
+  warn "Domain already exists: $EXISTING_DOMAIN"
   DOMAIN_PREFIX="$EXISTING_DOMAIN"
-  success "Reusing existing domain: $DOMAIN_PREFIX"
+
+  # Ensure it uses Managed Login v2
+  info "Ensuring Managed Login v2..."
+  aws cognito-idp update-user-pool-domain \
+    --user-pool-id "$USER_POOL_ID" \
+    --domain "$DOMAIN_PREFIX" \
+    --managed-login-version 2 \
+    --region "$REGION" \
+    --output json >/dev/null 2>&1 || true
+  success "Domain: $DOMAIN_PREFIX (Managed Login v2)"
 else
-  # Check if the domain prefix is available
   DOMAIN_CHECK=$(aws cognito-idp describe-user-pool-domain \
     --domain "$DOMAIN_PREFIX" \
     --region "$REGION" \
@@ -254,27 +289,43 @@ print(desc.get('Status', ''))
 " 2>/dev/null || echo "")
 
   if [[ -n "$DOMAIN_STATUS" ]]; then
-    error "Domain prefix '$DOMAIN_PREFIX' is already taken by another account."
-    error "Choose a different prefix with --domain-prefix"
+    error "Domain prefix '$DOMAIN_PREFIX' is already taken. Choose a different one with --domain-prefix."
     exit 1
   fi
 
+  info "Creating domain '$DOMAIN_PREFIX' with Managed Login v2..."
   aws cognito-idp create-user-pool-domain \
     --user-pool-id "$USER_POOL_ID" \
     --domain "$DOMAIN_PREFIX" \
-    --region "$REGION"
+    --managed-login-version 2 \
+    --region "$REGION" \
+    --output json >/dev/null
 
-  success "Domain created: $DOMAIN_PREFIX"
+  success "Domain created: $DOMAIN_PREFIX (Managed Login v2)"
 fi
 
 COGNITO_DOMAIN="${DOMAIN_PREFIX}.auth.${REGION}.amazoncognito.com"
 
 # ------------------------------------------------------------------
-# Optional: Create a test user
+# Step 4: Apply Branding (optional)
+# ------------------------------------------------------------------
+if [[ "$APPLY_BRANDING" == true ]]; then
+  step "Managed Login Branding"
+  if [[ -x "$SCRIPT_DIR/brand.sh" ]]; then
+    bash "$SCRIPT_DIR/brand.sh" \
+      --region "$REGION" \
+      --pool-id "$USER_POOL_ID" \
+      --client-id "$CLIENT_ID"
+  else
+    warn "brand.sh not found or not executable. Skipping branding."
+  fi
+fi
+
+# ------------------------------------------------------------------
+# Step 5: Test User (optional)
 # ------------------------------------------------------------------
 if [[ "$CREATE_TEST_USER" == true ]]; then
-  echo ""
-  info "Creating a test user..."
+  step "Test User"
   read -rp "  Email: " TEST_EMAIL
   read -rsp "  Password (min 8 chars, upper+lower+number): " TEST_PASSWORD
   echo ""
@@ -297,51 +348,43 @@ if [[ "$CREATE_TEST_USER" == true ]]; then
       --permanent \
       --region "$REGION"
 
-    success "Test user created and confirmed: $TEST_EMAIL"
+    success "Test user created: $TEST_EMAIL"
   fi
 fi
 
 # ------------------------------------------------------------------
 # Output
 # ------------------------------------------------------------------
-echo ""
-echo "============================================================"
-echo "  Cognito Deployment Complete"
-echo "============================================================"
-echo ""
-echo "Add the following to your .env file:"
-echo ""
+step "Deployment Complete"
 
 ENV_BLOCK="VITE_COGNITO_USER_POOL_ID=${USER_POOL_ID}
 VITE_COGNITO_CLIENT_ID=${CLIENT_ID}
 VITE_COGNITO_REGION=${REGION}
 VITE_COGNITO_DOMAIN=${DOMAIN_PREFIX}"
 
-echo "$ENV_BLOCK"
 echo ""
-echo "------------------------------------------------------------"
-echo "  Resources Created"
-echo "------------------------------------------------------------"
-echo "  User Pool ID:    $USER_POOL_ID"
-echo "  App Client ID:   $CLIENT_ID"
-echo "  Cognito Domain:  https://$COGNITO_DOMAIN"
-echo "  Callback URL:    $CALLBACK_URL"
-echo "  Region:          $REGION"
-echo "------------------------------------------------------------"
+echo "  Add to .env:"
+echo "  ┌──────────────────────────────────────────────────────"
+echo "$ENV_BLOCK" | sed 's/^/  │  /'
+echo "  └──────────────────────────────────────────────────────"
+echo ""
+echo "  Resources:"
+echo "    User Pool:     $USER_POOL_ID"
+echo "    App Client:    $CLIENT_ID"
+echo "    Domain:        https://$COGNITO_DOMAIN"
+echo "    Callback URLs: ${ALL_CALLBACK_URLS[*]}"
+echo "    Login version: Managed Login v2"
+echo ""
 
-# Write to file if requested
 if [[ -n "$OUTPUT_ENV" ]]; then
   echo "$ENV_BLOCK" > "$OUTPUT_ENV"
   success "Environment variables written to: $OUTPUT_ENV"
 fi
 
-# Also update cognito-config.json in project root if it exists
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+# Update cognito-config.json
 CONFIG_FILE="$PROJECT_ROOT/cognito-config.json"
-
 if [[ -f "$CONFIG_FILE" ]]; then
-  info "Updating $CONFIG_FILE..."
+  info "Updating cognito-config.json..."
   cat > "$CONFIG_FILE" <<EOF
 {
   "userPoolId": "${USER_POOL_ID}",
@@ -354,4 +397,4 @@ EOF
 fi
 
 echo ""
-success "Done! Run your app with 'npm run dev' and sign in at http://localhost:3000"
+success "Done! Run 'npm run dev' and open http://localhost:3000"
