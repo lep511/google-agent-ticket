@@ -11,6 +11,7 @@ import { DebugPanel } from './components/DebugPanel';
 import {
   CognitoUserSession,
   getCurrentCognitoUser,
+  getIdToken,
   handleOAuthCallback,
   signInWithHostedUI,
   signOutCognito,
@@ -586,7 +587,7 @@ export default function App() {
     };
 
     try {
-      const idToken = localStorage.getItem('cognito_id_token');
+      const idToken = await getIdToken();
       const resp = await fetch('/api/analyze', {
         method: 'POST',
         headers: {

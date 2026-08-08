@@ -290,3 +290,29 @@ export async function signOutCognito(): Promise<void> {
     window.location.href = logoutUrl;
   }
 }
+
+/**
+ * Returns the current valid ID token for API authorization, or null if
+ * unavailable. Checks both the Hosted UI token and the SRP session.
+ */
+export async function getIdToken(): Promise<string | null> {
+  const storedToken = localStorage.getItem('cognito_id_token');
+  if (storedToken) {
+    try {
+      const payload = JSON.parse(atob(storedToken.split('.')[1]));
+      const now = Math.floor(Date.now() / 1000);
+      if (payload.exp && payload.exp > now) return storedToken;
+    } catch { /* fall through */ }
+  }
+
+  return new Promise((resolve) => {
+    const currentUser = userPool.getCurrentUser();
+    if (!currentUser) return resolve(null);
+
+    currentUser.getSession((err: any, session: any) => {
+      if (err || !session?.isValid()) return resolve(null);
+      const token = session.getIdToken()?.getJwtToken();
+      resolve(token || null);
+    });
+  });
+}
