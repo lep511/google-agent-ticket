@@ -41,7 +41,11 @@ export interface InputBarConfig {
   inputPlaceholder: string;
   /** Etiqueta del botón de ejecución (Requirement 13.7). */
   actionLabel: string;
-  /** Campo de instrucción visible solo cuando es verdadero (Requirement 13.6). */
+  /**
+   * Instruction field visible only when true (Requirement 13.6). Reserved for
+   * `ticker` agents: in `text` mode the bar stays a single field, so this is
+   * always false regardless of what the manifest declares.
+   */
   supportsInstruction: boolean;
 }
 
@@ -58,18 +62,24 @@ export const FALLBACK_INPUT_BAR_CONFIG: InputBarConfig = {
 };
 
 /**
- * Deriva la presentación de la barra del agente activo: `inputMode`,
- * `inputPlaceholder`, `actionLabel` y `supportsInstruction` del manifiesto
+ * Derives the active agent's bar presentation from the manifest: `inputMode`,
+ * `inputPlaceholder`, `actionLabel` and `supportsInstruction`
  * (Requirements 13.3, 13.4, 13.5, 13.6, 13.7).
+ *
+ * The instruction field is only offered to `ticker` agents. A free-text agent
+ * already takes the whole bar for its prompt, so splitting it into input plus
+ * optional instruction adds no value there and `supportsInstruction` is forced
+ * to false even when the manifest declares it.
  */
 export function inputBarConfig(agent: AgentCatalogEntry | null): InputBarConfig {
   if (!agent) return FALLBACK_INPUT_BAR_CONFIG;
 
   const placeholder = agent.inputPlaceholder?.trim();
   const actionLabel = agent.actionLabel?.trim();
+  const inputMode: InputMode = agent.inputMode === 'text' ? 'text' : 'ticker';
 
   return {
-    inputMode: agent.inputMode === 'text' ? 'text' : 'ticker',
+    inputMode,
     inputPlaceholder:
       placeholder && placeholder.length > 0
         ? agent.inputPlaceholder
@@ -78,7 +88,7 @@ export function inputBarConfig(agent: AgentCatalogEntry | null): InputBarConfig 
       actionLabel && actionLabel.length > 0
         ? agent.actionLabel
         : FALLBACK_INPUT_BAR_CONFIG.actionLabel,
-    supportsInstruction: agent.supportsInstruction === true,
+    supportsInstruction: inputMode === 'ticker' && agent.supportsInstruction === true,
   };
 }
 
