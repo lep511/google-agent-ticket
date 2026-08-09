@@ -42,3 +42,4 @@ dist-ssr
 .vercel
 api/*.mjs
 certs/
+.env*

@@ -1,13 +1,11 @@
 import { LandingView } from './LandingView';
-import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { DottedBackground } from './components/PulsatingDots';
 import { History, Search, Loader2 } from 'lucide-react';
 import ReportTemplate from "./ReportTemplate";
 import SimpleReportView, { normalizeSimpleReport } from './components/SimpleReportView';
 import { AgentTimeline, TimelineEvent } from './components/AgentTimeline';
 import { AgentSelector } from './components/AgentSelector';
-// DEBUG (provisional): borrar este import junto con el bloque <DebugPanel /> del final.
-import { DebugPanel } from './components/DebugPanel';
 import {
   CognitoUserSession,
   getCurrentCognitoUser,
@@ -82,11 +80,8 @@ export interface ReportData {
 }
 
 /**
- * Número de documentos citados por el informe, contado según el contrato del
- * renderizador que lo produjo. `findings` solo existe en el contrato
- * `financial_report`; los informes `simple_report` citan sus documentos en
- * `sources`, así que contar siempre `findings` dejaba la métrica en cero para
- * todos los agentes de informe simple (Requirement 14.3).
+ * Number of documents cited by the report, counted according to the contract of
+ * the renderer that produced it.
  */
 export function countReportDocuments(
   data: ReportData | Record<string, unknown> | null | undefined,
@@ -123,13 +118,12 @@ const ENABLE_JSON_DOWNLOAD = false;
 const MODEL_ID = 'deepseek-ai/deepseek-v4-flash-0731';
 const MODEL_DISPLAY_NAME = 'DeepSeek V4 Flash';
 
-/** Estado de la petición del catálogo de agentes (Requirements 11.7, 11.8, 11.9). */
 export type CatalogStatus = 'loading' | 'ready' | 'error';
 
 /**
- * Agente que produjo el resultado en pantalla, junto con su renderizador. Se
- * congela al iniciar la ejecución para que un cambio de agente posterior no
- * altere la presentación de ese resultado (Requirement 14.1).
+ * Agent that produced the current on-screen result, along with its renderer.
+ * Frozen at the start of a run so a later agent change doesn't affect the
+ * presentation of that result.
  */
 export interface RunAgent {
   agentId: string;
@@ -138,10 +132,9 @@ export interface RunAgent {
 }
 
 /**
- * Copy of the Report Snapshot that feeds the restored report view (Requirement
- * 5). It is a copy and not a reference to the History Entry so that deleting
- * that entry, or clearing the whole history, leaves the report on screen
- * untouched (Requirement 10.10).
+ * Copy of the report snapshot that feeds the restored report view. It is a copy
+ * (not a reference to the History Entry) so that deleting that entry or clearing
+ * the history leaves the report on screen untouched.
  */
 export interface RestoredReport {
   entryId: string;
@@ -153,29 +146,20 @@ export interface RestoredReport {
 }
 
 export default function App() {
-  /** Valor de entrada; su significado depende del `inputMode` del agente activo. */
   const [inputValue, setInputValue] = useState('');
   const [instruction, setInstruction] = useState('');
 
-  // Catálogo de agentes y agente activo.
+  // Agent catalog and active agent.
   const [agents, setAgents] = useState<AgentCatalogEntry[]>([]);
   const [defaultAgentId, setDefaultAgentId] = useState<string | null>(null);
   const [catalogStatus, setCatalogStatus] = useState<CatalogStatus>('loading');
   const [catalogError, setCatalogError] = useState<string | null>(null);
-  // Requirement 11.8: el último agente conocido (el almacenado) sigue activo
-  // aunque la petición del catálogo falle.
   const [activeAgentId, setActiveAgentId] = useState<string | null>(() => readStoredAgentId());
-  // Requirement 14.1: agente y renderizador de la ejecución en curso.
   const [runAgent, setRunAgent] = useState<RunAgent | null>(null);
-  
-  // Gemini 3.6 Flash state
+
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reportData, setReportData] = useState<ReportData | null>(null);
-  /**
-   * Requirement 14.6: el texto final de la ejecución no contenía ningún objeto
-   * válido para su renderizador, así que no se promovió informe alguno.
-   */
   const [unstructuredReport, setUnstructuredReport] = useState(false);
   const [events, setEvents] = useState<TimelineEvent[]>([]);
   const abortRef = useRef<AbortController | null>(null);
@@ -193,7 +177,6 @@ export default function App() {
 
   /* ── Interaction history ─────────────────────────────────────── */
 
-  /** Full history of every agent, as it is persisted (Requirement 8.3). */
   const [historyEntries, setHistoryEntries] = useState<InteractionHistoryEntry[]>([]);
   /**
    * Mirror of `historyEntries` readable outside the render cycle. The recording
@@ -205,13 +188,10 @@ export default function App() {
   const historyTriggerRef = useRef<HTMLButtonElement | null>(null);
   /**
    * Report restored from the history. It lives beside the live run state
-   * (`reportData`, `runAgent`, `isReportOpen` and the live metrics) and never
-   * writes into it, so closing it gives back exactly the previous view
-   * (Requirement 5.7).
+   * and never writes into it, so closing it gives back exactly the previous view.
    */
   const [restoredReport, setRestoredReport] = useState<RestoredReport | null>(null);
 
-  /** Requirement 6.2: load history scoped to the current user. */
   useEffect(() => {
     const stored = readHistory(user?.userId);
     historyRef.current = stored;
@@ -220,8 +200,8 @@ export default function App() {
 
   /**
    * Single write gate: persists the list and publishes the effective one, which
-   * is the trimmed list when the quota forced a trim (Requirements 6.1, 6.6,
-   * 7.5). Every history mutation goes through here.
+   * is the trimmed list when the quota forced a trim. Every history mutation
+   * goes through here.
    */
   const applyHistory = useCallback((next: InteractionHistoryEntry[]) => {
     const { entries } = persistHistory(next, user?.userId);
@@ -229,10 +209,6 @@ export default function App() {
     setHistoryEntries(entries);
   }, [user?.userId]);
 
-  /**
-   * Requirements 10.3, 10.4: only the entry with that `id` disappears, the
-   * resulting list is persisted and the panel stays open.
-   */
   const deleteHistoryEntry = useCallback(
     (id: string) => {
       applyHistory(deleteEntry(historyRef.current, id));
@@ -240,25 +216,17 @@ export default function App() {
     [applyHistory],
   );
 
-  /** Requirement 10.7: full deletion, across every agent. */
   const clearHistory = useCallback(() => {
     applyHistory([]);
   }, [applyHistory]);
 
   /**
-   * Requirements 5.1, 5.5, 5.6: activating a Visible Entry paints its stored
-   * Report Snapshot and closes the panel. The whole restoration is a local state
-   * assignment, so no request reaches `/api/analyze`. While a run is in progress
-   * nothing is restored; the panel also disables its rows and explains why.
+   * Activating a visible entry paints its stored report snapshot and closes the
+   * panel. While a run is in progress nothing is restored.
    */
   const restoreEntry = useCallback(
     (entry: InteractionHistoryEntry) => {
       if (running) return;
-      /*
-        The snapshot fields are copied into the restored state instead of keeping
-        a handle on the entry, which is what keeps the report on screen alive
-        after that entry is deleted or the history is cleared (Requirement 10.10).
-      */
       setRestoredReport({
         entryId: entry.id,
         report: entry.report,
@@ -272,10 +240,7 @@ export default function App() {
     [running],
   );
 
-  /**
-   * Requirement 2.9: closing the panel returns keyboard focus to the
-   * History_Trigger, whatever closed it (overlay, `Escape` or close control).
-   */
+  // Return focus to the history trigger when the panel closes.
   const wasHistoryOpen = useRef(false);
   useEffect(() => {
     if (wasHistoryOpen.current && !isHistoryOpen) {
@@ -308,38 +273,17 @@ export default function App() {
     setError(null);
   };
 
-  /**
-   * Requirements 8.1, 8.2, 8.5: entries whose `agentId` matches the Active
-   * Agent exactly. A null Active Agent yields zero Visible Entries, and a change
-   * of Active Agent recomputes the list on the next render.
-   */
   const visibleEntries = useMemo(
     () => selectVisibleEntries(historyEntries, activeAgentId),
     [historyEntries, activeAgentId],
   );
 
-  /** Entrada de catálogo del agente activo; nula mientras no hay catálogo. */
   const activeAgent = findAgent(agents, activeAgentId);
-  /** Requirement 11.9: sin agentes válidos no hay nada que ejecutar. */
   const isCatalogEmpty = catalogStatus === 'ready' && agents.length === 0;
-  /**
-   * Requirement 12.7: nombre que encabeza el panel de ejecución. Es el `name`
-   * del agente activo; si el catálogo aún no está disponible se recurre al
-   * nombre informado por la ejecución en curso.
-   */
-  const executionPanelAgentName = activeAgent?.name ?? runAgent?.agentName ?? 'Agente';
+  const executionPanelAgentName = activeAgent?.name ?? runAgent?.agentName ?? 'Agent';
 
-  /**
-   * Presentación de la barra de entrada declarada por el agente activo:
-   * `inputMode`, `inputPlaceholder`, `actionLabel` y `supportsInstruction`
-   * (Requirements 13.3, 13.4, 13.5, 13.6, 13.7).
-   */
   const { inputMode, inputPlaceholder, actionLabel, supportsInstruction } =
     inputBarConfig(activeAgent);
-  /**
-   * Requirements 8.7, 8.8: el botón solo se habilita cuando la entrada cumple
-   * las reglas de longitud y conjunto de caracteres del `inputMode` activo.
-   */
   const canRunAnalysis = canRun({
     value: inputValue,
     instruction,
@@ -348,12 +292,8 @@ export default function App() {
   });
 
   /**
-   * Pide el catálogo y fija el agente activo: el agentId almacenado cuando está
-   * en el catálogo (Requirement 12.1), y el `defaultAgentId` sobrescribiendo el
-   * valor almacenado en cualquier otro caso (Requirement 12.2).
-   *
-   * Si la petición falla, el estado pasa a error y el último agente conocido
-   * sigue activo (Requirement 11.8); el selector reintenta con esta función.
+   * Fetches the catalog and sets the active agent: the stored agentId when it
+   * exists in the catalog, otherwise the defaultAgentId overwrites storage.
    */
   const loadCatalog = useCallback(async (signal?: AbortSignal) => {
     setCatalogStatus('loading');
@@ -396,7 +336,7 @@ export default function App() {
     return () => controller.abort();
   }, [loadCatalog]);
 
-  /** Vacía informe, línea de tiempo, métricas y error previos. */
+  /** Clears report, timeline, metrics, and previous error. */
   const resetRunResults = () => {
     setReportData(null);
     setUnstructuredReport(false);
@@ -413,22 +353,16 @@ export default function App() {
   };
 
   /**
-   * Selección de agente del usuario: persiste el agentId (Requirement 12.3) y
-   * vacía el resultado previo cuando el agente activo cambia
-   * (Requirement 12.4). Durante una ejecución la selección no se mueve
-   * (Requirement 11.4).
+   * User agent selection: persists the agentId and clears the previous result
+   * when the active agent changes. During a run the selection is locked.
    */
   const selectAgent = (agentId: string) => {
     if (running) return;
     storeSelectedAgentId(agentId);
     if (agentId === activeAgentId) return;
     setActiveAgentId(agentId);
-    /*
-      La barra se vacía al cambiar de agente: cada agente declara su propio
-      `inputMode`, así que la entrada anterior puede no ser válida para el nuevo
-      (un ticker en un campo de texto libre, por ejemplo). Reseleccionar el
-      agente activo no llega aquí y conserva lo escrito.
-    */
+    // Clear the input bar on agent change: each agent declares its own inputMode,
+    // so the previous input may not be valid for the new one.
     setInputValue('');
     setInstruction('');
     resetRunResults();
@@ -466,7 +400,7 @@ export default function App() {
       return newEvents;
     });
   };
-  
+
   const pushEvent = createPushEvent(setEvents, eventIdRef);
 
   const extractThinkingTitle = (text: string) => {
@@ -489,11 +423,6 @@ export default function App() {
     return 'Analyzing...';
   };
 
-  /**
-   * Extractor del texto final parametrizado por el renderizador de la
-   * ejecución: las claves raíz aceptadas son las de ese renderizador
-   * (Requirements 14.4, 14.5).
-   */
   const parseFinalText = (text: string, renderer: OutputRenderer) =>
     extractReport(text, renderer);
 
@@ -523,8 +452,8 @@ export default function App() {
     setStart(Date.now());
     eIdRef.current = 0;
 
-    // Requirement 14.1: la ejecución arranca etiquetada con el agente activo y
-    // su renderizador; el evento `agent_info` confirma o corrige esos valores.
+    // The run starts tagged with the active agent and its renderer; the
+    // `agent_info` event confirms or corrects those values.
     const requestedAgent = findAgent(agents, requestedAgentId);
     setRunAgent(
       requestedAgent
@@ -540,21 +469,15 @@ export default function App() {
     aRef.current = controller;
     const startTimestamp = Date.now();
     let currentToolRuns = 0;
-    /*
-      Run-local accumulators for the Report Snapshot (Requirement 3.3). Every
-      `set*` call schedules an asynchronous state update, so reading React state
-      when the run finishes would snapshot stale values; these mirrors always
-      carry the numbers this run produced.
-    */
-    /** Report object promoted by this run, or null when none was promoted. */
+    // Run-local accumulators for the report snapshot. Every `set*` call schedules
+    // an asynchronous state update, so reading React state when the run finishes
+    // would snapshot stale values; these mirrors always carry the numbers this
+    // run produced.
     let promotedReport: Record<string, unknown> | null = null;
     let currentTokenCount = 0;
     let currentDuration = 0;
-    /**
-     * Requirement 3.2: identity of the agent that produced the report. It is
-     * frozen here and only `agent_info` refreshes it, so a later change of
-     * Active Agent cannot retag this run.
-     */
+    // Identity of the agent that produced the report. Frozen here and only
+    // `agent_info` refreshes it.
     let runIdentity: RunAgent | null = requestedAgent
       ? {
           agentId: requestedAgent.id,
@@ -562,25 +485,13 @@ export default function App() {
           outputRenderer: requestedAgent.outputRenderer,
         }
       : null;
-    /**
-     * Renderizador con el que se interpreta el texto final de esta ejecución.
-     * Arranca con el del agente enviado y lo confirma o corrige `agent_info`
-     * (Requirements 14.1, 14.5).
-     */
+    // Renderer used to interpret the final text of this run. Starts with the
+    // requested agent's renderer and is confirmed or corrected by `agent_info`.
     let runRenderer: OutputRenderer = requestedAgent?.outputRenderer ?? FALLBACK_OUTPUT_RENDERER;
-    /** Requirement 14.6: solo se avisa cuando no se promovió ningún informe. */
     let reportPromoted = false;
-    /**
-     * Mensaje del evento `error` del flujo, cuando el servidor informó un fallo
-     * del agente remoto. Sin esto la ejecución terminaba en silencio.
-     */
+    // Error message from the stream's `error` event, when the remote agent failed.
     let streamErrorMessage: string | null = null;
-    /**
-     * Eventos que esta ejecución dejó en la línea de tiempo. La vista principal
-     * deriva la pantalla de `running`, `reportData` y `events.length`, así que
-     * terminar con los tres vacíos devuelve al usuario a la vista de aterrizaje
-     * sin explicación. Este contador permite garantizar siempre una traza.
-     */
+    // Event counter to guarantee there is always a trace in the timeline.
     let eventsPushed = 0;
     const emit = (...args: Parameters<ReturnType<typeof createPushEvent>>) => {
       eventsPushed += 1;
@@ -596,14 +507,9 @@ export default function App() {
           ...(idToken ? { 'Authorization': `Bearer ${idToken}` } : {}),
         },
         body: JSON.stringify({
-          // Requirement 12.6: el agentId del agente activo viaja en el cuerpo.
           agentId: requestedAgentId ?? undefined,
-          // `input` es el campo principal; `ticker` se mantiene como alias
-          // heredado para no romper el contrato anterior (Requirement 9.2).
           input: inputValue.trim(),
           ticker: inputValue.trim(),
-          // Requirement 13.6: solo los agentes que declaran `supportsInstruction`
-          // muestran el campo, y solo entonces se envía su valor.
           instruction: supportsInstruction ? instruction.trim() || undefined : undefined,
           origin: window.location.origin,
           model: model
@@ -633,7 +539,7 @@ export default function App() {
 
         const { done, value } = await reader.read();
         if (done) break;
-        
+
         buffer += decoder.decode(value, { stream: true });
 
         const lines = buffer.split('\n\n');
@@ -646,24 +552,17 @@ export default function App() {
             try {
               const evt = JSON.parse(dataStr);
               if (evt.type === 'agent_info') {
-                  // Requirement 14.1: the renderer of this run is fixed by the
-                  // agent that served it.
                   const informedAgentId = typeof evt.agentId === 'string' ? evt.agentId : null;
                   if (informedAgentId) {
                     runRenderer = isOutputRenderer(evt.outputRenderer)
                       ? evt.outputRenderer
                       : FALLBACK_OUTPUT_RENDERER;
-                    // Requirement 3.2: the accumulator and the live state move
-                    // together, so the History Entry carries this identity.
                     runIdentity = {
                       agentId: informedAgentId,
                       agentName: typeof evt.agentName === 'string' ? evt.agentName : informedAgentId,
                       outputRenderer: runRenderer,
                     };
                     setRunAgent(runIdentity);
-                    // Requirements 12.5, 12.6: when the agent that ran is not
-                    // the requested one, the informed agent becomes active and
-                    // is stored.
                     if (informedAgentId !== requestedAgentId) {
                       setActiveAgentId(informedAgentId);
                       storeSelectedAgentId(informedAgentId);
@@ -682,18 +581,14 @@ export default function App() {
                   const label = extractThinkingTitle(evt.text);
                   emit('thinking', label, evt.text);
               } else if (evt.type === 'error') {
-                  /*
-                    El servidor cierra el flujo con `error` + `done` cuando el
-                    agente remoto falla. Sin esta rama el fallo se descartaba:
-                    ni error visible ni evento en la línea de tiempo, así que la
-                    vista volvía a la pantalla inicial sin rastro alguno.
-                  */
+                  // The server closes the stream with `error` + `done` when the
+                  // remote agent fails. Without this the failure was discarded silently.
                   streamErrorMessage =
                     typeof evt.message === 'string' && evt.message.trim()
                       ? evt.message
                       : 'The agent reported an error with no detail.';
-                  console.error('[stream] Evento de error del agente:', streamErrorMessage);
-                  emit('error', 'Run failed', streamErrorMessage);
+                  console.error('[stream] Agent error event:', streamErrorMessage);
+                  emit('error', 'Run failed', streamErrorMessage ?? undefined);
                   setErr(streamErrorMessage);
               } else if (evt.type === 'complete') {
                   if (evt.interaction) {
@@ -702,16 +597,12 @@ export default function App() {
                       if (usage) {
                           const tokens = usage.total_token_count || usage.totalTokenCount || usage.total_tokens || 0;
                           if (tokens > 0) {
-                              // Requirement 3.3: mirrored into the run-local
-                              // accumulator for the History Entry metrics.
                               currentTokenCount = tokens;
                               setTok(tokens);
                           }
                       }
                   }
               } else if (evt.type === 'final_stats') {
-                  // Requirement 3.3: the accumulators follow the displayed
-                  // metrics step by step.
                   if (evt.tokens > 0) {
                       currentTokenCount = evt.tokens;
                       setTok(evt.tokens);
@@ -737,25 +628,21 @@ export default function App() {
                   }
               }
             } catch (parseError) {
-              // Un evento ilegible ya no desaparece sin dejar rastro: queda en
-              // consola con su carga para poder diagnosticarlo.
               console.warn('[stream] Unreadable SSE event discarded:', dataStr, parseError);
             }
           }
         }
-        
+
         if (accumulatedText) {
             const foundData = parseFinalText(accumulatedText, runRenderer);
             if (foundData) {
-                // Requirement 3.1: the promoted report is kept run-locally too,
-                // because the History Entry is built outside the render cycle.
                 promotedReport = foundData;
                 setRep(foundData);
                 reportPromoted = true;
             }
         }
       }
-      
+
       if (buffer) {
           try {
               const lines = buffer.split('\n\n');
@@ -773,33 +660,25 @@ export default function App() {
               console.warn('[stream] Buffer tail discarded as unreadable:', buffer, tailError);
           }
       }
-      
+
       if (accumulatedText) {
           const finalData = parseFinalText(accumulatedText, runRenderer);
           if (finalData) {
-              // Requirement 3.1: same mirroring for the tail of the stream.
               promotedReport = finalData;
               setRep(finalData);
               reportPromoted = true;
           }
       }
 
-      /*
-        Requirement 14.6: sin objeto válido para el renderizador de la ejecución
-        no se promueve informe; el texto crudo queda en la línea de tiempo y el
-        aviso explica que no pudo estructurarse.
-      */
+      // No valid object for the run's renderer: the raw text stays in the
+      // timeline and the warning explains it could not be structured.
       if (!reportPromoted && accumulatedText.trim()) {
           emit('text', 'Unstructured response', accumulatedText);
           setUnstructuredReport(true);
       }
 
-      /*
-        Una ejecución que acaba sin informe, sin texto y sin ningún evento deja
-        las tres condiciones de la vista de aterrizaje satisfechas, y el usuario
-        vuelve a la pantalla inicial como si nunca hubiera ejecutado nada. Aquí
-        se garantiza siempre una traza en la línea de tiempo y un error visible.
-      */
+      // A run that ends without a report, text, or any event leaves the landing
+      // view conditions satisfied. Guarantee there is always a trace.
       if (!reportPromoted && !accumulatedText.trim() && eventsPushed === 0) {
           const message =
             streamErrorMessage ??
@@ -813,27 +692,13 @@ export default function App() {
       setDur(currentDuration);
       setRun(false);
 
-      /*
-        Requirements 3.1, 3.2, 3.6: exactly one History Entry per run that
-        promoted a report, tagged with the identity frozen for this run instead
-        of the Active Agent at the moment of saving. This is the only recording
-        point: the `AbortError` branch (user stop) and the error branch of the
-        `catch` never reach it, and a run that finished without promoting a
-        report leaves `reportPromoted` false, so all three paths leave the
-        history untouched.
-      */
+      // Exactly one history entry per run that promoted a report, tagged with
+      // the identity frozen for this run.
       if (reportPromoted && promotedReport && runIdentity) {
         const draft: HistoryEntryDraft = {
           agentId: runIdentity.agentId,
           agentName: runIdentity.agentName,
           outputRenderer: runIdentity.outputRenderer,
-          /*
-            `createHistoryEntry` trims the query and collapses an empty or
-            whitespace-only instruction into null (Requirements 3.3, 3.4, 3.5).
-            Requirement 13.6: only an agent that declares `supportsInstruction`
-            sent an instruction with this run, so any leftover text of a previous
-            agent is not recorded as part of it.
-          */
           query: inputValue,
           instruction: supportsInstruction ? instruction : null,
           createdAt: Date.now(),
@@ -844,12 +709,6 @@ export default function App() {
             toolRuns: currentToolRuns,
           },
         };
-        /*
-          The `ref` is read instead of the `historyEntries` state because this
-          callback closed over the list as it was when the run started.
-          Requirement 3.8: `insertEntry` places the entry first, so the list
-          stays ordered by `createdAt` descending.
-        */
         const entries = historyRef.current;
         applyHistory(insertEntry(entries, createHistoryEntry(draft, entries)));
       }
@@ -857,10 +716,6 @@ export default function App() {
     } catch (e: any) {
       if (e.name === 'AbortError') {
          console.log('Aborted');
-         /*
-           Detener antes del primer evento también dejaba la pantalla vacía: se
-           registra el corte para que la ejecución siga siendo visible.
-         */
          if (eventsPushed === 0) {
             emit('info', 'Run stopped', 'The run was stopped before producing results.');
          }
@@ -878,7 +733,6 @@ export default function App() {
 
   const runAnalysis = () => {
     if (running) return;
-    // Requirements 8.7, 11.9: sin entrada válida o sin agentes no hay ejecución.
     if (!canRunAnalysis) return;
     setIsReportOpen(false);
     setIsStopped(false);
@@ -886,17 +740,10 @@ export default function App() {
     startStream(MODEL_ID, activeAgentId, setRunning, setError, setReportData, setEvents, pushEvent, setTokenCount, setToolRuns, setDurationSecs, setStartTime, abortRef, eventIdRef);
   };
 
-  /*
-    Requirement 5.1: the restored report takes over the view. This guard runs
-    ahead of the live-report branch below so a restoration can be opened from the
-    landing view, from the run panel or on top of a live report, and closing it
-    only clears `restoredReport`: the live state was never touched, so whatever
-    was on screen before comes back on its own (Requirement 5.7).
-  */
+  // The restored report takes over the view. Closing it only clears
+  // `restoredReport`; the live state was never touched.
   if (restoredReport) {
-    /* Requirement 5.2: the renderer stored with the entry decides the view. */
     const restoredRenderer = restoredReport.outputRenderer;
-    /* Requirement 5.3: the metrics are the ones frozen in the snapshot. */
     const { durationSecs: restoredDuration, tokenCount: restoredTokens, toolRuns: restoredToolRuns } =
       restoredReport.metrics;
 
@@ -905,7 +752,6 @@ export default function App() {
         {restoredRenderer === 'simple_report' ? (
           <SimpleReportView
             data={restoredReport.report as unknown as RawSimpleReport}
-            /* Requirement 5.4: stored agent name as title, stored query as subtitle. */
             title={restoredReport.agentName}
             subtitle={restoredReport.query}
             onClose={() => setRestoredReport(null)}
@@ -916,7 +762,6 @@ export default function App() {
         ) : (
           <ReportTemplate
             data={restoredReport.report as unknown as ReportData}
-            /* `ticker` is the header identifier of this view (Requirement 5.4). */
             ticker={restoredReport.query}
             onClose={() => setRestoredReport(null)}
             durationSecs={restoredDuration}
@@ -930,22 +775,12 @@ export default function App() {
   }
 
   if (isReportOpen === 'flash' && reportData) {
-    /*
-      Requirement 14.1: el renderizador es el de la ejecución que produjo este
-      informe, guardado en `runAgent` al recibir su `agent_info`. Un cambio de
-      agente activo posterior no lo altera.
-    */
     const reportRenderer = runAgent?.outputRenderer ?? FALLBACK_OUTPUT_RENDERER;
 
     return (
       <div className="w-full h-screen print:h-auto print:overflow-visible">
          {reportRenderer === 'simple_report' ? (
-           /* Requirement 14.3: informe simple con `SimpleReportView`. */
            <SimpleReportView
-             /*
-               El informe llega recién extraído del texto del modelo, con la
-               forma del contrato `simple_report`; la vista normaliza cada campo.
-             */
              data={reportData as unknown as RawSimpleReport}
              title={runAgent?.agentName ?? 'Report'}
              subtitle={inputValue}
@@ -955,7 +790,6 @@ export default function App() {
              tokenCount={tokenCount}
            />
          ) : (
-           /* Requirement 14.2: informe financiero con el contrato de props intacto. */
            <ReportTemplate
              data={reportData}
              ticker={inputValue}
@@ -1000,23 +834,13 @@ export default function App() {
   }
 
   return (
-    /*
-      Shell bound to the viewport height (`dvh`, so mobile browser chrome does
-      not push the bottom row out of sight). The rows that scroll are the ones
-      inside it, never the document.
-    */
     <div className="relative h-dvh bg-stone-900 overflow-hidden font-sans text-stone-100 flex flex-col">
       <DottedBackground />
-      
+
       {/* Header */}
       <header className="relative z-20 flex shrink-0 items-center justify-between gap-3 px-6 py-4 border-b border-white/10 bg-black/20 backdrop-blur-md">
         <div className="flex items-center gap-4">
           <span className="font-display font-bold text-xl tracking-wider uppercase text-white">Tickr</span>
-          {/*
-            Requirements 11.1, 11.4: selector del agente activo en la cabecera.
-            Con una ejecución en curso queda bloqueado y el propio componente
-            explica el motivo.
-          */}
           <AgentSelector
             agents={agents}
             activeAgentId={activeAgentId}
@@ -1027,22 +851,16 @@ export default function App() {
             onSelect={selectAgent}
             onRetry={() => loadCatalog()}
           />
-          {/*
-            Requirements 1.1, 1.2, 1.3: History_Trigger in the header, right
-            after the Agent_Selector, so both controls share the left group.
-          */}
           <button
             ref={historyTriggerRef}
             type="button"
             aria-label="History"
-            /* Requirements 1.4, 1.5, 1.6: one toggle drives the panel and this state. */
             aria-expanded={isHistoryOpen}
             onClick={() => setIsHistoryOpen((open) => !open)}
             className="flex items-center gap-2 rounded border border-white/10 bg-white/5 px-3 py-1.5 font-sans text-sm text-stone-300 transition-colors hover:bg-white/10 hover:text-stone-100"
           >
             <History className="h-4 w-4" aria-hidden="true" />
             <span className="hidden sm:inline">History</span>
-            {/* Requirement 1.7: the count appears only with Visible Entries. */}
             {visibleEntries.length > 0 && (
               <span className="rounded-full bg-stone-800 px-1.5 py-0.5 font-mono text-[11px] text-stone-200">
                 {visibleEntries.length}
@@ -1066,16 +884,11 @@ export default function App() {
 
       <main className="relative z-10 flex-1 flex flex-col pt-4 sm:pt-8 min-h-0">
         {!running && !reportData && events.length === 0 ? (
-           /* Requirements 13.1, 13.2: la vista de aterrizaje describe al agente activo. */
            <LandingView agent={activeAgent} />
         ) : (
            <div className="flex-1 flex flex-row overflow-hidden min-h-0 w-full px-6">
              <div className="flex-1 flex flex-col bg-stone-900 rounded-xl border border-stone-800 overflow-hidden min-h-0 max-w-4xl mx-auto w-full">
                 <div className="p-3 bg-stone-800 border-b border-stone-700 font-bold text-stone-200 text-sm flex justify-between items-center">
-                  {/*
-                    Requirement 12.7: el `name` del agente activo encabeza el
-                    panel y el nombre del modelo queda como texto secundario.
-                  */}
                   <div className="flex items-center gap-2 min-w-0">
                     <img src="/deepseek-logo.svg" alt="DeepSeek" className="w-5 h-5 shrink-0" />
                     <span className="truncate">{executionPanelAgentName}</span>
@@ -1084,9 +897,9 @@ export default function App() {
                   {running && <Loader2 className="w-4 h-4 animate-spin text-stone-400" />}
                 </div>
                 <div className="flex-1 min-h-0 flex flex-col relative overflow-hidden">
-                  <AgentTimeline 
-                    events={events} 
-                    running={running} 
+                  <AgentTimeline
+                    events={events}
+                    running={running}
                     hasReport={!!reportData && isReportOpen !== 'flash'}
                     onViewReport={() => setIsReportOpen('flash')}
                     metrics={
@@ -1094,8 +907,6 @@ export default function App() {
                         ? {
                             durationSecs,
                             tokenCount,
-                            // El conteo sigue el contrato del agente que produjo
-                            // el informe, no el del analista financiero.
                             documentCount: countReportDocuments(
                               reportData,
                               runAgent?.outputRenderer ?? FALLBACK_OUTPUT_RENDERER,
@@ -1110,11 +921,7 @@ export default function App() {
            </div>
         )}
 
-        {/*
-          Input bar always visible at the bottom. It is the last row of the
-          column instead of a `fixed` overlay, so shrinking the window scrolls
-          the area above it rather than hiding it behind the viewport edge.
-        */}
+        {/* Input bar always visible at the bottom. */}
         <div className="relative z-20 mt-auto w-full shrink-0 bg-gradient-to-t from-stone-900 via-stone-900 to-transparent px-6 pb-4 pt-4 sm:pb-8">
           <div className="max-w-4xl mx-auto w-full">
             {error && (
@@ -1123,10 +930,6 @@ export default function App() {
               </div>
             )}
 
-            {/*
-              Requirement 14.6: aviso de informe no estructurado. El texto crudo
-              del agente sigue disponible en la línea de tiempo.
-            */}
             {unstructuredReport && (
               <div
                 role="status"
@@ -1136,14 +939,10 @@ export default function App() {
                 in the timeline below.
               </div>
             )}
-            
+
 
             <div className="bg-stone-800 border border-stone-700 rounded-xl shadow-2xl p-2 w-full flex items-center gap-2 relative z-30 transition-all focus-within:border-stone-500 focus-within:ring-1 focus-within:ring-stone-500">
               {inputMode === 'ticker' ? (
-                /*
-                  Requirement 13.3: en modo `ticker`, campo corto en mayúsculas
-                  con tipografía monoespaciada e icono de búsqueda.
-                */
                 <div
                   className={`pl-3 py-2 flex items-center gap-2 transition-colors ${
                     running ? 'text-stone-600' : 'text-stone-400'
@@ -1152,17 +951,12 @@ export default function App() {
                   <Search className="w-5 h-5 shrink-0" aria-hidden="true" />
                   <input
                     type="text"
-                    aria-label="Entrada del agente"
+                    aria-label="Agent input"
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value.toUpperCase())}
-                    /* Requirement 13.5: el `inputPlaceholder` del manifiesto. */
                     placeholder={inputPlaceholder}
                     maxLength={inputMaxLength('ticker')}
                     disabled={running}
-                    /*
-                      El texto introducido se atenúa mientras hay una ejecución
-                      en curso: el campo está deshabilitado justo en ese caso.
-                    */
                     className={`bg-transparent border-none outline-none text-white font-mono uppercase placeholder-stone-600 transition-colors disabled:text-stone-500 disabled:placeholder-stone-700 ${
                       supportsInstruction ? 'w-28' : 'flex-1'
                     }`}
@@ -1170,10 +964,9 @@ export default function App() {
                   />
                 </div>
               ) : (
-                /* Requirement 13.4: en modo `text`, campo ancho de texto libre. */
                 <input
                   type="text"
-                  aria-label="Entrada del agente"
+                  aria-label="Agent input"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder={inputPlaceholder}
@@ -1183,18 +976,13 @@ export default function App() {
                   onKeyDown={(e) => e.key === 'Enter' && runAnalysis()}
                 />
               )}
-              {/*
-                Requirement 13.6: el campo de instrucción existe solo cuando el
-                agente declara `supportsInstruction` verdadero, y entonces está
-                habilitado.
-              */}
               {supportsInstruction && (
                 <input
                   type="text"
-                  aria-label="Instrucción adicional"
+                  aria-label="Additional instruction"
                   value={instruction}
                   onChange={(e) => setInstruction(e.target.value)}
-                  placeholder="Instrucción opcional para el agente"
+                  placeholder="Optional instruction for the agent"
                   maxLength={MAX_INSTRUCTION_LENGTH}
                   disabled={running}
                   className="bg-transparent border-none outline-none flex-1 px-3 py-2 text-stone-200 placeholder-stone-500 transition-colors disabled:text-stone-500 disabled:placeholder-stone-700"
@@ -1202,52 +990,35 @@ export default function App() {
                 />
               )}
               {running ? (
-                <button 
+                <button
                   onClick={() => setShowStopConfirm(true)}
                   className="bg-[#CC3131] text-white hover:bg-[#aa2929] px-6 py-2 rounded-lg font-medium transition-colors ml-2 tracking-wide text-sm"
                 >
                   Stop
                 </button>
               ) : (
-                <button 
+                <button
                   onClick={runAnalysis}
-                  /*
-                    Requirements 8.7, 8.8, 11.9: deshabilitado mientras la
-                    entrada no cumple las reglas del `inputMode` activo o el
-                    catálogo está vacío.
-                  */
                   disabled={!canRunAnalysis}
                   className="bg-white text-black hover:bg-stone-200 disabled:bg-stone-700 disabled:text-stone-500 disabled:cursor-not-allowed px-6 py-2 rounded-lg font-medium transition-colors ml-2 tracking-wide text-sm whitespace-nowrap"
                 >
-                  {/* Requirement 13.7: etiqueta declarada por el agente. */}
                   {actionLabel}
                 </button>
               )}
             </div>
 
-            {/* Requirement 13.8: el aviso legal sigue visible bajo la barra. */}
             <div className="text-center mt-4">
-              <span className="text-xs text-stone-500 font-mono tracking-wider">Gemini can make mistakes, don’t rely on it for financial advice.</span>
+              <span className="text-xs text-stone-500 font-mono tracking-wider">This AI can make mistakes, please verify important information.</span>
             </div>
           </div>
         </div>
       </main>
 
-      {/*
-        Requirements 2.2, 2.3, 8.1: the drawer receives the Visible Entries
-        already filtered and returns intents; the panel itself resolves the
-        overlay click, the close control and the `Escape` layers.
-      */}
       <HistoryPanel
         open={isHistoryOpen}
         entries={visibleEntries}
         running={running}
         onClose={() => setIsHistoryOpen(false)}
-        /*
-          Requirements 5.1, 5.6: activating an entry copies its Report Snapshot
-          into the restored state and closes the panel; a run in progress blocks
-          the restoration.
-        */
         onRestore={restoreEntry}
         onDelete={deleteHistoryEntry}
         onClearAll={clearHistory}
@@ -1259,13 +1030,13 @@ export default function App() {
             <h3 className="text-lg font-bold text-white mb-2">Stop Analysis?</h3>
             <p className="text-stone-400 text-sm mb-6">Are you sure you want to stop the current analysis? This action cannot be undone.</p>
             <div className="flex justify-end gap-3">
-              <button 
+              <button
                 onClick={() => setShowStopConfirm(false)}
                 className="px-4 py-2 bg-stone-800 hover:bg-stone-700 text-white rounded-lg font-medium transition-colors text-sm"
               >
                 Cancel
               </button>
-              <button 
+              <button
                 onClick={() => {
                   stopAgent();
                   setShowStopConfirm(false);
@@ -1278,45 +1049,6 @@ export default function App() {
           </div>
         </div>
       )}
-
-      {/* ---------------------------------------------------------------- */}
-      {/* DEBUG (provisional): bloque autocontenido. Para desactivarlo pon  */}
-      {/* DEBUG_PANEL_ENABLED en false en components/DebugPanel.tsx, o abre */}
-      {/* la app con ?nodebug. Para borrarlo, elimina este bloque, el       */}
-      {/* import de DebugPanel y el archivo del componente.                */}
-      {/* ---------------------------------------------------------------- */}
-      <DebugPanel
-        state={{
-          running,
-          isStopped,
-          error,
-          catalogStatus,
-          catalogError,
-          agents: agents.length,
-          activeAgentId,
-          defaultAgentId,
-          activeAgentName: activeAgent?.name,
-          outputRenderer: activeAgent?.outputRenderer,
-          runAgentId: runAgent?.agentId,
-          runRenderer: runAgent?.outputRenderer,
-          inputMode,
-          inputValue,
-          instruction,
-          canRunAnalysis,
-          model: MODEL_ID,
-          events: events.length,
-          hasReport: !!reportData,
-          unstructuredReport,
-          reportOpen: isReportOpen,
-          durationSecs,
-          tokenCount,
-          toolRuns,
-          startTime,
-          user: user?.email ?? user?.username ?? null,
-        }}
-        events={events}
-      />
-      {/* ------------------------- FIN DEBUG ---------------------------- */}
     </div>
   );
 }

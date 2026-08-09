@@ -11,13 +11,25 @@ import { act, cleanup, render, screen, waitFor, within } from '@testing-library/
 import userEvent from '@testing-library/user-event';
 
 import App from './App';
-import { HISTORY_STORAGE_KEY, type InteractionHistoryEntry } from './interactionHistory';
+import { HISTORY_STORAGE_KEY, userHistoryKey, type InteractionHistoryEntry } from './interactionHistory';
 import {
   OUTPUT_RENDERERS,
   type AgentCatalogEntry,
   type AgentCatalogResponse,
   type OutputRenderer,
 } from './types';
+
+vi.mock('./cognito', () => ({
+  handleOAuthCallback: vi.fn().mockResolvedValue(null),
+  getCurrentCognitoUser: vi.fn().mockResolvedValue({
+    userId: 'test-user-id',
+    username: 'testuser',
+    email: 'test@example.com',
+  }),
+  getIdToken: vi.fn().mockResolvedValue('mock-id-token'),
+  signInWithHostedUI: vi.fn(),
+  signOutCognito: vi.fn().mockResolvedValue(undefined),
+}));
 
 /**
  * Per-test budget for the asynchronous property tests. Each generated case
@@ -251,9 +263,11 @@ const storedHistoryArb: fc.Arbitrary<InteractionHistoryEntry[]> = fc
  * each mounted case starts from its own History Key with no leakage from the
  * previous one.
  */
+const TEST_USER_ID = 'test-user-id';
+
 function seedStoredHistory(entries: InteractionHistoryEntry[]): void {
   const storage = createStorageDouble();
-  storage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(entries));
+  storage.setItem(userHistoryKey(TEST_USER_ID), JSON.stringify(entries));
   vi.stubGlobal('localStorage', storage);
 }
 
@@ -619,7 +633,7 @@ const PRE_EXISTING_ENTRY: InteractionHistoryEntry = {
 
 /** Content of the History Key as an array, or null when the key is absent. */
 function readPersistedHistory(): InteractionHistoryEntry[] | null {
-  const raw = localStorage.getItem(HISTORY_STORAGE_KEY);
+  const raw = localStorage.getItem(userHistoryKey(TEST_USER_ID));
   return raw === null ? null : (JSON.parse(raw) as InteractionHistoryEntry[]);
 }
 
@@ -629,7 +643,7 @@ async function driveRun(
   ticker: string,
   outcome: RunOutcome,
 ): Promise<void> {
-  await user.type(screen.getByLabelText('Entrada del agente'), ticker);
+  await user.type(screen.getByLabelText('Agent input'), ticker);
   await user.click(screen.getByRole('button', { name: CATALOG_AGENT.actionLabel }));
 
   if (outcome === 'stopped') {
@@ -1190,7 +1204,7 @@ function captureInterfaceState(): InterfaceStateSnapshot {
   return {
     landingVisible:
       screen.queryByRole('heading', { level: 1, name: CATALOG_AGENT.name }) !== null,
-    runPanelVisible: screen.queryByAltText('NVIDIA') !== null,
+    runPanelVisible: screen.queryByAltText('DeepSeek') !== null,
     reportCardVisible:
       screen.queryByRole('heading', { name: 'Your report is now ready' }) !== null,
     reportViewVisible: screen.queryByTitle('Close report') !== null,
@@ -1951,9 +1965,8 @@ describe('History_Trigger in the header', () => {
     expect(leadingGroup.contains(agentSelector)).toBe(true);
     expect(leadingGroup.contains(trigger)).toBe(true);
 
-    // The last group is the session one, which offers the sign-in control while
-    // no user is authenticated.
-    expect(sessionGroup.contains(screen.getByRole('button', { name: 'Sign In' }))).toBe(true);
+    // The last group is the session one.
+    expect(sessionGroup.contains(screen.getByRole('button', { name: 'Sign Out' }))).toBe(true);
 
     // Requirement 1.1: document order confirms the placement, right after the
     // Agent_Selector and ahead of the session group.
@@ -2063,7 +2076,7 @@ describe('Hydrating the interaction history on mount', () => {
     // Invalid JSON: the mount has to survive it and expose an empty list
     // (Requirements 6.2, 6.4).
     const storage = createStorageDouble();
-    storage.setItem(HISTORY_STORAGE_KEY, '{not json');
+    storage.setItem(userHistoryKey(TEST_USER_ID), '{not json');
     vi.stubGlobal('localStorage', storage);
 
     render(<App />);

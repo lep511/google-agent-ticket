@@ -101,12 +101,20 @@ export function buildAgentCatalogResponse(
 ): AgentCatalogResponse {
   const { defaultAgentId } = snapshot;
 
-  return {
-    agents: snapshot.definitions.map((definition) =>
-      toAgentCatalogEntry(definition, defaultAgentId),
-    ),
-    defaultAgentId,
-  };
+  const entries = snapshot.definitions.map((definition) =>
+    toAgentCatalogEntry(definition, defaultAgentId),
+  );
+
+  // Place the default agent first regardless of its catalog order.
+  if (defaultAgentId) {
+    const idx = entries.findIndex((e) => e.id === defaultAgentId);
+    if (idx > 0) {
+      const [defaultEntry] = entries.splice(idx, 1);
+      entries.unshift(defaultEntry);
+    }
+  }
+
+  return { agents: entries, defaultAgentId };
 }
 
 /** Cuerpo de error del catálogo, sin rutas del sistema de archivos. */

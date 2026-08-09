@@ -24,11 +24,19 @@ fast-check property tests run at least 100 iterations. Override with `FC_NUM_RUN
 
 **Tickr** is a single-process app: an Express server runs AI agents in-process using the [Strands Agents SDK](https://strandsagents.com/) and streams results as SSE to a React frontend served by Vite (dev) or from `dist/` (production).
 
+### Deployment topology
+
+- **Frontend**: Deployed on Vercel (Vite static build) at `https://tickr-bay.vercel.app`
+- **Backend**: Express server running on EC2 (`44.197.184.195:3000`)
+- Vercel rewrites `/api/*` to the EC2 backend (configured in `vercel.json`)
+- Auto-deploys on push to `main` via GitHub integration (repo: `lep511/google-agent-ticket`)
+
 ### Runtime stack
 
-- **Agent SDK**: `@strands-agents/sdk` with `VercelModel` adapter wrapping `@ai-sdk/google` (Gemini)
-- **Model**: Gemini 3.x via `GEMINI_API_KEY`. Gemini 2.5 breaks multi-step runs (it rejects replayed tool-call ids)
-- **Tool**: `google_search` — a single grounded Gemini lookup per call; redirect URLs are resolved to publisher URLs before the agent sees them
+- **Agent SDK**: `@strands-agents/sdk` with NVIDIA NIM provider (OpenAI-compatible endpoint)
+- **Model**: DeepSeek V4 Flash via `NVIDIA_API_KEY` (default: `deepseek-ai/deepseek-v4-flash-0731`)
+- **Tools**: `braveSearchTool` (web search via Brave API), `calculatorTool` (arithmetic), tool registry for automatic resolution per agent
+- **Auth**: Amazon Cognito (user pool `us-east-1_2kDiHif9V`, Managed Login with authorization code + PKCE)
 - **Frontend**: React 19, Tailwind CSS 4, Recharts, motion (animations), lucide-react (icons)
 
 ### Key directories
@@ -36,9 +44,13 @@ fast-check property tests run at least 100 iterations. Override with `FC_NUM_RUN
 | Path | Purpose |
 |------|---------|
 | `server.ts` | Express entry point: mounts API routes, Vite middleware, access control |
-| `server/lib/` | All server modules: agent registry, validation, Strands runner, prompt builder, tools |
+| `server/lib/model/` | Model providers: `strandsAgent.ts` (Strands runner), `nvidiaProvider.ts` (NVIDIA NIM) |
+| `server/lib/agent/` | Agent system: registry, catalog, manifest validation, types, events |
+| `server/lib/tools/` | Tool implementations: `braveSearchTool.ts`, `calculatorTool.ts`, `toolRegistry.ts` |
+| `server/lib/` | Other server modules: input validation, prompt builder, Cognito auth, artifact upload |
 | `agent/` | Agent definitions (discovered at runtime from filesystem). Each subfolder is one agent |
 | `src/` | React frontend: App, components, client-side types and logic |
+| `cognito_setup/` | Cognito deployment scripts (`deploy.sh`, `teardown.sh`, Managed Login branding) |
 | `tests/` | Shared fixtures, setup files, and test helpers |
 
 ### Agent system
@@ -49,7 +61,9 @@ Agents are filesystem-discovered from `agent/<agent_id>/`. Each folder contains:
 - `prompt.md` — user prompt template with `{{input}}`, `{{instruction}}`, `{{schema}}` placeholders
 - `output.schema.json` — JSON schema the model must return
 
-The registry (`server/lib/agentRegistry.ts`) caches the catalog in memory and rebuilds when the mtime of `agent/` changes. Adding a new agent requires no TypeScript changes.
+Current agents: `financial_analyst_agent`, `web_search_agent`, `brainstorm_agent`, `calculator_agent`.
+
+The registry (`server/lib/agent/agentRegistry.ts`) caches the catalog in memory and rebuilds when the mtime of `agent/` changes. Adding a new agent requires no TypeScript changes.
 
 ### Request flow
 
@@ -79,10 +93,16 @@ Motion library is stubbed in web tests (`tests/helpers/motionStub.tsx`).
 ## Environment
 
 Required in `.env`:
-- `GEMINI_API_KEY` — credentials for the Gemini model
-- `VITE_COGNITO_*` — Cognito auth configuration (user pool, client, region, domain)
+- `NVIDIA_API_KEY` — NVIDIA NGC API key for NIM models
+- `VITE_COGNITO_USER_POOL_ID` — Cognito user pool ID
+- `VITE_COGNITO_CLIENT_ID` — Cognito app client ID
+- `VITE_COGNITO_REGION` — AWS region (e.g. `us-east-1`)
+- `VITE_COGNITO_DOMAIN` — Cognito Managed Login domain prefix
 
 Optional:
-- `GEMINI_MODEL_ID` — override agent model (default: `gemini-3.6-flash`)
-- `GEMINI_SEARCH_MODEL_ID` — model for google_search tool (default: `gemini-2.5-flash`)
+- `NVIDIA_MODEL_ID` — override model (default: `deepseek-ai/deepseek-v4-flash-0731`)
+- `BRAVE_API_KEY` — Brave Search API key (required for `web_search_agent`)
 - `HOST` — bind address (default `127.0.0.1`; non-loopback requires `API_ACCESS_TOKEN`)
+- `API_ACCESS_TOKEN` — shared secret (≥32 chars) required when HOST is not loopback
+- `CORS_ORIGINS` — comma-separated origins allowed for cross-origin API calls (e.g. `https://tickr-bay.vercel.app`)
+- `MCP_CONFIG_PATH` — path to MCP servers JSON config for additional agent tools
