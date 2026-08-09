@@ -11,25 +11,17 @@ import { act, cleanup, render, screen, waitFor, within } from '@testing-library/
 import userEvent from '@testing-library/user-event';
 
 import App from './App';
-import { HISTORY_STORAGE_KEY, userHistoryKey, type InteractionHistoryEntry } from './interactionHistory';
+import {
+  HISTORY_STORAGE_KEY,
+  userHistoryKey,
+  type InteractionHistoryEntry,
+} from './interactionHistory';
 import {
   OUTPUT_RENDERERS,
   type AgentCatalogEntry,
   type AgentCatalogResponse,
   type OutputRenderer,
 } from './types';
-
-vi.mock('./cognito', () => ({
-  handleOAuthCallback: vi.fn().mockResolvedValue(null),
-  getCurrentCognitoUser: vi.fn().mockResolvedValue({
-    userId: 'test-user-id',
-    username: 'testuser',
-    email: 'test@example.com',
-  }),
-  getIdToken: vi.fn().mockResolvedValue('mock-id-token'),
-  signInWithHostedUI: vi.fn(),
-  signOutCognito: vi.fn().mockResolvedValue(undefined),
-}));
 
 /**
  * Per-test budget for the asynchronous property tests. Each generated case
@@ -67,6 +59,53 @@ function createStorageDouble(): Storage {
       values.set(key, String(value));
     },
   } satisfies Storage;
+}
+
+/* ── Signed-in session ───────────────────────────────────────── */
+
+/**
+ * The application gates its whole interface behind a Cognito session, and it
+ * scopes the History Key to the signed-in user. Both come from the same place:
+ * an unexpired ID token in `localStorage`. Seeding that token is enough to sign
+ * the tests in through the real `getCurrentCognitoUser` path, with no module
+ * mock, so a change to how the session is read shows up here.
+ */
+const TEST_USER_ID = 'test-user-sub';
+
+/** Storage key the application reads and writes for the signed-in user. */
+const HISTORY_KEY = userHistoryKey(TEST_USER_ID);
+
+/**
+ * Keys a seeded history is written to. The mount reads the history twice: once
+ * before the session resolves, under the unscoped key, and again under the key
+ * of the signed-in user. Seeding both makes the first committed count already
+ * the final one, so the assertions do not depend on which read a given machine
+ * commits first.
+ */
+const SEEDED_HISTORY_KEYS = [HISTORY_STORAGE_KEY, HISTORY_KEY] as const;
+
+/**
+ * Unsigned ID token: `getCurrentCognitoUser` only base64-decodes the payload and
+ * checks `exp`, so a real signature is not needed to represent a live session.
+ */
+function fakeIdToken(): string {
+  const header = btoa(JSON.stringify({ alg: 'none', typ: 'JWT' }));
+  const payload = btoa(
+    JSON.stringify({
+      sub: TEST_USER_ID,
+      'cognito:username': 'tester',
+      email: 'tester@example.com',
+      exp: Math.floor(Date.now() / 1000) + 3600,
+    }),
+  );
+  return `${header}.${payload}.signature`;
+}
+
+/** Fresh storage double already holding a live session. */
+function signedInStorage(): Storage {
+  const storage = createStorageDouble();
+  storage.setItem('cognito_id_token', fakeIdToken());
+  return storage;
 }
 
 /* ── Synthetic agent catalog ─────────────────────────────────── */
@@ -123,7 +162,7 @@ function installFetchDouble(catalog: AgentCatalogResponse = CATALOG_RESPONSE): v
 }
 
 beforeEach(() => {
-  vi.stubGlobal('localStorage', createStorageDouble());
+  vi.stubGlobal('localStorage', signedInStorage());
   installFetchDouble();
 });
 
@@ -263,11 +302,10 @@ const storedHistoryArb: fc.Arbitrary<InteractionHistoryEntry[]> = fc
  * each mounted case starts from its own History Key with no leakage from the
  * previous one.
  */
-const TEST_USER_ID = 'test-user-id';
-
 function seedStoredHistory(entries: InteractionHistoryEntry[]): void {
-  const storage = createStorageDouble();
-  storage.setItem(userHistoryKey(TEST_USER_ID), JSON.stringify(entries));
+  const storage = signedInStorage();
+  const raw = JSON.stringify(entries);
+  for (const key of SEEDED_HISTORY_KEYS) storage.setItem(key, raw);
   vi.stubGlobal('localStorage', storage);
 }
 
@@ -633,7 +671,7 @@ const PRE_EXISTING_ENTRY: InteractionHistoryEntry = {
 
 /** Content of the History Key as an array, or null when the key is absent. */
 function readPersistedHistory(): InteractionHistoryEntry[] | null {
-  const raw = localStorage.getItem(userHistoryKey(TEST_USER_ID));
+  const raw = localStorage.getItem(HISTORY_KEY);
   return raw === null ? null : (JSON.parse(raw) as InteractionHistoryEntry[]);
 }
 
@@ -643,7 +681,7 @@ async function driveRun(
   ticker: string,
   outcome: RunOutcome,
 ): Promise<void> {
-  await user.type(screen.getByLabelText('Agent input'), ticker);
+  await user.type(screen.getByLabelText('Entrada del agente'), ticker);
   await user.click(screen.getByRole('button', { name: CATALOG_AGENT.actionLabel }));
 
   if (outcome === 'stopped') {
@@ -1199,12 +1237,20 @@ interface InterfaceStateSnapshot {
   historyPanelOpen: boolean;
 }
 
+/**
+ * Alt text of the model badge in the execution panel header. That badge is the
+ * element unique to the panel, so it is what tells the panel apart from the
+ * landing view. It names the model provider, so switching providers in `App.tsx`
+ * has to be reflected here.
+ */
+const RUN_PANEL_MODEL_BADGE_ALT = 'DeepSeek';
+
 function captureInterfaceState(): InterfaceStateSnapshot {
   const trigger = screen.queryByRole('button', { name: 'History' });
   return {
     landingVisible:
       screen.queryByRole('heading', { level: 1, name: CATALOG_AGENT.name }) !== null,
-    runPanelVisible: screen.queryByAltText('DeepSeek') !== null,
+    runPanelVisible: screen.queryByAltText(RUN_PANEL_MODEL_BADGE_ALT) !== null,
     reportCardVisible:
       screen.queryByRole('heading', { name: 'Your report is now ready' }) !== null,
     reportViewVisible: screen.queryByTitle('Close report') !== null,
@@ -1965,7 +2011,9 @@ describe('History_Trigger in the header', () => {
     expect(leadingGroup.contains(agentSelector)).toBe(true);
     expect(leadingGroup.contains(trigger)).toBe(true);
 
-    // The last group is the session one.
+    // The last group is the session one. The tests run signed in, so it carries
+    // the identity of the current user and the sign-out control.
+    expect(sessionGroup).toHaveTextContent('tester@example.com');
     expect(sessionGroup.contains(screen.getByRole('button', { name: 'Sign Out' }))).toBe(true);
 
     // Requirement 1.1: document order confirms the placement, right after the
@@ -2075,8 +2123,8 @@ describe('Hydrating the interaction history on mount', () => {
 
     // Invalid JSON: the mount has to survive it and expose an empty list
     // (Requirements 6.2, 6.4).
-    const storage = createStorageDouble();
-    storage.setItem(userHistoryKey(TEST_USER_ID), '{not json');
+    const storage = signedInStorage();
+    for (const key of SEEDED_HISTORY_KEYS) storage.setItem(key, '{not json');
     vi.stubGlobal('localStorage', storage);
 
     render(<App />);

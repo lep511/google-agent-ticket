@@ -118,7 +118,10 @@ function inputModeLabel(inputMode: string): string {
 export type AgentCatalogStatus = 'loading' | 'ready' | 'error';
 
 export interface AgentSelectorProps {
-  /** Catálogo ya ordenado tal como lo devuelve `GET /api/agents`. */
+  /**
+   * Catalog already ordered as `GET /api/agents` returns it. The selector
+   * re-orders it for display so the default agent is listed first.
+   */
   agents: AgentCatalogEntry[];
   /** Agente activo; nulo mientras no hay catálogo. */
   activeAgentId: string | null;
@@ -137,7 +140,7 @@ export interface AgentSelectorProps {
 }
 
 export function AgentSelector({
-  agents,
+  agents: catalogAgents,
   activeAgentId,
   defaultAgentId,
   status,
@@ -152,6 +155,23 @@ export function AgentSelector({
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
+
+  /*
+    Display order: the default agent goes first and the rest keep the catalog
+    order untouched. This only affects presentation, so the server contract and
+    the catalog total order stay as they are (the "first in order" rule that
+    designates the default agent still reads the unmodified catalog).
+  */
+  const agents = useMemo(() => {
+    if (defaultAgentId === null) return catalogAgents;
+    const defaultIndex = catalogAgents.findIndex((agent) => agent.id === defaultAgentId);
+    if (defaultIndex <= 0) return catalogAgents;
+    return [
+      catalogAgents[defaultIndex]!,
+      ...catalogAgents.slice(0, defaultIndex),
+      ...catalogAgents.slice(defaultIndex + 1),
+    ];
+  }, [catalogAgents, defaultAgentId]);
 
   const activeAgent = useMemo(
     () => agents.find((agent) => agent.id === activeAgentId) ?? null,

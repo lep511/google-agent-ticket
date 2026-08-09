@@ -112,15 +112,19 @@ describe('descubrimiento de carpetas de agente', () => {
     expect(warnings).toEqual([]);
   });
 
-  it('no lee el contenido de los archivos de ejecución', () => {
-    const catalog = createTempCatalog({ good_agent: {} });
+  it('does not read the contents of the runtime files', () => {
+    const catalog = createTempCatalog({
+      // A sentinel instead of a default file: the assertion then holds whatever
+      // the shared helper decides to ship in a default agent folder.
+      good_agent: { files: { 'runtime/notes.md': 'RUNTIME_FILE_SENTINEL' } },
+    });
 
     const result = discoverAgentFolders(catalog.agentsDir, null);
 
     expect(result.manifestReads).toBe(1);
     const serialized = JSON.stringify(result.folders);
-    expect(serialized).not.toContain('Instrucciones de prueba');
-    expect(serialized).not.toContain('base_agent');
+    expect(serialized).not.toContain('RUNTIME_FILE_SENTINEL');
+    expect(serialized).not.toContain('Test instructions');
   });
 
   it('registra el error y devuelve un catálogo vacío cuando agent/ no se puede enumerar', () => {
@@ -134,7 +138,9 @@ describe('descubrimiento de carpetas de agente', () => {
     expect(warnings[0]?.code).toBe('enumeration_error');
   });
 
-  it('enumera como máximo 100 subcarpetas y advierte de las restantes', () => {
+  // Materializing 102 folders on disk is what costs the time here, not the
+  // enumeration under test, and it does not fit the default 5 s budget.
+  it('enumerates at most 100 subfolders and warns about the rest', () => {
     const spec: Record<string, Record<string, never>> = {};
     for (let i = 0; i < 102; i += 1) {
       spec[`agent_${String(i).padStart(3, '0')}`] = {};
@@ -149,9 +155,11 @@ describe('descubrimiento de carpetas de agente', () => {
       'folder_limit_exceeded',
       'folder_limit_exceeded',
     ]);
-  });
+  }, 30_000);
 
-  it('reconstruye 50 carpetas en menos de 3 s', () => {
+  // The 3 s budget is the measured enumeration itself (`durationMs`), so the
+  // wall-clock timeout only has to leave room for building the fixture.
+  it('rebuilds 50 folders in under 3 s', () => {
     const spec: Record<string, Record<string, never>> = {};
     for (let i = 0; i < 50; i += 1) spec[`agent_${String(i).padStart(2, '0')}`] = {};
     const catalog = createTempCatalog(spec);
@@ -160,7 +168,7 @@ describe('descubrimiento de carpetas de agente', () => {
 
     expect(result.folders).toHaveLength(50);
     expect(result.durationMs).toBeLessThan(3000);
-  });
+  }, 30_000);
 });
 
 describe('isSnakeCaseAgentId', () => {

@@ -3,102 +3,131 @@ import os from 'node:os';
 import path from 'node:path';
 import { afterEach } from 'vitest';
 
+import {
+  AGENTS_FILE_NAME,
+  DEFAULT_PROMPT_FILE,
+  DEFAULT_SCHEMA_FILE,
+  MANIFEST_FILE_NAME,
+  type AllowedIconName,
+  type InputMode,
+  type OutputRenderer,
+} from '../../server/lib/agent/agentTypes.ts';
+
 /**
- * Utilidad para materializar catálogos de agentes en un directorio temporal.
+ * Materializes agent catalogs in a temporary directory.
  *
- * Cada catálogo se crea bajo un directorio propio de `os.tmpdir()` y se borra
- * automáticamente tras cada prueba: basta con importar este módulo para que el
- * `afterEach` de limpieza quede registrado.
+ * Every catalog lives under its own directory inside `os.tmpdir()` and is
+ * removed after each test: importing this module is enough to register the
+ * cleanup `afterEach`.
  *
- * Diseño → Testing Strategy: "los generadores cubren catálogos aleatorios en
- * disco temporal".
+ * Design → Testing Strategy: "the generators cover random catalogs on a
+ * temporary disk".
+ *
+ * The default folder holds exactly the four files the server requires of a real
+ * agent (`manifest.json`, `AGENTS.md`, the prompt file and the schema file), and
+ * the file names come from the production constants, so a rename on the server
+ * side cannot leave this helper behind.
  */
 
-/** Contenido de un archivo del agente: texto, binario o JSON serializable. */
+/** Content of an agent file: text or binary. */
 export type FileContent = string | Buffer;
 
 export interface AgentFolderSpec {
   /**
-   * Contenido de `manifest.json`. Un objeto se serializa con `JSON.stringify`;
-   * una cadena se escribe literalmente (útil para JSON malformado).
-   * `null` omite el archivo por completo.
+   * Content of `manifest.json`. An object is serialized with `JSON.stringify`;
+   * a string is written verbatim (handy for malformed JSON). `null` omits the
+   * file entirely.
    */
   manifest?: unknown | string | null;
   /**
-   * Archivos adicionales de la carpeta del agente, con rutas relativas
-   * (se admiten subcarpetas con `/`). Sobrescriben los valores por defecto.
+   * Extra files for the agent folder, keyed by relative path (subfolders with
+   * `/` are supported). They override the defaults.
    */
   files?: Record<string, FileContent>;
   /**
-   * Cuando es `false`, no se escriben los archivos por defecto
-   * (`agent.yaml`, `AGENTS.md`, `requirements.txt`, `prompt.md`,
-   * `output.schema.json`). Por defecto `true`.
+   * When `false`, the default files (`AGENTS.md`, the prompt file and the schema
+   * file) are not written. Defaults to `true`.
    */
   withDefaultFiles?: boolean;
 }
 
-/** Especificación de un catálogo: nombre de carpeta → contenido. */
+/** Catalog specification: folder name → content. */
 export type CatalogSpec = Record<string, AgentFolderSpec>;
 
 export interface TempCatalog {
-  /** Directorio raíz temporal (equivalente a la raíz del repositorio). */
+  /** Temporary root directory (stands in for the repository root). */
   readonly root: string;
-  /** Directorio que hace de `agent/`. */
+  /** Directory that plays the role of `agent/`. */
   readonly agentsDir: string;
-  /** Ruta absoluta de la carpeta de un agente. */
+  /** Absolute path of an agent folder. */
   agentDir(folderName: string): string;
-  /** Ruta absoluta de un archivo dentro de la carpeta de un agente. */
+  /** Absolute path of a file inside an agent folder. */
   filePath(folderName: string, relativePath: string): string;
-  /** Añade o reemplaza una carpeta de agente después de crear el catálogo. */
+  /** Adds or replaces an agent folder after the catalog was created. */
   writeAgent(folderName: string, spec?: AgentFolderSpec): string;
-  /** Escribe un archivo suelto relativo a `agentsDir`. */
+  /** Writes a loose file relative to `agentsDir`. */
   writeLooseFile(relativePath: string, content: FileContent): string;
-  /** Elimina una carpeta de agente del catálogo. */
+  /** Removes an agent folder from the catalog. */
   removeAgent(folderName: string): void;
-  /** Borra el catálogo del disco. Idempotente. */
+  /** Deletes the catalog from disk. Idempotent. */
   cleanup(): void;
 }
 
-export const DEFAULT_PROMPT_FILE = 'prompt.md';
-export const DEFAULT_SCHEMA_FILE = 'output.schema.json';
+export { DEFAULT_PROMPT_FILE, DEFAULT_SCHEMA_FILE };
 
-const LUCIDE_SAFE_ICON = 'LineChart';
+/**
+ * Field values of the default manifest, typed against the production unions so
+ * `tsc --noEmit` fails if any of them ever leaves its allow-list.
+ */
+const DEFAULT_ICON: AllowedIconName = 'LineChart';
+const DEFAULT_INPUT_MODE: InputMode = 'ticker';
+const DEFAULT_OUTPUT_RENDERER: OutputRenderer = 'financial_report';
+
+/** File names of a valid agent folder, in the order the server checks them. */
+export const REQUIRED_AGENT_FILES = [
+  MANIFEST_FILE_NAME,
+  AGENTS_FILE_NAME,
+  DEFAULT_PROMPT_FILE,
+  DEFAULT_SCHEMA_FILE,
+] as const;
 
 const createdCatalogs = new Set<TempCatalog>();
 
-/** Manifiesto mínimo válido para la carpeta indicada. */
+/** Minimal valid manifest for the given folder. */
 export function validManifest(
   folderName: string,
   overrides: Record<string, unknown> = {},
 ): Record<string, unknown> {
   return {
     id: folderName,
-    name: `Agente ${folderName}`,
-    tagline: `Resumen de una línea de ${folderName}`,
-    description: `Descripción larga del agente ${folderName}.`,
-    icon: LUCIDE_SAFE_ICON,
-    inputMode: 'ticker',
+    name: `Agent ${folderName}`,
+    tagline: `One-line summary of ${folderName}`,
+    description: `Long description of the ${folderName} agent.`,
+    icon: DEFAULT_ICON,
+    inputMode: DEFAULT_INPUT_MODE,
     inputPlaceholder: 'AAPL',
     actionLabel: 'Analyze',
-    outputRenderer: 'financial_report',
+    outputRenderer: DEFAULT_OUTPUT_RENDERER,
     ...overrides,
   };
 }
 
-/** Archivos por defecto de una carpeta de agente válida. */
+/**
+ * Default files of a valid agent folder, mirroring what the real folders under
+ * `agent/` ship. `manifest.json` is written separately because a spec can
+ * replace or omit it.
+ */
 export function defaultAgentFiles(folderName: string): Record<string, string> {
   return {
-    'agent.yaml': `id: ${folderName}\nbase_agent: antigravity-preview-05-2026\n`,
-    'AGENTS.md': `# ${folderName}\n\nInstrucciones de prueba.\n`,
-    'requirements.txt': 'requests\n',
-    [DEFAULT_PROMPT_FILE]: 'Entrada: {{input}}\nInstrucción: {{instruction}}\nEsquema: {{schema}}\n',
+    [AGENTS_FILE_NAME]: `# ${folderName}\n\nTest instructions.\n`,
+    [DEFAULT_PROMPT_FILE]: 'Input: {{input}}\nInstruction: {{instruction}}\nSchema: {{schema}}\n',
     [DEFAULT_SCHEMA_FILE]: JSON.stringify({ type: 'object', properties: {} }, null, 2),
   };
 }
 
 function writeFileDeep(target: string, content: FileContent): void {
   fs.mkdirSync(path.dirname(target), { recursive: true });
-  fs.writeFileSync(target, content as never);
+  fs.writeFileSync(target, content);
 }
 
 function materializeAgent(agentsDir: string, folderName: string, spec: AgentFolderSpec): string {
@@ -112,7 +141,7 @@ function materializeAgent(agentsDir: string, folderName: string, spec: AgentFold
 
   const manifest = spec.manifest === undefined ? validManifest(folderName) : spec.manifest;
   if (manifest !== null) {
-    files['manifest.json'] =
+    files[MANIFEST_FILE_NAME] =
       typeof manifest === 'string' ? manifest : JSON.stringify(manifest, null, 2);
   }
 
@@ -124,9 +153,9 @@ function materializeAgent(agentsDir: string, folderName: string, spec: AgentFold
 }
 
 /**
- * Crea un catálogo temporal. Devuelve rutas y utilidades de mutación; la
- * limpieza es automática tras cada prueba, pero `cleanup()` está disponible
- * para pruebas que necesiten liberarlo antes.
+ * Creates a temporary catalog. Returns paths and mutation helpers; cleanup runs
+ * automatically after each test, but `cleanup()` is available for tests that
+ * need to release it earlier.
  */
 export function createTempCatalog(spec: CatalogSpec = {}): TempCatalog {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'tickr-agents-'));
@@ -162,14 +191,14 @@ export function createTempCatalog(spec: CatalogSpec = {}): TempCatalog {
   return catalog;
 }
 
-/** Borra todos los catálogos temporales creados hasta el momento. */
+/** Deletes every temporary catalog created so far. */
 export function cleanupTempCatalogs(): void {
   for (const catalog of [...createdCatalogs]) {
     catalog.cleanup();
   }
 }
 
-// `globals: false`, así que la limpieza se registra explícitamente al importar.
+// `globals: false`, so the cleanup is registered explicitly on import.
 afterEach(() => {
   cleanupTempCatalogs();
 });
