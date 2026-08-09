@@ -114,13 +114,26 @@ The browser never talks to the backend directly — Vercel handles HTTPS and for
 
 **Keeping the backend running (pm2):**
 
-The Express server must stay running for the Vercel frontend to work. Use `pm2` for process management:
+The Express server must stay running for the Vercel frontend to work. Use `pm2` for process management.
+
+If Node was installed via `nvm`, load it into the shell first (needed on fresh SSM/SSH sessions, since they don't source `.bashrc`/`.nvm` automatically):
+
+```bash
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+nvm use <installed-node-version>   # e.g. nvm use 24.19.0
+```
+
+Install pm2 globally, then start the server with the **project's local `tsx` binary** — not `npx tsx`. `npx tsx` resolves against a cached copy under `~/.npm/_npx/...` instead of the project's `node_modules`, which fails with `ERR_MODULE_NOT_FOUND` for dependencies like `dotenv` that are only installed locally:
 
 ```bash
 npm install -g pm2
-pm2 start "npx tsx server.ts" --name tickr
+
+cd /path/to/tickr
+pm2 start ./node_modules/.bin/tsx --name tickr -- server.ts
+
 pm2 save       # Persist across pm2 restarts
-pm2 startup    # Auto-start on system boot
+pm2 startup    # Prints a command to run once (with sudo) to auto-start on system boot
 ```
 
 Useful commands:
@@ -128,6 +141,8 @@ Useful commands:
 pm2 logs tickr     # View logs
 pm2 restart tickr  # Restart after code changes
 pm2 stop tickr     # Stop the server
+pm2 delete tickr   # Stop and remove from pm2's process list
+pm2 flush tickr    # Clear old log output (useful after fixing a startup error)
 ```
 
 ## Agents

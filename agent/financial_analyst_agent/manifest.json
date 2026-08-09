@@ -1,8 +1,8 @@
 {
   "id": "financial_analyst_agent",
   "name": "Financial Analyst",
-  "tagline": "Finds and synthesizes recent SEC filings and public disclosures.",
-  "description": "Automatically locates recent SEC filings and public disclosures for a ticker, extracts management commentary, key takeaways and risks, and synthesizes multiple filings into a single structured financial report.",
+  "tagline": "Finds and synthesizes 2026 SEC filings and public disclosures.",
+  "description": "Locates 2026 SEC filings and public disclosures for a ticker, extracts management commentary, key takeaways and risks, and synthesizes them into a single structured financial report. Scope is limited to fiscal year 2026 to keep the number of web searches low.",
   "icon": "Landmark",
   "accentColor": "#2563EB",
   "order": 5,
@@ -15,10 +15,10 @@
   "outputRenderer": "financial_report",
   "landing": {
     "title": "Tickr, your intelligent financial document analyzer",
-    "subtitle": "Automatically finds and synthesizes recent SEC filings and public disclosures.",
+    "subtitle": "Finds and synthesizes 2026 SEC filings and public disclosures.",
     "highlights": [
       {
-        "title": "Comprehensive SEC document coverage.",
+        "title": "SEC document coverage for 2026.",
         "items": [
           {
             "title": "Form 10-K & 10-Q",

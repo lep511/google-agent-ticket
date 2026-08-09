@@ -157,7 +157,7 @@ export default function ReportTemplate({ data, ticker, onClose, durationSecs = 0
         {/* Financial Charts */}
         {data.financial_charts && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 print:mt-8 print:block print:w-full print:clear-both print:break-before-auto">
-            <AnalysisCard title="Stock Price" subtext="This chart shows the closing price for the past four months on the last trading date." className="print:break-inside-avoid print:w-full print:mb-6">
+            <AnalysisCard title="Stock Price" subtext="This chart shows the closing price on the last trading date for the most recent months of 2026." className="print:break-inside-avoid print:w-full print:mb-6">
               <div className="h-64 mt-4 print:h-64 print:w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={data.financial_charts.stock_price_4m ? [...data.financial_charts.stock_price_4m] : []}>
@@ -176,7 +176,7 @@ export default function ReportTemplate({ data, ticker, onClose, durationSecs = 0
             
             <AnalysisCard 
               title="Financial Performance"
-              subtext={data.financial_charts.financial_performance_4q && data.financial_charts.financial_performance_4q.length > 0 && data.financial_charts.financial_performance_4q[0].distributions !== undefined ? "This chart shows the quarterly distributions (dividends/yield per share) for the past four completed quarters." : "This chart shows the revenue and net income for the past four completed quarters."}
+              subtext={data.financial_charts.financial_performance_4q && data.financial_charts.financial_performance_4q.length > 0 && data.financial_charts.financial_performance_4q[0].distributions !== undefined ? "This chart shows the quarterly distributions (dividends/yield per share) for the completed quarters of 2026." : "This chart shows the revenue and net income for the completed quarters of 2026."}
               className="print:break-inside-avoid print:w-full print:mb-6"
             >
               <div className="h-64 mt-4 print:h-64 print:w-full">

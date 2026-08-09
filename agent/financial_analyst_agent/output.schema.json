@@ -16,16 +16,16 @@
     {
       "documentType": "Form 10-K",
       "keyInsights": ["...", "..."],
-      "date": "2023-12-31",
+      "date": "2026-02-15",
       "sourceUrl": "..."
     }
   ],
   "financial_charts": {
     "stock_price_4m": [
-      { "date": "Oct '24", "price": 150.5 }
+      { "date": "Apr '26", "price": 150.5 }
     ],
     "financial_performance_4q": [
-      { "quarter": "Q1 2025", "revenue": 10.5, "net_income": 2.1, "distributions": 0.5 }
+      { "quarter": "Q1 2026", "revenue": 10.5, "net_income": 2.1, "distributions": 0.5 }
     ]
   }
 }
