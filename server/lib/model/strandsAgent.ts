@@ -198,8 +198,16 @@ export function mapStrandsEvent(event: AgentStreamEvent): AgentEvent | null {
  * Maximum number of agent-loop turns (one model call + tool execution each).
  * Prevents runaway loops when the model keeps calling tools without producing
  * a final answer — e.g. retrying a rate-limited search tool indefinitely.
+ *
+ * The ceiling has to leave room for the turn that writes the final answer, on
+ * top of every research turn the agent needs. Research-heavy agents spend one
+ * turn per tool call: `financial_analyst_agent` alone asks for several filings
+ * plus separate searches for monthly closing prices and quarterly figures, so a
+ * tight ceiling ended the loop before the report was ever written. The run then
+ * finished with tool traces and no final text, which is indistinguishable from
+ * a model that simply said nothing.
  */
-export const MAX_AGENT_TURNS = 15;
+export const MAX_AGENT_TURNS = 50;
 
 /**
  * Runs the agent and yields `AgentEvent`s, closing with a `done` event.

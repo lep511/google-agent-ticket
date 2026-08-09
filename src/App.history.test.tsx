@@ -681,7 +681,7 @@ async function driveRun(
   ticker: string,
   outcome: RunOutcome,
 ): Promise<void> {
-  await user.type(screen.getByLabelText('Entrada del agente'), ticker);
+  await user.type(screen.getByLabelText('Agent input'), ticker);
   await user.click(screen.getByRole('button', { name: CATALOG_AGENT.actionLabel }));
 
   if (outcome === 'stopped') {

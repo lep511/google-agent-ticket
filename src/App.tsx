@@ -34,6 +34,7 @@ import {
   inputMaxLength,
 } from './agentInput';
 import { FALLBACK_OUTPUT_RENDERER, extractReport } from './resultExtraction';
+import { describeStopReason, explainMissingReport } from './runDiagnostics';
 import { HistoryPanel } from './components/HistoryPanel';
 import { CookieConsent } from './components/CookieConsent';
 import {
@@ -160,7 +161,9 @@ export default function App() {
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reportData, setReportData] = useState<ReportData | null>(null);
-  const [unstructuredReport, setUnstructuredReport] = useState(false);
+  // Reason a finished run put no report on screen, or `null` while there is
+  // nothing to explain. Holds the message so the banner never has to guess it.
+  const [unstructuredReport, setUnstructuredReport] = useState<string | null>(null);
   const [events, setEvents] = useState<TimelineEvent[]>([]);
   const abortRef = useRef<AbortController | null>(null);
   const eventIdRef = useRef(0);
@@ -339,7 +342,7 @@ export default function App() {
   /** Clears report, timeline, metrics, and previous error. */
   const resetRunResults = () => {
     setReportData(null);
-    setUnstructuredReport(false);
+    setUnstructuredReport(null);
     setEvents([]);
     setError(null);
     setTokenCount(0);
@@ -444,7 +447,7 @@ export default function App() {
     setRun(true);
     setErr(null);
     setRep(null);
-    setUnstructuredReport(false);
+    setUnstructuredReport(null);
     setEvts([]);
     setTok(0);
     setTRuns(0);
@@ -491,6 +494,10 @@ export default function App() {
     let reportPromoted = false;
     // Error message from the stream's `error` event, when the remote agent failed.
     let streamErrorMessage: string | null = null;
+    // `stopReason` reported by the run's `complete` event. It is the only signal
+    // that tells a truncated report apart from a model that never answered, so a
+    // run that promotes nothing has to be able to name it.
+    let runStopReason: unknown = null;
     // Event counter to guarantee there is always a trace in the timeline.
     let eventsPushed = 0;
     const emit = (...args: Parameters<ReturnType<typeof createPushEvent>>) => {
@@ -593,6 +600,9 @@ export default function App() {
               } else if (evt.type === 'complete') {
                   if (evt.interaction) {
                       const interaction = evt.interaction;
+                      if (interaction.stopReason !== undefined && interaction.stopReason !== null) {
+                          runStopReason = interaction.stopReason;
+                      }
                       const usage = interaction.usage || interaction.usage_metadata || (interaction.metadata && interaction.metadata.usage) || null;
                       if (usage) {
                           const tokens = usage.total_token_count || usage.totalTokenCount || usage.total_tokens || 0;
@@ -633,14 +643,14 @@ export default function App() {
           }
         }
 
-        if (accumulatedText) {
-            const foundData = parseFinalText(accumulatedText, runRenderer);
-            if (foundData) {
-                promotedReport = foundData;
-                setRep(foundData);
-                reportPromoted = true;
-            }
-        }
+        /*
+          No extraction attempt here. The text of a chunk is a prefix of the
+          answer, not the answer: running the extractor on it wasted work on
+          every chunk and, worse, a prefix that happened to close its braces
+          could promote a report missing everything the model had yet to write,
+          with no way to take it back. The run's text is only complete once the
+          reader is done and the tail of the buffer has been drained.
+        */
       }
 
       if (buffer) {
@@ -661,6 +671,8 @@ export default function App() {
           }
       }
 
+      // The stream is closed and the buffer drained: this is the run's complete
+      // text, and the only text the extractor is asked about.
       if (accumulatedText) {
           const finalData = parseFinalText(accumulatedText, runRenderer);
           if (finalData) {
@@ -670,22 +682,43 @@ export default function App() {
           }
       }
 
-      // No valid object for the run's renderer: the raw text stays in the
-      // timeline and the warning explains it could not be structured.
-      if (!reportPromoted && accumulatedText.trim()) {
-          emit('text', 'Unstructured response', accumulatedText);
-          setUnstructuredReport(true);
-      }
+      /*
+        A run that promoted no report always says why. The previous version only
+        explained itself when the run produced text, or when it pushed no event
+        at all; a run that called tools and then stopped before writing its
+        answer — the shape of a turn or token budget running out — finished in
+        total silence, with no report, no warning and no error on screen.
+      */
+      if (!reportPromoted) {
+          const stopReasonDetail = describeStopReason(runStopReason);
 
-      // A run that ends without a report, text, or any event leaves the landing
-      // view conditions satisfied. Guarantee there is always a trace.
-      if (!reportPromoted && !accumulatedText.trim() && eventsPushed === 0) {
-          const message =
-            streamErrorMessage ??
-            'The agent finished without returning any response.';
-          console.error('[stream] Run finished with no result:', message);
-          emit('error', 'No result', message);
-          setErr(message);
+          if (accumulatedText.trim()) {
+              // The raw answer is worth reading, so it stays in the timeline and
+              // the banner explains which contract it failed.
+              emit('text', 'Unstructured response', accumulatedText);
+              setUnstructuredReport(
+                explainMissingReport({
+                  text: accumulatedText,
+                  stopReason: runStopReason,
+                  renderer: runRenderer,
+                }),
+              );
+          } else if (streamErrorMessage !== null) {
+              // The failure is already in the timeline and in the error banner.
+              // Only the stop reason would be lost, so that is all this adds.
+              if (stopReasonDetail) {
+                  emit('info', 'Stop reason', `The model stopped because ${stopReasonDetail}.`);
+              }
+          } else {
+              const message = explainMissingReport({
+                text: accumulatedText,
+                stopReason: runStopReason,
+                renderer: runRenderer,
+              });
+              console.error('[stream] Run finished with no report:', message);
+              emit('error', 'No report', message);
+              setErr(message);
+          }
       }
 
       currentDuration = Math.round((Date.now() - startTimestamp) / 1000);
@@ -935,8 +968,7 @@ export default function App() {
                 role="status"
                 className="mb-4 bg-amber-500/10 border border-amber-500/50 text-amber-100 px-4 py-3 rounded text-sm"
               >
-                The report could not be structured. The agent's raw response is preserved
-                in the timeline below.
+                {unstructuredReport}
               </div>
             )}
 

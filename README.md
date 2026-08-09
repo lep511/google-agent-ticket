@@ -196,7 +196,23 @@ Agents run in-process with the Strands SDK. One run is assembled from:
 | Model | request `model` field → `NVIDIA_MODEL_ID` env → default |
 | Tools | per-agent (`search_web`, `calculate`, or none) |
 
-Model failures retry with exponential backoff (429, 5xx) up to 4 attempts. Agent loops are capped at 15 turns.
+Model failures retry with exponential backoff (429, 5xx) up to 4 attempts.
+
+### Turn budget (`MAX_AGENT_TURNS`)
+
+A **turn** is one iteration of the agent loop: one model call plus the execution of any tools that call requested. `MAX_AGENT_TURNS` (`server/lib/model/strandsAgent.ts`, currently **50**) is the hard ceiling on turns per run, passed to the SDK as `limits: { turns }`.
+
+It exists to stop runaway loops — a model that keeps calling tools and never writes an answer, for example retrying a rate-limited search forever — from burning tokens without end.
+
+Sizing it matters, because the budget has to cover **every research turn plus the turn that writes the final answer**. Agents spend roughly one turn per tool call, and research-heavy ones spend many: `financial_analyst_agent` looks for several filings and then searches separately for monthly closing prices and quarterly figures. When the ceiling is hit first, the loop ends with tool traces and no final text, and the UI has no report to render. Raise this value before trimming what an agent is asked to research.
+
+Related limits, all in the same file:
+
+| Constant | Value | Caps |
+| --- | --- | --- |
+| `MAX_AGENT_TURNS` | 50 | Agent-loop turns per run |
+| `MAX_MODEL_ATTEMPTS` | 4 | Model attempts, first one included |
+| `DEFAULT_MAX_OUTPUT_TOKENS` | 65536 | Output tokens per model call |
 
 ## API
 
