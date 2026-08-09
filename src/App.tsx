@@ -760,7 +760,18 @@ export default function App() {
 
     } catch (e: any) {
       if (e.name === 'AbortError') {
-         console.log('Aborted');
+         // Only `stopAgent` aborts this request, so an abort is always the user
+         // stopping the analysis. It is logged with the state of the run it cut,
+         // matching the `[stop]` record the server writes to the run logs.
+         const stopDetails = [
+           `agent=${runIdentity?.agentId ?? 'unknown'}`,
+           `input="${inputValue.trim().replace(/\s+/g, ' ').slice(0, 80)}"`,
+           `model=${model}`,
+           `elapsed=${((Date.now() - startTimestamp) / 1000).toFixed(2)}s`,
+           `toolCalls=${currentToolRuns}`,
+           `tokens=${currentTokenCount}`,
+         ].join(' ');
+         console.log(`[stop] User stop the analysis [${stopDetails}]`);
          if (eventsPushed === 0) {
             emit('info', 'Run stopped', 'The run was stopped before producing results.');
          }

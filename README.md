@@ -263,6 +263,8 @@ npm run dev          # Dev server on http://localhost:3000
 npm run build        # Vite frontend + esbuild server bundle
 npm start            # Production server from dist/
 npm run lint         # tsc --noEmit
-npm test             # vitest --run
-npm run test:watch   # vitest watch mode
+npm test             # vitest --run, every suite (~4 min)
+npm run test:essential      # fast suites only (~21 s)
+npm run test:non-essential  # the four long property suites
+npm run test:watch   # vitest watch mode, essential suites only
 ```

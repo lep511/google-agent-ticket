@@ -8,8 +8,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 npm run dev          # Dev server (Express + Vite middleware) on http://localhost:3000
 npm run build        # Vite frontend build + esbuild server bundle → dist/
 npm run lint         # tsc --noEmit (type check only)
-npm test             # vitest --run (all projects)
-npm run test:watch   # vitest in watch mode
+npm test             # vitest --run (all four projects, ~4 min)
+npm run test:essential      # projects `server` + `web`: fast suites, ~21 s
+npm run test:non-essential  # projects `server-slow` + `web-slow`: the long property suites
+npm run test:watch   # vitest in watch mode, essential suites only
 ```
 
 Run a single test file:

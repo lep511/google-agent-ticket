@@ -9,7 +9,7 @@ builders, and the tests that cover that infrastructure itself.
 ```
 tests/
 ├── setup/
-│   ├── fastCheck.ts        # global fast-check config, loaded by both projects
+│   ├── fastCheck.ts        # global fast-check config, loaded by every project
 │   └── dom.ts              # jest-dom matchers + unmount between tests (web only)
 ├── helpers/
 │   ├── tempCatalog.ts      # builds agent catalogs in a temp directory
@@ -29,32 +29,56 @@ so on. Both locations are picked up automatically.
 ## Running
 
 ```bash
-npm test                        # whole suite, single run
-npm run test:watch              # watch mode
-npx vitest --run --project server
-npx vitest --run --project web
+npm run test:essential          # 181 tests, ~21 s: the run for every edit
+npm run test:non-essential      # 76 tests, ~4 min: run before merging
+npm test                        # everything, single run
+npm run test:watch              # watch mode, essential suites only
+npx vitest                      # watch mode, every suite
 npx vitest --run src/interactionHistory.test.ts
 npm run lint                    # tsc --noEmit, covers the test files too
 ```
 
-The full suite takes about four minutes. Most of that is the property tests in
-`src/App.history.test.tsx`, which mount the whole application a hundred times per
-property. Run a single project or a single file while iterating.
+## Essential and non-essential
 
-## The two projects
+Four suites cost about 227 s of the 231 s the whole run spends in tests, so they
+are split off into their own projects. The line is drawn by cost, not by value:
+they assert as much as any other test, they just mount the whole application or
+build real catalogs on disk once per property case, a hundred cases per property.
+Iteration counts stay where the design put them; the suites move out of the edit
+loop instead.
 
-`vitest.config.ts` defines two projects with separate environments:
+| Non-essential suite                    | Cost    | Why                        |
+|----------------------------------------|---------|----------------------------|
+| `src/App.history.test.tsx`             | ~194 s  | mounts the whole app       |
+| `src/components/HistoryPanel.test.tsx` | ~22 s   | mounts the panel tree      |
+| `server/lib/agent/agentRegistry.test.ts` | ~5.8 s | real catalogs on disk      |
+| `tests/server/tempCatalog.test.ts`     | ~5.7 s  | real catalogs on disk      |
 
-| Project  | Environment | Includes                                          |
-|----------|-------------|---------------------------------------------------|
-| `server` | `node`      | `server/**/*.test.ts`, `tests/server/**`, `tests/*.test.ts` |
-| `web`    | `jsdom`     | `src/**/*.test.{ts,tsx}`, `tests/web/**`          |
+Both lists live in `vitest.config.ts`. A new suite is essential by default; add it
+to `NON_ESSENTIAL_SERVER_TESTS` or `NON_ESSENTIAL_WEB_TESTS` only when its own
+timing, not a guess, puts it in the table above. Nothing is excluded outright:
+every suite belongs to exactly one project, and `npm test` runs all four.
 
-Both alias `@` to the repository root. The `web` project additionally aliases
-`motion/react` to `tests/helpers/motionStub.tsx` and defines `global` as `window`,
-which `amazon-cognito-identity-js` expects in the browser.
+## The four projects
 
-Both projects run with `globals: false`, so `describe`, `it`, `expect`, `vi` and
+`vitest.config.ts` pairs each environment with each cost:
+
+| Project       | Environment | Includes                                                   |
+|---------------|-------------|------------------------------------------------------------|
+| `server`      | `node`      | `server/**/*.test.ts`, `tests/server/**`, `tests/*.test.ts`, minus the non-essential ones |
+| `web`         | `jsdom`     | `src/**/*.test.{ts,tsx}`, `tests/web/**`, minus the non-essential ones |
+| `server-slow` | `node`      | the non-essential backend suites                           |
+| `web-slow`    | `jsdom`     | the non-essential frontend suites                          |
+
+The two `node` projects share one configuration and the two `jsdom` ones share
+another, so a project pair can never drift apart on environment, aliases or setup
+files.
+
+All of them alias `@` to the repository root. The `jsdom` projects additionally
+alias `motion/react` to `tests/helpers/motionStub.tsx` and define `global` as
+`window`, which `amazon-cognito-identity-js` expects in the browser.
+
+Every project runs with `globals: false`, so `describe`, `it`, `expect`, `vi` and
 the lifecycle hooks must be imported from `vitest` explicitly. Imports use
 explicit `.ts` / `.tsx` extensions, matching `allowImportingTsExtensions` in
 `tsconfig.json`.
@@ -137,7 +161,7 @@ value, so the assertion does not depend on what a default folder happens to ship
 
 ### `helpers/motionStub.tsx`
 
-Aliased over `motion/react` for the whole `web` project. The real library runs an
+Aliased over `motion/react` for both `jsdom` projects. The real library runs an
 animation pipeline on every mount: it reads computed styles, schedules frames and
 maintains a motion-value graph per element. None of that changes what the
 component tests assert, but in jsdom it dominates the cost of a property test

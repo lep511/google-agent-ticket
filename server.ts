@@ -22,6 +22,8 @@ import {
 import {
   buildAgentInfoEvent,
   buildStreamFailureEvents,
+  buildUserStopEvent,
+  buildUserStopLogLine,
   describeAgentStartFailure,
   describeStreamFailure,
 } from "./server/lib/analyzeExecution.ts";
@@ -333,6 +335,8 @@ async function startServer() {
       let errorEmitted = false;
       /** Verdadero cuando el propio flujo ya emitió su evento `done`. */
       let doneEmitted = false;
+      /** True when the loop closed on the run's own `done`/`complete`/`error`. */
+      let runCompleted = false;
 
       /** Re-emits the already consumed event and continues with the rest. */
       const stream = (async function* (): AsyncGenerator<AgentEvent> {
@@ -398,19 +402,49 @@ async function startServer() {
           }
 
           if (event.type === 'done' || event.type === 'complete' || event.type === 'error') {
+              runCompleted = true;
               break;
           }
         }
       } catch (streamError: any) {
-        streamFailure = describeStreamFailure(streamError);
-        console.error(`[analyze] Stream interrupted: ${streamFailure}`);
-        debugLog += `[ERROR]\n${streamFailure}\n\n`;
+        // A connection closed mid-run is the Stop Analysis confirmation, not an
+        // agent failure: it is recorded as a stop right after this loop so the
+        // log names the reason instead of reporting an error the agent never had.
+        if (!runAbort.signal.aborted) {
+          streamFailure = describeStreamFailure(streamError);
+          console.error(`[analyze] Stream interrupted: ${streamFailure}`);
+          debugLog += `[ERROR]\n${streamFailure}\n\n`;
+        }
       }
 
       // Flush any remaining accumulated text to the debug log
       if (accumulatedLogText) {
         debugLog += `[TEXT OUTPUT]\n${accumulatedLogText}\n\n`;
         accumulatedLogText = '';
+      }
+
+      /*
+        The user stopped the run: the browser aborted the request before the agent
+        reached its own `done`/`complete`/`error`. Both logs of the run get a
+        `[stop]` record with the state of the analysis that was cut, so a run
+        without a report can be told apart from one that failed.
+      */
+      const userStopped = runAbort.signal.aborted && !runCompleted;
+      if (userStopped) {
+        const stopInfo = {
+          agentId: agent.agentId,
+          agentName: agent.manifest.name,
+          input,
+          model: effectiveModel ?? null,
+          elapsedSecs: (Date.now() - startTime) / 1000,
+          toolCalls: Object.keys(toolExecutions).length,
+          tokens: totalTokens,
+          runLog: runLogNames.baseName,
+        };
+        const stopLogLine = buildUserStopLogLine(stopInfo);
+        console.log(stopLogLine);
+        debugLog += `[${new Date().toISOString()}] ${stopLogLine}\n\n`;
+        appendJsonlLog(buildUserStopEvent(stopInfo));
       }
 
       if (streamFailure !== null) {
@@ -430,8 +464,9 @@ async function startServer() {
       const totalDurationSecs = ((Date.now() - startTime) / 1000);
       const totalDuration = totalDurationSecs.toFixed(2) + 's';
       
-      // Send final reliable stats to client
-      if (streamFailure === null) {
+      // Send final reliable stats to client. A stopped run has no listener left,
+      // so nothing is written to its closed connection.
+      if (streamFailure === null && !userStopped) {
         // Requirement 10.2: la URL apunta al `.jsonl` de esta misma ejecución
         // bajo el estático `/run_logs`.
         sendEvent({
@@ -462,7 +497,10 @@ async function startServer() {
           summaryLog += `--------------------------------------------------------\n`;
       });
       
-      summaryLog += `\n2. OVERALL AGENT STATUS: ${allWorked ? 'SUCCESS' : 'WITH ERRORS'}\n`;
+      const overallStatus = userStopped
+        ? 'STOPPED BY USER'
+        : allWorked ? 'SUCCESS' : 'WITH ERRORS';
+      summaryLog += `\n2. OVERALL AGENT STATUS: ${overallStatus}\n`;
       summaryLog += `\n========================================================\n\n`;
       summaryLog += `RAW EXECUTION LOGS:\n\n`;
 

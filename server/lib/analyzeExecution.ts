@@ -76,6 +76,83 @@ export function describeStreamFailure(reason: unknown): string {
 }
 
 /* ────────────────────────────────────────────────────────── */
+/*  Run stopped by the user                                    */
+/* ────────────────────────────────────────────────────────── */
+
+/** Tag every record of a user stop carries, so the logs stay greppable. */
+export const USER_STOP_LOG_TAG = '[stop]';
+
+/** Phrase that names the reason a stopped run has no report. */
+export const USER_STOP_LOG_MESSAGE = 'User stop the analysis';
+
+/** Event type written to the `.jsonl` when the user stops a run. */
+export const USER_STOP_EVENT_TYPE = 'stopped';
+
+/** Longest input fragment a stop record repeats, so one line stays one line. */
+export const MAX_STOP_LOG_INPUT_LENGTH = 80;
+
+/** What the run had done by the time the user stopped it. */
+export interface StoppedRunInfo {
+  agentId: string;
+  agentName: string;
+  /** Analysis input, repeated truncated so a long prompt cannot flood the log. */
+  input: string;
+  /** Model the run was using, or `null` when it ran with the default one. */
+  model: string | null;
+  /** Seconds the run had been going for when it was stopped. */
+  elapsedSecs: number;
+  /** Tool calls the agent had started. */
+  toolCalls: number;
+  /** Tokens accounted for at that point. */
+  tokens: number;
+  /** Base name of this run's log files, to tie the record to them. */
+  runLog: string;
+}
+
+/** Collapses the input into a single short fragment fit for one log line. */
+function toStopLogInput(input: string): string {
+  return input.replace(/\s+/g, ' ').trim().slice(0, MAX_STOP_LOG_INPUT_LENGTH);
+}
+
+/**
+ * Single line that records a user stop in the run's `.txt` log and in the server
+ * console: the `[stop]` tag, the reason, and the state of the analysis it cut.
+ *
+ * A stopped run used to end without any trace of why it carried no report, which
+ * read exactly like an agent that had failed silently.
+ */
+export function buildUserStopLogLine(info: StoppedRunInfo): string {
+  const details = [
+    `agent=${info.agentId}`,
+    `agentName="${info.agentName}"`,
+    `input="${toStopLogInput(info.input)}"`,
+    `model=${info.model ?? 'default'}`,
+    `elapsed=${info.elapsedSecs.toFixed(2)}s`,
+    `toolCalls=${info.toolCalls}`,
+    `tokens=${info.tokens}`,
+    `runLog=${info.runLog}`,
+  ].join(' ');
+  return `${USER_STOP_LOG_TAG} ${USER_STOP_LOG_MESSAGE} [${details}]`;
+}
+
+/** Machine-readable twin of the line above, for the run's `.jsonl` log. */
+export function buildUserStopEvent(info: StoppedRunInfo): Record<string, unknown> {
+  return {
+    type: USER_STOP_EVENT_TYPE,
+    stoppedBy: 'user',
+    message: USER_STOP_LOG_MESSAGE,
+    agentId: info.agentId,
+    agentName: info.agentName,
+    input: toStopLogInput(info.input),
+    model: info.model ?? 'default',
+    elapsedSecs: Number(info.elapsedSecs.toFixed(2)),
+    toolCalls: info.toolCalls,
+    tokens: info.tokens,
+    runLog: info.runLog,
+  };
+}
+
+/* ────────────────────────────────────────────────────────── */
 /*  Failure to start a run                                     */
 /* ────────────────────────────────────────────────────────── */
 

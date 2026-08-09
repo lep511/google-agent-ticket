@@ -12,7 +12,9 @@
     "lint": "tsc --noEmit",
     "build:vercel": "vite build",
     "test": "vitest --run",
-    "test:watch": "vitest"
+    "test:essential": "vitest --run --project server --project web",
+    "test:non-essential": "vitest --run --project server-slow --project web-slow",
+    "test:watch": "vitest --project server --project web"
   },
   "dependencies": {
     "@strands-agents/sdk": "1.11.2",
