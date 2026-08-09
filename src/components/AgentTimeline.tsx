@@ -293,9 +293,15 @@ export function AgentTimeline({ events, running, paused, hasReport, onViewReport
            </motion.div>
         )}
 
-        <div ref={endRef} className="h-4 w-full" />
         </div>
       </div>
+
+      {/*
+        Bottom breathing room lives outside the wrapper that hosts the line:
+        inside it, the spacer stretched the line past the last card and left a
+        dangling tail below it.
+      */}
+      <div ref={endRef} className="h-4 w-full shrink-0" />
 
       {/* Floating Circular Scroll-to-Bottom Button */}
       <AnimatePresence>
