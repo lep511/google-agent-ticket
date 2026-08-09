@@ -1,31 +1,34 @@
 /**
- * Ensamblador de prompt: construye el prompt final de una ejecución a partir de
- * la plantilla del agente resuelto, el valor de entrada efectivo, la
- * instrucción opcional y el contenido literal del archivo de esquema.
+ * Prompt assembler: builds the final prompt of a run from the resolved agent's
+ * template, the effective input value, the optional instruction and the literal
+ * contents of the schema file.
  *
- * Secuencia del ensamblado:
- *  1. Leer la plantilla y el esquema desde las rutas de la entrada de catálogo
- *     (`agentRegistry.readAgentPromptTemplate` y `readAgentSchema`), que ya
- *     fallan con un error explícito que nombra el archivo cuando la lectura o
- *     el análisis falla o el archivo supera 256 KiB (Requirement 7.9).
- *  2. Buscar marcadores no soportados **solo en el texto de la plantilla**, antes
- *     de sustituir nada, de modo que un valor de entrada, una instrucción o un
- *     esquema que contengan la forma `{{...}}` no provoquen un fallo
+ * Assembly sequence:
+ *  1. Read the template and the schema from the paths of the catalog entry
+ *     (`agentRegistry.readAgentPromptTemplate` and `readAgentSchema`), which
+ *     already fail with an explicit error naming the file when the read or the
+ *     parse fails, or when the file exceeds 256 KiB (Requirement 7.9).
+ *  2. Look for unsupported placeholders **in the template text only**, before
+ *     substituting anything, so an input value, an instruction or a schema that
+ *     happens to contain the `{{...}}` shape does not break the build
  *     (Requirements 7.4, 7.5).
- *  3. Sustituir todas las apariciones de `{{input}}`, `{{instruction}}` y
+ *  3. Replace every occurrence of `{{input}}`, `{{instruction}}` and
  *     `{{schema}}` (Requirements 7.1, 7.2, 7.6, 7.7).
- *  4. Dejar el bloque común de reglas de salida JSON presente exactamente una
- *     vez en el prompt final (Requirement 7.3).
+ *  4. Leave the shared JSON output rules block present exactly once in the final
+ *     prompt (Requirement 7.3).
  *
- * Sobre el paso 4: el bloque se añade al final, después de todo el texto
- * proveniente de la plantilla, salvo que la propia plantilla ya declare esas
- * dos reglas (envoltura en un bloque ```json y prohibición de renombrar las
- * claves del esquema). Esa comprobación mantiene el bloque una sola vez en el
- * prompt y preserva la equivalencia carácter a carácter del prompt del agente
- * `financial_analyst_agent` con el prompt embebido en la versión previa de
- * `server.ts`, cuya plantilla ya contiene esas reglas (Requirement 7.8).
+ * On step 4: the block is appended at the end, after all the text coming from
+ * the template, unless the template itself already declares those two rules
+ * (wrapping the answer in a ```json block, and not renaming the schema keys).
+ * That check is the only thing keeping the block present exactly once
+ * (Requirements 7.3, 7.8).
  *
- 
+ * No template in the repository declares both rules today. The `prompt.md` of
+ * `financial_analyst_agent` describes its schema but mentions neither the
+ * ```json wrapper nor the no-renaming rule, so `declaresJsonOutputRules` returns
+ * false and the block is appended to it like to every other agent. The branch
+ * that skips the block exists for templates that choose to spell those rules out
+ * themselves, not for any particular agent.
  */
 
 import {

@@ -1,12 +1,15 @@
 /* ──────────────────────────────────────────────────────────── */
-/*  Extracción del resultado del texto final                    */
+/*  Extraction of the result from the final text                */
 /*                                                              */
-/*  Lógica pura del `Result_Extractor`: recibe el texto crudo    */
-/*  emitido por el agente y el `outputRenderer` de esa ejecución */
-/*  y devuelve el objeto de informe, o nulo si el texto no       */
-/*  contiene ninguno válido para ese renderizador.               */
+/*  Pure logic of the `Result_Extractor`: it takes the raw text  */
+/*  the agent emitted plus the `outputRenderer` of that run and  */
+/*  returns the report object, or null when the text holds no    */
+/*  valid one for that renderer.                                 */
 /*                                                              */
-
+/*  Two passes, in this order: the ```json fenced blocks, then a */
+/*  brace-balance scan of the whole text. The scan is the safety */
+/*  net for the fence pass, which a stray ``` inside a JSON      */
+/*  string is enough to cut short.                               */
 /* ──────────────────────────────────────────────────────────── */
 
 import type { OutputRenderer } from './types';
@@ -79,37 +82,85 @@ function fromFencedBlocks(
 }
 
 /**
- * Degradación por llaves exteriores: se analiza el tramo entre la primera `{` y
- * la última `}` y, si no es JSON válido, se busca un objeto que arranque con
- * alguna de las claves raíz del renderizador (Requirement 14.4).
+ * Every balanced `{...}` span the text closes at nesting depth zero, in the
+ * order they open.
+ *
+ * The scan tracks string literals and their escapes, so a brace, a backtick or a
+ * ``` fence sitting inside a JSON string never opens or closes a candidate —
+ * which matters because reports carry Markdown-formatted prose in their fields.
+ * A span whose braces never balance, the shape of a truncated report, is not
+ * returned at all: half an object is not a candidate.
  */
-function fromOuterBraces(
+function balancedObjectSpans(text: string): string[] {
+  const spans: string[] = [];
+  let depth = 0;
+  let start = -1;
+  let inString = false;
+  let escaped = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+
+    if (inString) {
+      if (escaped) {
+        escaped = false;
+      } else if (char === '\\') {
+        escaped = true;
+      } else if (char === '"') {
+        inString = false;
+      }
+      continue;
+    }
+
+    if (char === '"') {
+      inString = true;
+    } else if (char === '{') {
+      if (depth === 0) start = i;
+      depth += 1;
+    } else if (char === '}' && depth > 0) {
+      // A `}` at depth zero is prose, not the close of a candidate.
+      depth -= 1;
+      if (depth === 0 && start !== -1) {
+        spans.push(text.slice(start, i + 1));
+        start = -1;
+      }
+    }
+  }
+
+  return spans;
+}
+
+/**
+ * Fallback for text with no usable fenced block: the last balanced object that
+ * parses and belongs to the renderer (Requirement 14.4).
+ *
+ * Scanning for balanced spans replaced two brittle heuristics. Slicing from the
+ * first `{` to the last `}` broke on any prose brace around the report, and the
+ * `\{\s*"key"[\s\S]*?\}\s*\}` rescue regex depended on how the model happened to
+ * indent its JSON. Both are gone: a candidate is now delimited by its own braces.
+ */
+function fromBalancedObjects(
   text: string,
   renderer: OutputRenderer | null | undefined,
 ): ExtractedReport | null {
-  const firstBrace = text.indexOf('{');
-  const lastBrace = text.lastIndexOf('}');
-  if (firstBrace === -1 || lastBrace <= firstBrace) return null;
-
-  const outer = parseCandidate(text.slice(firstBrace, lastBrace + 1), renderer);
-  if (outer) return outer;
-
-  for (const key of reportRootKeys(renderer)) {
-    const pattern = new RegExp(`\\{\\s*"${key}"[\\s\\S]*?\\}\\s*\\}`);
-    const match = text.match(pattern);
-    if (!match) continue;
-    const found = parseCandidate(match[0], renderer);
+  const spans = balancedObjectSpans(text);
+  // Last first, matching the fenced pass: a later object supersedes an earlier one.
+  for (let i = spans.length - 1; i >= 0; i--) {
+    const found = parseCandidate(spans[i], renderer);
     if (found) return found;
   }
-
   return null;
 }
 
 /**
- * Extrae el informe del texto final de una ejecución: último bloque ```json
- * válido, con degradación a la búsqueda por llaves exteriores. Devuelve nulo
- * cuando el texto no contiene ningún objeto válido para el renderizador, caso
- * en el que no debe promoverse ningún informe (Requirements 14.4, 14.5, 14.6).
+ * Extracts the report from the final text of a run: the last valid ```json
+ * block, falling back to the last balanced object in the text. Returns null when
+ * the text holds no object valid for the renderer, in which case no report may
+ * be promoted (Requirements 14.4, 14.5, 14.6).
+ *
+ * Meant to run on the complete text of a finished run. On a partial text it
+ * either finds nothing (a truncated object never balances) or, if the report
+ * happens to be complete already, the same object it would find at the end.
  */
 export function extractReport(
   text: string | null | undefined,
@@ -117,7 +168,7 @@ export function extractReport(
 ): ExtractedReport | null {
   if (!text) return null;
   try {
-    return fromFencedBlocks(text, renderer) ?? fromOuterBraces(text, renderer);
+    return fromFencedBlocks(text, renderer) ?? fromBalancedObjects(text, renderer);
   } catch {
     return null;
   }

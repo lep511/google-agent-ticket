@@ -2,7 +2,7 @@ import React from 'react';
 import { 
   X, FileText, CheckCircle2, ChevronRight, Link as LinkIcon, Calendar
 , TrendingUp, TrendingDown, Minus, Lightbulb, AlertTriangle, Printer} from 'lucide-react';
-import { ReportData } from './App';
+import { DeepInsight, DocumentFinding, ReportData } from './App';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from 'recharts';
 import { FormattedMarkdown } from './components/FormattedMarkdown';
 
@@ -40,7 +40,14 @@ export default function ReportTemplate({ data, ticker, onClose, durationSecs = 0
     return 'text-red-600';
   };
 
-  const findings = data.findings || [];
+  /*
+    The report is JSON the model wrote, so its shape is a hope, not a guarantee.
+    `findings` typed as an array is not enough: a model that answers with an
+    object or a string there used to reach `.filter` and throw during render,
+    which blanked the whole report instead of degrading to the empty state below.
+  */
+  const findings: DocumentFinding[] = Array.isArray(data.findings) ? data.findings : [];
+  const deepInsights: DeepInsight[] = Array.isArray(data.deep_insights) ? data.deep_insights : [];
   
   return (
     <div className="min-h-full bg-[#F6F4F0] text-stone-900 font-sans w-full flex flex-col h-full overflow-y-auto print:h-auto print:overflow-visible print:bg-white print:p-0">
@@ -199,11 +206,11 @@ export default function ReportTemplate({ data, ticker, onClose, durationSecs = 0
         )}
 
         {/* Deep Insights */}
-        {data.deep_insights && data.deep_insights.length > 0 && (
+        {deepInsights.length > 0 && (
           <div className="mt-8 print:mt-6 print:mb-6">
             <h2 className="text-2xl font-display font-bold text-stone-900 uppercase tracking-wider mb-6 print:mb-4 print:break-after-avoid">Deep Insights</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 print:grid-cols-3 print:gap-4">
-              {data.deep_insights.slice(0, 3).map((insight, index) => (
+              {deepInsights.slice(0, 3).map((insight, index) => (
                 <div key={index} className="bg-white p-6 rounded-xl border border-stone-200 shadow-sm flex flex-col print:break-inside-avoid print:shadow-none print:border-stone-300">
                    <div className="flex items-start justify-between mb-4 border-b border-stone-100 pb-4 print:border-stone-200">
                      <div className="flex items-center gap-3">
