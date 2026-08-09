@@ -43,20 +43,23 @@ function TimelineItem({ event, running }: { event: TimelineEvent; running: boole
 
   const hasDetail = Boolean(event.detail && event.detail.trim());
 
-  // `endTime` sólo se rellena cuando el siguiente evento entra, así que el
-  // único evento sin cierre durante una ejecución es el que corre ahora mismo.
+  // `endTime` is only filled in when the next event arrives, so during a run the
+  // only event without a closing time is the one running right now.
   const isActive = running && !event.endTime;
-  // Los pasos ya ejecutados se atenúan, salvo si el usuario los abre para leer.
-  const isDimmed = !isActive && !expanded;
+  // Steps that already ran are muted, unless the user opens them to read. The
+  // muting uses colour instead of opacity so the card stays solid and neither
+  // the timeline line nor the panel behind it shows through.
+  const isMuted = !isActive && !expanded;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 16, scale: 0.98 }}
-      animate={{ opacity: isDimmed ? 0.55 : 1, y: 0, scale: 1 }}
-      whileHover={isDimmed ? { opacity: 0.95 } : undefined}
-      transition={{ opacity: { duration: 0.45 } }}
-      className={`backdrop-blur-md border rounded-xl w-full flex flex-col overflow-hidden shadow-2xl transition-colors duration-500 ${
-        isActive ? 'bg-black/45 border-white/30' : 'bg-black/20 border-white/10'
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.45 }}
+      className={`border rounded-xl w-full flex flex-col overflow-hidden shadow-2xl transition-colors duration-500 ${
+        isActive
+          ? 'bg-stone-700 border-white/30'
+          : 'bg-stone-800 border-stone-700 hover:border-stone-600'
       }`}
     >
       <div 
@@ -65,8 +68,8 @@ function TimelineItem({ event, running }: { event: TimelineEvent; running: boole
       >
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <Icon className="w-5 h-5 text-white shrink-0" />
-            <h3 className="font-bold text-white text-base tracking-tight">{event.label}</h3>
+            <Icon className={`w-5 h-5 shrink-0 transition-colors duration-500 ${isMuted ? 'text-stone-400' : 'text-white'}`} />
+            <h3 className={`font-bold text-base tracking-tight transition-colors duration-500 ${isMuted ? 'text-stone-300' : 'text-white'}`}>{event.label}</h3>
           </div>
           {hasDetail && (
             <button
@@ -189,11 +192,22 @@ export function AgentTimeline({ events, running, paused, hasReport, onViewReport
       /* `fade-bottom-edge`: the events dissolve where the list meets the bar. */
       className="w-full flex-1 overflow-y-auto relative px-6 py-8 flex flex-col items-center fade-bottom-edge"
     >
-      {events.length > 0 && (
-         <div className="absolute top-0 bottom-0 left-1/2 w-px bg-white/20 -translate-x-1/2 z-0" />
-      )}
-      
-      <div className="space-y-6 w-full max-w-none relative z-10">
+      <div className="w-full max-w-none relative">
+        {/*
+          The line lives inside the content wrapper, not in the scroll
+          container: an absolute box anchored to the scroller only spans its
+          visible height, so the line stopped growing once the events overflowed.
+          Anchored here it stretches over the full list and keeps extending as
+          new cards arrive.
+        */}
+        {events.length > 0 && (
+          <div
+            aria-hidden="true"
+            className="absolute top-0 bottom-0 left-1/2 w-px bg-white/20 -translate-x-1/2 z-0"
+          />
+        )}
+
+        <div className="space-y-6 relative z-10">
         <AnimatePresence initial={false}>
           {events.map((e) => (
             <TimelineItem key={e.id} event={e} running={running} />
@@ -204,7 +218,7 @@ export function AgentTimeline({ events, running, paused, hasReport, onViewReport
            <motion.div
              initial={{ opacity: 0 }}
              animate={{ opacity: 1 }}
-             className="bg-black/20 backdrop-blur-md border border-white/10 rounded-xl p-6 w-full flex flex-col gap-4 overflow-hidden shadow-2xl"
+             className="bg-stone-800 border border-stone-700 rounded-xl p-6 w-full flex flex-col gap-4 overflow-hidden shadow-2xl"
            >
              <div className="flex items-center gap-3">
                <div className="w-5 h-5 border-2 border-white rounded-full animate-pulse shrink-0" />
@@ -217,7 +231,7 @@ export function AgentTimeline({ events, running, paused, hasReport, onViewReport
            <motion.div
              initial={{ opacity: 0, scale: 0.95 }}
              animate={{ opacity: 1, scale: 1 }}
-             className="bg-black/40 backdrop-blur-md border border-yellow-500/50 rounded-xl p-6 w-full flex items-center justify-between cursor-pointer hover:bg-black/60 transition-colors shadow-lg shadow-black/10 animate-pulse"
+             className="bg-stone-800 border border-yellow-500/50 rounded-xl p-6 w-full flex items-center justify-between cursor-pointer hover:bg-stone-700 transition-colors shadow-lg shadow-black/10 animate-pulse"
              onClick={onDecisionClick}
            >
              <div className="flex items-center gap-3">
@@ -235,7 +249,7 @@ export function AgentTimeline({ events, running, paused, hasReport, onViewReport
            <motion.div
              initial={{ opacity: 0, y: 16 }}
              animate={{ opacity: 1, y: 0 }}
-             className="bg-black/20 backdrop-blur-md border border-white/10 rounded-xl w-full flex flex-col cursor-pointer hover:bg-black/30 transition-colors shadow-2xl"
+             className="bg-stone-800 border border-stone-700 rounded-xl w-full flex flex-col cursor-pointer hover:bg-stone-700 transition-colors shadow-2xl"
              onClick={onViewReport}
            >
              <div className="p-6 flex items-center justify-between">
@@ -265,7 +279,7 @@ export function AgentTimeline({ events, running, paused, hasReport, onViewReport
            <motion.div
              initial={{ opacity: 0, y: 16 }}
              animate={{ opacity: 1, y: 0 }}
-             className="bg-black/40 backdrop-blur-md border border-red-500/50 rounded-xl w-full flex flex-col shadow-2xl"
+             className="bg-stone-800 border border-red-500/50 rounded-xl w-full flex flex-col shadow-2xl"
            >
              <div className="p-6 flex items-center justify-between">
                  <div className="flex items-center gap-3">
@@ -280,6 +294,7 @@ export function AgentTimeline({ events, running, paused, hasReport, onViewReport
         )}
 
         <div ref={endRef} className="h-4 w-full" />
+        </div>
       </div>
 
       {/* Floating Circular Scroll-to-Bottom Button */}
