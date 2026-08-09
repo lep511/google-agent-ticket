@@ -36,6 +36,7 @@ import {
   DEFAULT_MODEL_NAME,
   DEFAULT_MODEL_PROVIDER,
   DEFAULT_ORDER,
+  DEFAULT_TOOLS,
   FIELD_MAX_LENGTHS,
   MANIFEST_DEFAULTS,
   ORDER_MAX,
@@ -52,6 +53,7 @@ import {
   type ModelProviderType,
   type ResolvedAgentDefinition,
 } from './agentTypes.ts';
+import { isKnownToolName } from '../tools/toolRegistry.ts';
 
 /* ────────────────────────────────────────────────────────── */
 /*  Advertencias                                               */
@@ -326,6 +328,7 @@ interface OptionalFields {
   accentColor: string;
   modelProvider: ModelProviderType;
   modelName: string;
+  tools: readonly string[];
   landing: AgentLanding | null;
 }
 
@@ -453,6 +456,29 @@ function readOptionalFields(
     }
   }
 
+  let tools: readonly string[] = DEFAULT_TOOLS;
+  if (raw.tools !== undefined && raw.tools !== null) {
+    if (Array.isArray(raw.tools)) {
+      const valid: string[] = [];
+      for (const entry of raw.tools) {
+        if (isKnownToolName(entry)) {
+          valid.push(entry);
+        } else {
+          degrade(
+            'invalid_optional_field',
+            `el campo opcional "tools" contiene "${String(entry)}" que no es un nombre de herramienta conocido: se omite.`,
+          );
+        }
+      }
+      tools = valid;
+    } else {
+      degrade(
+        'invalid_optional_field',
+        'el campo opcional "tools" no es un arreglo: se aplica el valor por defecto vacío.',
+      );
+    }
+  }
+
   return {
     order: normalizedOrder.order,
     isDefault: readBooleanField(raw, 'isDefault', degrade),
@@ -462,6 +488,7 @@ function readOptionalFields(
     accentColor: readAccentColor(raw, degrade),
     modelProvider,
     modelName,
+    tools,
     landing,
   };
 }
@@ -613,6 +640,7 @@ export function validateAgentFolder(folder: DiscoveredAgentFolder): ManifestVali
       schemaFile: optional.schemaFile,
       modelProvider: optional.modelProvider,
       modelName: optional.modelName,
+      tools: optional.tools,
       landing: optional.landing,
     };
 

@@ -11,8 +11,7 @@ import type { AgentEvent } from "./server/lib/agent/agentEvents.ts";
 import { buildAgentCatalogHttpResult } from "./server/lib/agent/agentCatalog.ts";
 import { subAgentsDebugFileName, writeDebugFile } from "./server/lib/debugFiles.ts";
 import { agentRegistry } from "./server/lib/agent/agentRegistry.ts";
-import { createCalculatorTool } from "./server/lib/tools/calculatorTool.ts";
-import { createBraveSearchTool } from "./server/lib/tools/braveSearchTool.ts";
+import { resolveAgentTools } from "./server/lib/tools/toolRegistry.ts";
 import {
   classifyAgentFailureStatus,
   createStrandsAgent,
@@ -262,9 +261,7 @@ async function startServer() {
       res.on('close', () => runAbort.abort());
 
       const mcpClients = await loadMcpClients();
-      const agentTools = [];
-      if (agent.agentId === 'calculator_agent') agentTools.push(createCalculatorTool());
-      if (agent.agentId === 'web_search_agent') agentTools.push(createBraveSearchTool());
+      const agentTools = resolveAgentTools(agent.manifest.tools);
       const strandsAgent = createStrandsAgent({
         systemPrompt,
         modelId: effectiveModel,

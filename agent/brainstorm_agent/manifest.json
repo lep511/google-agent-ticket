@@ -11,6 +11,7 @@
   "inputPlaceholder": "Describe the topic or problem to brainstorm about",
   "actionLabel": "Brainstorm",
   "supportsInstruction": true,
+  "tools": [],
   "outputRenderer": "simple_report",
   "landing": {
     "title": "Brainstorm, creative ideation on demand",

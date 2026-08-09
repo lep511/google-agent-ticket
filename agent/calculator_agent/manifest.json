@@ -11,5 +11,6 @@
   "inputPlaceholder": "Enter a math problem or expression",
   "actionLabel": "Calculate",
   "supportsInstruction": true,
+  "tools": ["calculate"],
   "outputRenderer": "simple_report"
 }

@@ -41,6 +41,7 @@ function definition(
       schemaFile: 'output.schema.json',
       modelProvider: 'gemini',
       modelName: 'gemini-3.6-flash',
+      tools: [],
       landing: null,
       ...overrides,
     },

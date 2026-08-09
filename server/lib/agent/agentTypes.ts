@@ -137,6 +137,7 @@ export const DEFAULT_PROMPT_FILE = 'prompt.md';
 export const DEFAULT_SCHEMA_FILE = 'output.schema.json';
 export const DEFAULT_MODEL_PROVIDER: ModelProviderType = 'nvidia';
 export const DEFAULT_MODEL_NAME = 'deepseek-ai/deepseek-v4-flash-0731';
+export const DEFAULT_TOOLS: readonly string[] = [];
 
 /**
  * Valores por defecto que el registro aplica cuando el manifiesto omite un
@@ -151,6 +152,7 @@ export const MANIFEST_DEFAULTS = {
   accentColor: DEFAULT_ACCENT_COLOR,
   modelProvider: DEFAULT_MODEL_PROVIDER,
   modelName: DEFAULT_MODEL_NAME,
+  tools: DEFAULT_TOOLS,
   landing: null,
 } as const;
 
@@ -206,6 +208,7 @@ export interface AgentManifest {
   schemaFile: string;
   modelProvider: ModelProviderType;
   modelName: string;
+  tools: readonly string[];
   landing: AgentLanding | null;
 }
 

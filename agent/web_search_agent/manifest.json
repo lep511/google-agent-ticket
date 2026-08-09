@@ -11,6 +11,7 @@
   "inputPlaceholder": "What do you want to search for?",
   "actionLabel": "Search",
   "supportsInstruction": true,
+  "tools": ["search_web"],
   "outputRenderer": "simple_report",
   "landing": {
     "title": "Web Search, find and synthesize information from the web",
