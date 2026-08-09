@@ -40,18 +40,35 @@ const NORMAL_STOP_REASONS: ReadonlySet<string> = new Set([
  * Why the model stopped, phrased to complete the sentence "The model stopped
  * because ...". Keys are `stopReasonKey` values.
  */
+const TURN_BUDGET_SPENT =
+  'the agent used up every turn of its loop budget before writing the report';
+
+const TOKEN_BUDGET_SPENT = 'it reached its output token ceiling, so the report was cut off mid-write';
+
 const STOP_REASON_EXPLANATIONS: Readonly<Record<string, string>> = {
-  maxtokens: 'it reached its output token ceiling, so the report was cut off mid-write',
-  length: 'it reached its output token ceiling, so the report was cut off mid-write',
-  maxturns: 'the agent used up every turn of its loop budget before writing the report',
-  maxturnsreached:
-    'the agent used up every turn of its loop budget before writing the report',
-  turnlimitreached:
-    'the agent used up every turn of its loop budget before writing the report',
+  // Token budgets. `maxTokens` is the model's own ceiling; `limit*Tokens` are the
+  // per-invocation caps the SDK enforces.
+  maxtokens: TOKEN_BUDGET_SPENT,
+  length: TOKEN_BUDGET_SPENT,
+  limitoutputtokens: TOKEN_BUDGET_SPENT,
+  limittotaltokens: 'the run spent its whole token budget before the report was written',
+  modelcontextwindowexceeded: 'the conversation outgrew the model context window',
+
+  // Turn budgets. `limitTurns` is what the Strands SDK reports for
+  // `limits: { turns }`; the rest cover other providers' wording.
+  limitturns: TURN_BUDGET_SPENT,
+  maxturns: TURN_BUDGET_SPENT,
+  maxturnsreached: TURN_BUDGET_SPENT,
+  turnlimitreached: TURN_BUDGET_SPENT,
+
   tooluse: 'the run ended while the agent was still calling tools, before it wrote the report',
   contentfilter: 'the model provider filtered the response',
   contentfiltered: 'the model provider filtered the response',
   guardrailintervened: 'a guardrail stopped the response',
+  refusal: 'the model refused to answer',
+  pauseturn: 'the model paused in the middle of its turn',
+  interrupt: 'the run was interrupted',
+  checkpoint: 'the run paused at a checkpoint',
   cancelled: 'the run was cancelled',
   canceled: 'the run was cancelled',
 };

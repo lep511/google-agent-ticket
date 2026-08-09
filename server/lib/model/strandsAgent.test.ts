@@ -9,8 +9,12 @@ import type { Agent, AgentStreamEvent } from '@strands-agents/sdk';
 import { describe, expect, it } from 'vitest';
 
 import {
-  RetryStrategy,
+  MAX_AGENT_TURNS,
   MAX_MODEL_ATTEMPTS,
+  RetryStrategy,
+  SALVAGE_PROMPT,
+  SALVAGE_TURNS,
+  TURN_LIMIT_STOP_REASON,
   classifyAgentFailureStatus,
   describeAgentFailure,
   mapStrandsEvent,
@@ -193,6 +197,108 @@ describe('streamStrandsAgent', () => {
 
     await expect(stream.next()).resolves.toMatchObject({ value: { type: 'text' } });
     await expect(stream.next()).rejects.toThrow('stream broke');
+  });
+
+  /** Agent double serving one event sequence per `stream` call, recording each. */
+  function fakeAgentPasses(passes: AgentStreamEvent[][]) {
+    const calls: Array<{ prompt: string; turns: unknown }> = [];
+    const agent = {
+      async *stream(prompt: string, options?: { limits?: { turns?: number } }) {
+        calls.push({ prompt, turns: options?.limits?.turns });
+        for (const value of passes[calls.length - 1] ?? []) yield value;
+      },
+    } as unknown as Agent;
+    return { agent, calls };
+  }
+
+  function resultEvent(
+    stopReason: string,
+    usage?: { input: number; output: number; total: number },
+  ): AgentStreamEvent {
+    return event({
+      type: 'agentResultEvent',
+      result: {
+        stopReason,
+        metrics: usage
+          ? {
+              accumulatedUsage: {
+                inputTokens: usage.input,
+                outputTokens: usage.output,
+                totalTokens: usage.total,
+              },
+            }
+          : {},
+      },
+    });
+  }
+
+  async function collect(stream: AsyncGenerator<unknown>): Promise<unknown[]> {
+    const collected: unknown[] = [];
+    for await (const emitted of stream) collected.push(emitted);
+    return collected;
+  }
+
+  it('runs a single pass and emits one complete when the agent answers', async () => {
+    const { agent, calls } = fakeAgentPasses([[textDelta('done'), resultEvent('endTurn')]]);
+
+    expect(await collect(streamStrandsAgent(agent, 'prompt'))).toEqual([
+      { type: 'text', text: 'done' },
+      { type: 'complete', interaction: { stopReason: 'endTurn' } },
+      { type: 'done' },
+    ]);
+    expect(calls).toEqual([{ prompt: 'prompt', turns: MAX_AGENT_TURNS }]);
+  });
+
+  /*
+    The turn budget tripping used to end the run with tool traces and no answer,
+    throwing away everything the agent had researched. The salvage pass spends it.
+  */
+  it('asks for a final answer when the turn budget trips, and reports it as one run', async () => {
+    const { agent, calls } = fakeAgentPasses([
+      [textDelta('researching'), resultEvent(TURN_LIMIT_STOP_REASON, { input: 100, output: 20, total: 120 })],
+      [textDelta('the report'), resultEvent('endTurn', { input: 5, output: 15, total: 20 })],
+    ]);
+
+    expect(await collect(streamStrandsAgent(agent, 'prompt'))).toEqual([
+      { type: 'text', text: 'researching' },
+      // The first pass's result is held back: the SSE endpoint closes the stream
+      // on `complete`, so emitting it here would hide the salvaged report.
+      { type: 'text', text: 'the report' },
+      {
+        type: 'complete',
+        interaction: {
+          stopReason: 'endTurn',
+          usage: { input_tokens: 105, output_tokens: 35, total_tokens: 140 },
+          turnLimitReached: true,
+        },
+      },
+      { type: 'done' },
+    ]);
+
+    expect(calls).toEqual([
+      { prompt: 'prompt', turns: MAX_AGENT_TURNS },
+      { prompt: SALVAGE_PROMPT, turns: SALVAGE_TURNS },
+    ]);
+  });
+
+  it('keeps the original result when the salvage pass reports none', async () => {
+    const { agent, calls } = fakeAgentPasses([[resultEvent(TURN_LIMIT_STOP_REASON)], []]);
+
+    expect(await collect(streamStrandsAgent(agent, 'prompt'))).toEqual([
+      { type: 'complete', interaction: { stopReason: TURN_LIMIT_STOP_REASON } },
+      { type: 'done' },
+    ]);
+    expect(calls).toHaveLength(2);
+  });
+
+  it('does not salvage a run that stopped for any other reason', async () => {
+    const { agent, calls } = fakeAgentPasses([[resultEvent('maxTokens')]]);
+
+    expect(await collect(streamStrandsAgent(agent, 'prompt'))).toEqual([
+      { type: 'complete', interaction: { stopReason: 'maxTokens' } },
+      { type: 'done' },
+    ]);
+    expect(calls).toHaveLength(1);
   });
 });
 

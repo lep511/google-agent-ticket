@@ -209,8 +209,53 @@ export function mapStrandsEvent(event: AgentStreamEvent): AgentEvent | null {
  */
 export const MAX_AGENT_TURNS = 50;
 
+/** `stopReason` the SDK reports when `limits.turns` trips. */
+export const TURN_LIMIT_STOP_REASON = 'limitTurns';
+
+/**
+ * Turn budget of the salvage pass. Two turns, so a model that answers with one
+ * last tool call still gets a turn to write the report from its result.
+ */
+export const SALVAGE_TURNS = 2;
+
+/**
+ * Prompt of the salvage pass. Nothing new is researched: the point is to spend
+ * what was already gathered instead of throwing the whole run away.
+ */
+export const SALVAGE_PROMPT = [
+  'You have run out of research turns. Stop searching now.',
+  'Do NOT call any tool again.',
+  'Write the final report from the information you have already gathered, following the',
+  'output format you were given, and leave out or mark as unavailable whatever you could',
+  'not confirm.',
+].join(' ');
+
+/** Adds up the token accounting of the passes a run went through. */
+function mergeUsage(first: AgentUsage | null, second: AgentUsage | null): AgentUsage | null {
+  if (first === null) return second;
+  if (second === null) return first;
+  return {
+    input_tokens: first.input_tokens + second.input_tokens,
+    output_tokens: first.output_tokens + second.output_tokens,
+    total_tokens: first.total_tokens + second.total_tokens,
+  };
+}
+
 /**
  * Runs the agent and yields `AgentEvent`s, closing with a `done` event.
+ *
+ * When the turn budget trips, the SDK cuts the loop at the top of the next
+ * iteration and returns `stopReason: 'limitTurns'` without ever asking the model
+ * for an answer, so everything the agent had researched was lost and the run
+ * ended with tool traces and no report. This runs a salvage pass in that case:
+ * the agent keeps its conversation, so one more invocation asking it to write the
+ * report with no further tool calls turns a wasted run into a report built from
+ * partial research.
+ *
+ * Exactly one `complete` event reaches the caller, because that is the event the
+ * SSE endpoint closes the stream on. The result of the first pass is therefore
+ * held back until it is known whether a salvage pass follows, and the `complete`
+ * finally emitted carries the tokens of every pass.
  *
  * Failures are thrown, not turned into events: only the caller knows whether
  * anything has been written to the client yet, and therefore whether the run can
@@ -221,13 +266,65 @@ export async function* streamStrandsAgent(
   prompt: string,
   signal?: AbortSignal
 ): AsyncGenerator<AgentEvent> {
-  for await (const event of agent.stream(prompt, {
+  const options = (turns: number) => ({
     ...(signal ? { cancelSignal: signal } : {}),
-    limits: { turns: MAX_AGENT_TURNS },
-  })) {
-    const mapped = mapStrandsEvent(event);
-    if (mapped) yield mapped;
+    limits: { turns },
+  });
+
+  /**
+   * Consumes one pass, yielding everything but its result event, and returns
+   * that result so the caller decides when — and as what — it is emitted.
+   */
+  async function* runPass(
+    passPrompt: string,
+    turns: number,
+  ): AsyncGenerator<AgentEvent, AgentEvent | null> {
+    let result: AgentEvent | null = null;
+
+    for await (const event of agent.stream(passPrompt, options(turns))) {
+      const mapped = mapStrandsEvent(event);
+      if (mapped === null) continue;
+      if (mapped.type === 'complete') {
+        result = mapped;
+        continue;
+      }
+      yield mapped;
+    }
+
+    return result;
   }
+
+  const first = yield* runPass(prompt, MAX_AGENT_TURNS);
+  let outcome = first;
+
+  if (first?.interaction?.stopReason === TURN_LIMIT_STOP_REASON) {
+    console.warn(
+      `[agent] Turn budget of ${MAX_AGENT_TURNS} spent with no report; asking for a final answer from what was gathered.`,
+    );
+    const salvaged = yield* runPass(SALVAGE_PROMPT, SALVAGE_TURNS);
+
+    if (salvaged !== null) {
+      outcome = {
+        ...salvaged,
+        interaction: {
+          ...salvaged.interaction,
+          // The tokens of both passes, so the reported cost is the run's real one.
+          ...(() => {
+            const usage = mergeUsage(
+              (first.interaction?.usage as AgentUsage | undefined) ?? null,
+              (salvaged.interaction?.usage as AgentUsage | undefined) ?? null,
+            );
+            return usage === null ? {} : { usage };
+          })(),
+          // Kept so the browser can tell the user the report came out of a run
+          // whose research was cut short.
+          turnLimitReached: true,
+        },
+      };
+    }
+  }
+
+  if (outcome !== null) yield outcome;
   yield { type: 'done' };
 }
 

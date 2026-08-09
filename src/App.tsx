@@ -603,6 +603,18 @@ export default function App() {
                       if (interaction.stopReason !== undefined && interaction.stopReason !== null) {
                           runStopReason = interaction.stopReason;
                       }
+                      // The server ran its salvage pass: the report exists, but it
+                      // was written after the research budget ran out, so it rests
+                      // on less than the agent set out to gather.
+                      if (interaction.turnLimitReached === true) {
+                          emit(
+                            'info',
+                            'Research cut short',
+                            'The agent spent its whole turn budget before writing the report. ' +
+                              'It was asked to conclude with what it had already gathered, so this ' +
+                              'report may cover fewer documents than usual.',
+                          );
+                      }
                       const usage = interaction.usage || interaction.usage_metadata || (interaction.metadata && interaction.metadata.usage) || null;
                       if (usage) {
                           const tokens = usage.total_token_count || usage.totalTokenCount || usage.total_tokens || 0;

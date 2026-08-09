@@ -196,6 +196,8 @@ Agents run in-process with the Strands SDK. One run is assembled from:
 | Model | request `model` field → `NVIDIA_MODEL_ID` env → default |
 | Tools | per-agent (`search_web`, `calculate`, or none) |
 
+`search_web` serializes its requests and keeps ~1.1 s between them, because Brave's free tier allows about one per second. A failed search returns an `error` field with empty results instead of throwing: a thrown tool error comes back to the model with nothing to act on, and the retries it triggers each cost a turn.
+
 Model failures retry with exponential backoff (429, 5xx) up to 4 attempts.
 
 ### Turn budget (`MAX_AGENT_TURNS`)
@@ -204,7 +206,11 @@ A **turn** is one iteration of the agent loop: one model call plus the execution
 
 It exists to stop runaway loops — a model that keeps calling tools and never writes an answer, for example retrying a rate-limited search forever — from burning tokens without end.
 
-Sizing it matters, because the budget has to cover **every research turn plus the turn that writes the final answer**. Agents spend roughly one turn per tool call, and research-heavy ones spend many: `financial_analyst_agent` looks for several filings and then searches separately for monthly closing prices and quarterly figures. When the ceiling is hit first, the loop ends with tool traces and no final text, and the UI has no report to render. Raise this value before trimming what an agent is asked to research.
+Sizing it matters, because the budget has to cover **every research turn plus the turn that writes the final answer**. Agents spend roughly one turn per tool call, and research-heavy ones spend many: `financial_analyst_agent` looks for several filings and then searches separately for monthly closing prices and quarterly figures.
+
+**When the budget trips**, the SDK cuts the loop at the top of the next iteration and returns `stopReason: 'limitTurns'` without ever asking the model for an answer. The runner does not accept that outcome: it runs a **salvage pass** (`SALVAGE_PROMPT`, `SALVAGE_TURNS`) that reuses the agent's conversation and asks it to write the report from what it already gathered, with no further tool calls. The run reports a single `complete` event carrying the tokens of both passes plus `turnLimitReached: true`, and the browser notes in the timeline that the research was cut short. Without it, a run that spent its budget ended with tool traces and nothing to render.
+
+A run that keeps tripping the budget is usually looping on a failing tool rather than genuinely needing more turns — check the run log before raising the ceiling.
 
 Related limits, all in the same file:
 
