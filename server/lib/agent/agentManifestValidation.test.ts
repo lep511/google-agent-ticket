@@ -44,7 +44,7 @@ describe('campos obligatorios del manifiesto', () => {
     if (!result.ok) return;
     expect(result.warnings).toEqual([]);
     expect(result.definition.agentId).toBe('good_agent');
-    expect(result.definition.manifest.name).toBe('Agente good_agent');
+    expect(result.definition.manifest.name).toBe('Agent good_agent');
     expect(result.definition.paths.agentsFilePath).toContain('AGENTS.md');
     expect(result.definition.paths.promptPath).toContain('prompt.md');
     expect(result.definition.paths.schemaPath).toContain('output.schema.json');

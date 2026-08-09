@@ -4,11 +4,11 @@ import { defineConfig } from 'vitest/config';
 
 /**
  * Two test projects with separate environments:
- *  - `server`: entorno `node`, cubre `server/**` y las pruebas de backend en `tests/server/**`
- *  - `web`:    entorno `jsdom` con `@testing-library/react`, cubre `src/**` y `tests/web/**`
+ *  - `server`: `node` environment, covers `server/**` and the backend tests in `tests/server/**`
+ *  - `web`:    `jsdom` environment with `@testing-library/react`, covers `src/**` and `tests/web/**`
  *
- * La configuración compartida de `fast-check` (mínimo 100 iteraciones por
- * propiedad) vive en `tests/setup/fastCheck.ts`, cargado por ambos proyectos.
+ * The shared `fast-check` configuration (a minimum of 100 iterations per
+ * property) lives in `tests/setup/fastCheck.ts`, loaded by both projects.
  */
 const sharedAlias = {
   '@': path.resolve(__dirname, '.'),

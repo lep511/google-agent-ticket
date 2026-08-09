@@ -46,7 +46,6 @@
     "@types/jszip": "^3.4.0",
     "@types/node": "^22.14.0",
     "@types/pako": "^2.0.4",
-    "@vercel/node": "^5.9.7",
     "autoprefixer": "^10.4.21",
     "fast-check": "4.9.0",
     "jsdom": "30.0.1",
