@@ -6,6 +6,7 @@ import ReportTemplate from "./ReportTemplate";
 import SimpleReportView, { normalizeSimpleReport } from './components/SimpleReportView';
 import { AgentTimeline, TimelineEvent } from './components/AgentTimeline';
 import { AgentSelector } from './components/AgentSelector';
+import { UserMenu } from './components/UserMenu';
 import {
   CognitoUserSession,
   getCurrentCognitoUser,
@@ -937,9 +938,15 @@ export default function App() {
       <DottedBackground />
 
       {/* Header */}
-      <header className="relative z-20 flex shrink-0 items-center justify-between gap-3 px-6 py-4 border-b border-white/10 bg-black/20 backdrop-blur-md">
-        <div className="flex items-center gap-4">
-          <span className="font-display font-bold text-xl tracking-wider uppercase text-white">Tickr</span>
+      <header className="relative z-20 flex shrink-0 items-center justify-between gap-2 px-3 py-3 border-b border-white/10 bg-black/20 backdrop-blur-md sm:gap-3 sm:px-6 sm:py-4">
+        {/*
+          The leading group absorbs the width the session control does not need.
+          `min-w-0` is what lets the Agent_Selector shrink toward its floor
+          instead of pushing the account button off screen.
+        */}
+        <div className="flex min-w-0 flex-1 items-center gap-1.5 sm:gap-4">
+          {/* Below 360px the wordmark yields its room to the controls. */}
+          <span className="hidden shrink-0 font-display font-bold text-xl tracking-wider uppercase text-white min-[360px]:inline">Tickr</span>
           <AgentSelector
             agents={agents}
             activeAgentId={activeAgentId}
@@ -956,23 +963,20 @@ export default function App() {
             aria-label="History"
             aria-expanded={isHistoryOpen}
             onClick={() => setIsHistoryOpen((open) => !open)}
-            className="flex items-center gap-2 rounded border border-white/10 bg-white/5 px-3 py-1.5 font-sans text-sm text-stone-300 transition-colors hover:bg-white/10 hover:text-stone-100"
+            className="flex shrink-0 items-center gap-2 rounded border border-white/10 bg-white/5 px-2 py-1.5 font-sans text-sm text-stone-300 transition-colors hover:bg-white/10 hover:text-stone-100 sm:px-3"
           >
             <History className="h-4 w-4" aria-hidden="true" />
             <span className="hidden sm:inline">History</span>
             {visibleEntries.length > 0 && (
-              <span className="rounded-full bg-stone-800 px-1.5 py-0.5 font-mono text-[11px] text-stone-200">
+              <span className="shrink-0 rounded-full bg-stone-800 px-1.5 py-0.5 font-mono text-[11px] text-stone-200">
                 {visibleEntries.length}
               </span>
             )}
           </button>
         </div>
-        <div>
+        <div className="shrink-0">
           {user ? (
-            <div className="flex items-center gap-3 text-sm">
-              <span className="text-stone-400">{user.email || user.username}</span>
-              <button onClick={handleSignOut} className="px-3 py-1 bg-stone-800 hover:bg-stone-700 rounded text-stone-200 transition-colors">Sign Out</button>
-            </div>
+            <UserMenu email={user.email || user.username} onSignOut={handleSignOut} />
           ) : (
             <button onClick={signInWithHostedUI} className="px-4 py-2 bg-white text-black hover:bg-stone-200 rounded font-medium text-sm transition-colors">
               Sign In
@@ -985,7 +989,7 @@ export default function App() {
         {!running && !reportData && events.length === 0 ? (
            <LandingView agent={activeAgent} />
         ) : (
-           <div className="flex-1 flex flex-row overflow-hidden min-h-0 w-full px-6">
+           <div className="flex-1 flex flex-row overflow-hidden min-h-0 w-full px-3 sm:px-6">
              <div className="flex-1 flex flex-col bg-stone-900 rounded-xl border border-stone-800 overflow-hidden min-h-0 max-w-4xl mx-auto w-full">
                 <div className="p-3 bg-stone-800 border-b border-stone-700 font-bold text-stone-200 text-sm flex justify-between items-center">
                   <div className="flex items-center gap-2 min-w-0">
@@ -1021,7 +1025,7 @@ export default function App() {
         )}
 
         {/* Input bar always visible at the bottom. */}
-        <div className="relative z-20 mt-auto w-full shrink-0 bg-gradient-to-t from-stone-900 via-stone-900 to-transparent px-6 pb-4 pt-4 sm:pb-8">
+        <div className="relative z-20 mt-auto w-full shrink-0 bg-gradient-to-t from-stone-900 via-stone-900 to-transparent px-3 pb-4 pt-4 sm:px-6 sm:pb-8">
           <div className="max-w-4xl mx-auto w-full">
             {error && (
               <div className="mb-4 bg-red-500/10 border border-red-500/50 text-red-200 px-4 py-3 rounded text-sm">
@@ -1039,12 +1043,19 @@ export default function App() {
             )}
 
 
-            <div className="bg-stone-800 border border-stone-700 rounded-xl shadow-2xl p-2 w-full flex items-center gap-2 relative z-30 transition-all focus-within:border-stone-500 focus-within:ring-1 focus-within:ring-stone-500">
+            {/*
+              The bar is the only element that may take the full width: every
+              child either shrinks (`min-w-0` on the fields, which overrides the
+              intrinsic minimum size of an `input`) or keeps its size and never
+              grows (`shrink-0` on the action), so the action stays inside the
+              rounded container at any viewport width.
+            */}
+            <div className="bg-stone-800 border border-stone-700 rounded-xl shadow-2xl p-1.5 w-full min-w-0 flex items-center gap-1.5 relative z-30 transition-colors focus-within:border-stone-500 focus-within:ring-1 focus-within:ring-stone-500 sm:p-2 sm:gap-2">
               {inputMode === 'ticker' ? (
                 <div
-                  className={`pl-3 py-2 flex items-center gap-2 transition-colors ${
+                  className={`pl-2 py-2 flex min-w-0 items-center gap-2 transition-colors sm:pl-3 ${
                     running ? 'text-stone-600' : 'text-stone-400'
-                  } ${supportsInstruction ? 'border-r border-stone-700 pr-3' : 'flex-1 pr-3'}`}
+                  } ${supportsInstruction ? 'border-r border-stone-700 pr-3' : 'flex-1 pr-2 sm:pr-3'}`}
                 >
                   <Search className="w-5 h-5 shrink-0" aria-hidden="true" />
                   <input
@@ -1055,8 +1066,8 @@ export default function App() {
                     placeholder={inputPlaceholder}
                     maxLength={inputMaxLength('ticker')}
                     disabled={running}
-                    className={`bg-transparent border-none outline-none text-white font-mono uppercase placeholder-stone-600 transition-colors disabled:text-stone-500 disabled:placeholder-stone-700 ${
-                      supportsInstruction ? 'w-28' : 'flex-1'
+                    className={`bg-transparent border-none outline-none min-w-0 text-white font-mono uppercase placeholder-stone-600 transition-colors disabled:text-stone-500 disabled:placeholder-stone-700 ${
+                      supportsInstruction ? 'w-20 sm:w-28' : 'flex-1'
                     }`}
                     onKeyDown={(e) => e.key === 'Enter' && runAnalysis()}
                   />
@@ -1070,7 +1081,7 @@ export default function App() {
                   placeholder={inputPlaceholder}
                   maxLength={inputMaxLength('text')}
                   disabled={running}
-                  className="bg-transparent border-none outline-none flex-1 px-3 py-2 text-stone-100 placeholder-stone-500 transition-colors disabled:text-stone-500 disabled:placeholder-stone-700"
+                  className="bg-transparent border-none outline-none flex-1 min-w-0 px-2 py-2 text-stone-100 placeholder-stone-500 transition-colors disabled:text-stone-500 disabled:placeholder-stone-700 sm:px-3"
                   onKeyDown={(e) => e.key === 'Enter' && runAnalysis()}
                 />
               )}
@@ -1083,21 +1094,21 @@ export default function App() {
                   placeholder="Optional instruction for the agent"
                   maxLength={MAX_INSTRUCTION_LENGTH}
                   disabled={running}
-                  className="bg-transparent border-none outline-none flex-1 px-3 py-2 text-stone-200 placeholder-stone-500 transition-colors disabled:text-stone-500 disabled:placeholder-stone-700"
+                  className="bg-transparent border-none outline-none flex-1 min-w-0 px-2 py-2 text-stone-200 placeholder-stone-500 transition-colors disabled:text-stone-500 disabled:placeholder-stone-700 sm:px-3"
                   onKeyDown={(e) => e.key === 'Enter' && runAnalysis()}
                 />
               )}
               {running ? (
                 <button
                   onClick={() => setShowStopConfirm(true)}
-                  className="bg-[#CC3131] text-white hover:bg-[#aa2929] px-6 py-2 rounded-lg font-medium transition-colors ml-2 tracking-wide text-sm"
+                  className="bg-[#CC3131] text-white hover:bg-[#aa2929] shrink-0 px-4 py-2 rounded-lg font-medium transition-colors tracking-wide text-sm whitespace-nowrap sm:px-6"
                 >
                   Stop
                 </button>
               ) : showRestart ? (
                 <button
                   onClick={restartSession}
-                  className="bg-white text-black hover:bg-stone-200 px-6 py-2 rounded-lg font-medium transition-colors ml-2 tracking-wide text-sm whitespace-nowrap"
+                  className="bg-white text-black hover:bg-stone-200 shrink-0 px-4 py-2 rounded-lg font-medium transition-colors tracking-wide text-sm whitespace-nowrap sm:px-6"
                 >
                   Restart
                 </button>
@@ -1105,16 +1116,25 @@ export default function App() {
                 <button
                   onClick={runAnalysis}
                   disabled={!canRunAnalysis}
-                  className="bg-white text-black hover:bg-stone-200 disabled:bg-stone-700 disabled:text-stone-500 disabled:cursor-not-allowed px-6 py-2 rounded-lg font-medium transition-colors ml-2 tracking-wide text-sm whitespace-nowrap"
+                  className="bg-white text-black hover:bg-stone-200 disabled:bg-stone-700 disabled:text-stone-500 disabled:cursor-not-allowed shrink-0 px-4 py-2 rounded-lg font-medium transition-colors tracking-wide text-sm whitespace-nowrap sm:px-6"
                 >
                   {actionLabel}
                 </button>
               )}
             </div>
 
-            <div className="text-center mt-4">
-              <span className="text-xs text-stone-500 font-mono tracking-wider">This AI can make mistakes, please verify important information.</span>
-            </div>
+            {/*
+              Helper copy on a single line. When it no longer fits it dissolves
+              at both ends (`fade-inline-edges`) instead of wrapping or being cut
+              off by a hard edge; the full sentence stays in the DOM for
+              assistive technology and in the tooltip.
+            */}
+            <p
+              title="This AI can make mistakes, please verify important information."
+              className="fade-inline-edges mt-4 w-full overflow-hidden whitespace-nowrap text-center font-mono text-[10px] tracking-wide text-stone-500 sm:text-xs sm:tracking-wider"
+            >
+              This AI can make mistakes, please verify important information.
+            </p>
           </div>
         </div>
       </main>

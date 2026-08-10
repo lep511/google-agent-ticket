@@ -2017,9 +2017,16 @@ describe('History_Trigger in the header', () => {
     expect(leadingGroup.contains(trigger)).toBe(true);
 
     // The last group is the session one. The tests run signed in, so it carries
-    // the identity of the current user and the sign-out control.
-    expect(sessionGroup).toHaveTextContent('tester@example.com');
-    expect(sessionGroup.contains(screen.getByRole('button', { name: 'Sign Out' }))).toBe(true);
+    // the account control, and that control reveals the identity of the current
+    // user together with the sign-out action.
+    const accountTrigger = screen.getByRole('button', { name: 'Account' });
+    expect(sessionGroup.contains(accountTrigger)).toBe(true);
+
+    await userEvent.setup().click(accountTrigger);
+
+    const accountMenu = await screen.findByRole('menu', { name: 'Account' });
+    expect(accountMenu).toHaveTextContent('tester@example.com');
+    expect(accountMenu.contains(screen.getByRole('menuitem', { name: 'Sign Out' }))).toBe(true);
 
     // Requirement 1.1: document order confirms the placement, right after the
     // Agent_Selector and ahead of the session group.

@@ -77,3 +77,11 @@ export const motion = new Proxy({} as Record<string, ElementType>, {
 export function AnimatePresence({ children }: { children?: ReactNode }) {
   return createElement(Fragment, null, children);
 }
+
+/**
+ * jsdom reports no motion preference, and the stub animates nothing anyway, so
+ * the components read the same value the real hook would return there.
+ */
+export function useReducedMotion(): boolean | null {
+  return null;
+}

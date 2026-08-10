@@ -292,7 +292,12 @@ export function AgentSelector({
     activeAgent?.name ?? (status === 'loading' ? 'Cargando agentes…' : 'Sin agente');
 
   return (
-    <div ref={containerRef} className="group relative font-sans">
+    /*
+      Fluid width: `w-56` is the base (and maximum) size, and the flex parent may
+      shrink it when the header runs out of room, but never past `min-w`, which is
+      75% of that base. The label truncates once the floor is reached.
+    */
+    <div ref={containerRef} className="group relative w-56 min-w-42 shrink font-sans">
       {/* Requirement 11.1: icono, `name` e indicador de despliegue. */}
       <button
         ref={triggerRef}
@@ -304,11 +309,11 @@ export function AgentSelector({
         aria-label="Seleccionar agente"
         aria-describedby={running ? 'agent-selector-locked' : undefined}
         /*
-          The trigger keeps a fixed width so the header does not reflow when the
-          Active Agent changes: the icon and the chevron never shrink and the
-          name takes the remaining space, truncated with an ellipsis.
+          The trigger fills the width the container settled on, so the header does
+          not reflow when the Active Agent changes: the icon and the chevron never
+          shrink and the name takes the remaining space, truncated with an ellipsis.
         */
-        className="w-56 flex items-center gap-2 px-3 py-2 bg-stone-800 border border-stone-700 rounded-lg text-stone-100 hover:bg-stone-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-stone-800"
+        className="w-full flex items-center gap-2 px-2.5 py-2 bg-stone-800 border border-stone-700 rounded-lg text-stone-100 hover:bg-stone-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-stone-800 sm:px-3"
       >
         <span
           className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center shrink-0"
@@ -359,7 +364,8 @@ export function AgentSelector({
             exit={{ opacity: 0, y: -8, scale: 0.98 }}
             transition={{ duration: 0.15 }}
             onKeyDown={handlePanelKeyDown}
-            className="absolute left-0 top-full mt-2 z-50 w-80 max-h-[60vh] overflow-y-auto bg-stone-800 border border-stone-700 rounded-xl shadow-2xl shadow-black/50"
+            /* Never wider than the viewport, so the panel stays on screen at 320px. */
+            className="absolute left-0 top-full mt-2 z-50 w-[min(20rem,calc(100vw-1.5rem))] max-h-[60vh] overflow-y-auto overscroll-contain bg-stone-800 border border-stone-700 rounded-xl shadow-2xl shadow-black/50"
           >
             {/* Requirement 11.7: estado de carga del catálogo. */}
             {status === 'loading' && (

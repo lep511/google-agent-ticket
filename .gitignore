@@ -1,6 +1,10 @@
 old_version/*
 run_logs/*
 
+.kiro/skills/*
+.agents
+skills-lock.json
+
 debug/*
 !debug/.info-debug.txt
 

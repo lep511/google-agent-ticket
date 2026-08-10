@@ -90,6 +90,30 @@
     );
     mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 2rem), transparent 100%);
   }
+
+  /*
+    Single-line text that dissolves at both ends when it no longer fits, instead
+    of wrapping or hitting a hard clip. The text stays centered, so on wide
+    viewports the fade zones fall on empty space and nothing looks different;
+    once the line overflows, both ends fade into the background.
+    Pair it with `overflow-hidden whitespace-nowrap text-center`.
+  */
+  .fade-inline-edges {
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 1.5rem,
+      #000 calc(100% - 1.5rem),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 1.5rem,
+      #000 calc(100% - 1.5rem),
+      transparent 100%
+    );
+  }
 }
 
 
