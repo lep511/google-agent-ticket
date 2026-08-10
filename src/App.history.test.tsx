@@ -697,9 +697,14 @@ async function driveRun(
     return;
   }
 
-  // The action button comes back only once the run released `running`.
+  /*
+    The bar's action button comes back only once the run released `running`. A
+    run that promoted a report clears the input bar and offers "Restart" there;
+    every other outcome keeps the query and the agent's own action label.
+  */
+  const finishedLabel = outcome === 'promoted' ? 'Restart' : CATALOG_AGENT.actionLabel;
   await waitFor(() => {
-    expect(screen.getByRole('button', { name: CATALOG_AGENT.actionLabel })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: finishedLabel })).toBeInTheDocument();
   });
 }
 

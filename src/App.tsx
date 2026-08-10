@@ -157,8 +157,19 @@ export default function App() {
   const [catalogError, setCatalogError] = useState<string | null>(null);
   const [activeAgentId, setActiveAgentId] = useState<string | null>(() => readStoredAgentId());
   const [runAgent, setRunAgent] = useState<RunAgent | null>(null);
+  /**
+   * Query that started the on-screen run. Frozen when the run starts because a
+   * successful run empties the input bar, and the report still has to name what
+   * it was asked about.
+   */
+  const [runQuery, setRunQuery] = useState('');
 
   const [running, setRunning] = useState(false);
+  /**
+   * A run finished and put a report on screen. It turns the bar's action into a
+   * restart, since the query that produced that report is already answered.
+   */
+  const [runCompleted, setRunCompleted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reportData, setReportData] = useState<ReportData | null>(null);
   // Reason a finished run put no report on screen, or `null` while there is
@@ -294,6 +305,15 @@ export default function App() {
     isCatalogEmpty,
   });
 
+  /*
+    A successful run empties the bar, so its action becomes "Restart" instead of
+    an execution the empty field could never start. Typing a new query brings the
+    agent's own action label back, so a finished run never blocks the next one.
+  */
+  const hasPendingInput =
+    inputValue.trim().length > 0 || (supportsInstruction && instruction.trim().length > 0);
+  const showRestart = runCompleted && !hasPendingInput;
+
   /**
    * Fetches the catalog and sets the active agent: the stored agentId when it
    * exists in the catalog, otherwise the defaultAgentId overwrites storage.
@@ -350,9 +370,22 @@ export default function App() {
     setDurationSecs(0);
     setStartTime(null);
     setRunAgent(null);
+    setRunQuery('');
+    setRunCompleted(false);
     setIsReportOpen(false);
     setIsStopped(false);
     eventIdRef.current = 0;
+  };
+
+  /**
+   * Restart offered by the bar after a successful run: drops the finished result
+   * and the bar's contents, leaving the same clean state the session started in.
+   */
+  const restartSession = () => {
+    if (running) return;
+    setInputValue('');
+    setInstruction('');
+    resetRunResults();
   };
 
   /**
@@ -448,6 +481,8 @@ export default function App() {
     setErr(null);
     setRep(null);
     setUnstructuredReport(null);
+    setRunCompleted(false);
+    setRunQuery(inputValue);
     setEvts([]);
     setTok(0);
     setTRuns(0);
@@ -758,6 +793,14 @@ export default function App() {
         applyHistory(insertEntry(entries, createHistoryEntry(draft, entries)));
       }
 
+      // The run answered its query, so the bar drops the text it was given and
+      // offers a restart instead of re-running what is already on screen.
+      if (reportPromoted) {
+        setInputValue('');
+        setInstruction('');
+        setRunCompleted(true);
+      }
+
     } catch (e: any) {
       if (e.name === 'AbortError') {
          // Only `stopAgent` aborts this request, so an abort is always the user
@@ -839,7 +882,7 @@ export default function App() {
            <SimpleReportView
              data={reportData as unknown as RawSimpleReport}
              title={runAgent?.agentName ?? 'Report'}
-             subtitle={inputValue}
+             subtitle={runQuery}
              onClose={() => setIsReportOpen(false)}
              durationSecs={durationSecs}
              toolRuns={toolRuns}
@@ -848,7 +891,7 @@ export default function App() {
          ) : (
            <ReportTemplate
              data={reportData}
-             ticker={inputValue}
+             ticker={runQuery}
              onClose={() => setIsReportOpen(false)}
              durationSecs={durationSecs}
              toolRuns={toolRuns}
@@ -1050,6 +1093,13 @@ export default function App() {
                   className="bg-[#CC3131] text-white hover:bg-[#aa2929] px-6 py-2 rounded-lg font-medium transition-colors ml-2 tracking-wide text-sm"
                 >
                   Stop
+                </button>
+              ) : showRestart ? (
+                <button
+                  onClick={restartSession}
+                  className="bg-white text-black hover:bg-stone-200 px-6 py-2 rounded-lg font-medium transition-colors ml-2 tracking-wide text-sm whitespace-nowrap"
+                >
+                  Restart
                 </button>
               ) : (
                 <button
