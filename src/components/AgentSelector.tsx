@@ -313,7 +313,8 @@ export function AgentSelector({
           not reflow when the Active Agent changes: the icon and the chevron never
           shrink and the name takes the remaining space, truncated with an ellipsis.
         */
-        className="w-full flex items-center gap-2 px-2.5 py-2 bg-stone-800 border border-stone-700 rounded-lg text-stone-100 hover:bg-stone-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-stone-800 sm:px-3"
+        title={triggerLabel}
+        className="w-full flex items-center gap-2 px-2.5 py-2 bg-stone-800 border border-stone-600 rounded-lg text-stone-100 transition-colors hover:bg-stone-700 hover:border-stone-500 active:bg-stone-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-stone-800 disabled:hover:border-stone-600 sm:px-3"
       >
         <span
           className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center shrink-0"
@@ -325,11 +326,9 @@ export function AgentSelector({
             <TriggerIcon className="w-3.5 h-3.5" />
           )}
         </span>
-        {/* `title` reveals the full name on hover when it is truncated. */}
-        <span
-          title={triggerLabel}
-          className="flex-1 min-w-0 truncate text-left font-display font-bold text-sm tracking-wide text-white"
-        >
+        {/* The full name lives in the trigger's own `title`, so a truncated
+            label is still readable on hover from anywhere on the control. */}
+        <span className="flex-1 min-w-0 truncate text-left font-display font-bold text-sm tracking-wide text-white">
           {triggerLabel}
         </span>
         <ChevronDown
@@ -436,7 +435,7 @@ export function AgentSelector({
                         aria-selected={isActive}
                         tabIndex={focusIndex === index ? 0 : -1}
                         onClick={() => confirmSelection(agent)}
-                        className={`w-full text-left p-4 flex items-start gap-3 transition-colors hover:bg-white/5 focus:outline-none focus-visible:bg-white/10 ${
+                        className={`w-full text-left p-4 flex items-start gap-3 transition-colors hover:bg-white/5 active:bg-white/10 focus:outline-none focus-visible:bg-white/10 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-stone-400 ${
                           isActive ? 'bg-white/5 border-l-2' : 'border-l-2 border-transparent'
                         }`}
                         // Requirement 11.3: el acento del agente marca el activo.

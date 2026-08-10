@@ -56,7 +56,14 @@ export function landingContent(agent: AgentCatalogEntry | null): LandingContent 
   };
 }
 
-/** Punto destacado con subtítulo: icono en círculo, título y subtítulo. */
+/**
+ * Punto destacado con subtítulo: icono en círculo, título y subtítulo.
+ *
+ * The circle is centred on the whole text column, which is what keeps it aligned
+ * once the subtitle wraps to a second line on a narrow viewport. `min-w-0` lets
+ * that column take the width the icon does not need instead of overflowing the
+ * card, and the tighter leading keeps a wrapped row from looking cramped.
+ */
 function HighlightWithSubtitle({ item }: { item: AgentLandingHighlight }) {
   const Icon = resolveAgentIcon(item.icon);
   return (
@@ -64,9 +71,9 @@ function HighlightWithSubtitle({ item }: { item: AgentLandingHighlight }) {
       <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white shrink-0">
         <Icon className="w-4 h-4" aria-hidden="true" />
       </div>
-      <div className="flex-1">
-        <div className="text-sm font-medium text-white">{item.title}</div>
-        <div className="text-xs text-white/60">{item.subtitle}</div>
+      <div className="min-w-0 flex-1">
+        <div className="text-sm font-medium leading-snug text-white break-words">{item.title}</div>
+        <div className="text-xs leading-snug text-white/70 break-words">{item.subtitle}</div>
       </div>
     </div>
   );
@@ -77,8 +84,10 @@ function HighlightPlain({ item }: { item: AgentLandingHighlight }) {
   const Icon = item.icon ? resolveAgentIcon(item.icon) : CheckCircle2;
   return (
     <div className="flex items-center gap-3">
-      <Icon className="w-5 h-5 text-[#b3b3b3] shrink-0" aria-hidden="true" />
-      <div className="text-sm text-white/90 font-medium">{item.title}</div>
+      <Icon className="w-5 h-5 text-stone-300 shrink-0" aria-hidden="true" />
+      <div className="min-w-0 flex-1 text-sm font-medium leading-snug text-white/90 break-words">
+        {item.title}
+      </div>
     </div>
   );
 }
@@ -90,8 +99,10 @@ function HighlightCard({ group }: { group: AgentLandingHighlightGroup }) {
   const hasSubtitles = items.some((item) => Boolean(item.subtitle));
 
   return (
-    <div className="bg-black/20 backdrop-blur-md border border-white/10 rounded-none p-6 shadow-2xl flex flex-col hover:bg-black/30 transition-colors">
-      <h3 className="text-xl font-medium text-white mb-6 text-left">{group.title}</h3>
+    <div className="bg-black/20 backdrop-blur-md border border-white/10 rounded-none p-5 shadow-2xl flex flex-col hover:bg-black/30 transition-colors sm:p-6">
+      <h3 className="text-lg font-medium text-white mb-5 text-left text-pretty sm:text-xl sm:mb-6">
+        {group.title}
+      </h3>
 
       {items.length > 0 && (
         <div
@@ -140,7 +151,7 @@ export function LandingView({ agent = null }: LandingViewProps) {
       short windows.
     */
     <div className="flex-1 min-h-0 w-full overflow-y-auto overflow-x-hidden fade-bottom-edge">
-      <div className="flex min-h-full items-center justify-center p-4 sm:p-8">
+      <div className="flex min-h-full items-center justify-center px-4 py-[clamp(1rem,3vh,2rem)] sm:px-8">
         <AnimatePresence mode="wait">
           <motion.div
             // La clave por agente reanima la vista en cada cambio de selección.
@@ -149,14 +160,39 @@ export function LandingView({ agent = null }: LandingViewProps) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.25 }}
-            className="relative z-10 mx-auto flex w-full max-w-4xl flex-col items-center py-6 sm:py-12"
+            /* Fluid vertical rhythm: the gap to the header scales with the
+               viewport instead of jumping between two fixed values. */
+            className="relative z-10 mx-auto flex w-full max-w-4xl flex-col items-center py-[clamp(1rem,4vh,3rem)]"
           >
             {/* Header */}
-            <div className="mb-10 max-w-3xl text-center sm:mb-16">
-              <h1 className="mb-4 font-serif text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
+            <div className="relative mb-[clamp(2rem,7vh,4rem)] max-w-3xl text-center">
+              {/*
+                Scrim under the hero copy. The dotted texture of the shell runs
+                behind the title, and at mobile sizes those dots read through the
+                letterforms; a soft wash of the page background lifts the text off
+                the pattern without introducing a visible panel.
+              */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute -inset-x-6 -inset-y-4"
+                style={{
+                  background:
+                    'radial-gradient(65% 75% at 50% 45%, rgba(28,25,23,0.92) 0%, rgba(28,25,23,0.55) 55%, rgba(28,25,23,0) 100%)',
+                }}
+              />
+              {/*
+                `Instrument Serif` ships a single weight, so `font-bold` made the
+                browser synthesise the bold by double-stroking the glyphs, which
+                is what blurred the title on mobile. The real weight renders crisp,
+                and `font-synthesis: none` keeps any future weight class from
+                bringing the faux bold back.
+              */}
+              <h1 className="relative mb-4 font-serif text-[clamp(1.875rem,7vw,3rem)] font-normal leading-[1.1] tracking-tight text-white antialiased text-balance [font-synthesis:none]">
                 {title}
               </h1>
-              <p className="text-lg font-medium text-[#b3b3b3]">{subtitle}</p>
+              <p className="relative text-base font-medium text-stone-300 text-pretty sm:text-lg">
+                {subtitle}
+              </p>
             </div>
 
             {/* Cards */}

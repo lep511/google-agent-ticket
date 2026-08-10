@@ -944,9 +944,13 @@ export default function App() {
           `min-w-0` is what lets the Agent_Selector shrink toward its floor
           instead of pushing the account button off screen.
         */}
-        <div className="flex min-w-0 flex-1 items-center gap-1.5 sm:gap-4">
-          {/* Below 360px the wordmark yields its room to the controls. */}
-          <span className="hidden shrink-0 font-display font-bold text-xl tracking-wider uppercase text-white min-[360px]:inline">Tickr</span>
+        <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
+          {/*
+            The wordmark keeps a floor of 8px between itself and the selector at
+            every width, and below 380px it yields its room to the controls
+            instead of squeezing that gap shut.
+          */}
+          <span className="hidden shrink-0 font-display font-bold text-xl tracking-wider uppercase text-white min-[380px]:inline">Tickr</span>
           <AgentSelector
             agents={agents}
             activeAgentId={activeAgentId}
@@ -961,9 +965,11 @@ export default function App() {
             ref={historyTriggerRef}
             type="button"
             aria-label="History"
+            /* Native tooltip: it is the visible label when the text collapses. */
+            title="History"
             aria-expanded={isHistoryOpen}
             onClick={() => setIsHistoryOpen((open) => !open)}
-            className="flex shrink-0 items-center gap-2 rounded border border-white/10 bg-white/5 px-2 py-1.5 font-sans text-sm text-stone-300 transition-colors hover:bg-white/10 hover:text-stone-100 sm:px-3"
+            className="flex shrink-0 items-center gap-2 rounded border border-white/10 bg-white/5 px-2 py-1.5 font-sans text-sm text-stone-300 transition-colors hover:border-white/20 hover:bg-white/10 hover:text-stone-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 active:bg-white/20 sm:px-3"
           >
             <History className="h-4 w-4" aria-hidden="true" />
             <span className="hidden sm:inline">History</span>
@@ -985,7 +991,8 @@ export default function App() {
         </div>
       </header>
 
-      <main className="relative z-10 flex-1 flex flex-col pt-4 sm:pt-8 min-h-0">
+      {/* Fluid gap between the header and the view below it. */}
+      <main className="relative z-10 flex-1 flex flex-col pt-[clamp(0.75rem,3vh,2rem)] min-h-0">
         {!running && !reportData && events.length === 0 ? (
            <LandingView agent={activeAgent} />
         ) : (
@@ -1025,7 +1032,12 @@ export default function App() {
         )}
 
         {/* Input bar always visible at the bottom. */}
-        <div className="relative z-20 mt-auto w-full shrink-0 bg-gradient-to-t from-stone-900 via-stone-900 to-transparent px-3 pb-4 pt-4 sm:px-6 sm:pb-8">
+        {/*
+          Fluid bottom breathing room, plus whatever the device reserves for a
+          home indicator, so the bar and its notice never sit against the edge of
+          a phone screen.
+        */}
+        <div className="relative z-20 mt-auto w-full shrink-0 bg-gradient-to-t from-stone-900 via-stone-900 to-transparent px-3 pt-4 pb-[calc(clamp(1.5rem,5vh,2.5rem)_+_env(safe-area-inset-bottom))] sm:px-6">
           <div className="max-w-4xl mx-auto w-full">
             {error && (
               <div className="mb-4 bg-red-500/10 border border-red-500/50 text-red-200 px-4 py-3 rounded text-sm">
@@ -1050,7 +1062,7 @@ export default function App() {
               grows (`shrink-0` on the action), so the action stays inside the
               rounded container at any viewport width.
             */}
-            <div className="bg-stone-800 border border-stone-700 rounded-xl shadow-2xl p-1.5 w-full min-w-0 flex items-center gap-1.5 relative z-30 transition-colors focus-within:border-stone-500 focus-within:ring-1 focus-within:ring-stone-500 sm:p-2 sm:gap-2">
+            <div className="bg-stone-800 border border-stone-600 rounded-xl shadow-2xl shadow-black/60 ring-1 ring-white/5 p-1.5 w-full min-w-0 flex items-center gap-1.5 relative z-30 transition-colors focus-within:border-stone-400 focus-within:ring-1 focus-within:ring-stone-400 sm:p-2 sm:gap-2">
               {inputMode === 'ticker' ? (
                 <div
                   className={`pl-2 py-2 flex min-w-0 items-center gap-2 transition-colors sm:pl-3 ${
@@ -1066,7 +1078,7 @@ export default function App() {
                     placeholder={inputPlaceholder}
                     maxLength={inputMaxLength('ticker')}
                     disabled={running}
-                    className={`bg-transparent border-none outline-none min-w-0 text-white font-mono uppercase placeholder-stone-600 transition-colors disabled:text-stone-500 disabled:placeholder-stone-700 ${
+                    className={`bg-transparent border-none outline-none min-w-0 text-white font-mono uppercase placeholder-stone-400 transition-colors disabled:text-stone-500 disabled:placeholder-stone-600 ${
                       supportsInstruction ? 'w-20 sm:w-28' : 'flex-1'
                     }`}
                     onKeyDown={(e) => e.key === 'Enter' && runAnalysis()}
@@ -1081,7 +1093,7 @@ export default function App() {
                   placeholder={inputPlaceholder}
                   maxLength={inputMaxLength('text')}
                   disabled={running}
-                  className="bg-transparent border-none outline-none flex-1 min-w-0 px-2 py-2 text-stone-100 placeholder-stone-500 transition-colors disabled:text-stone-500 disabled:placeholder-stone-700 sm:px-3"
+                  className="bg-transparent border-none outline-none flex-1 min-w-0 px-2 py-2 text-stone-100 placeholder-stone-400 transition-colors disabled:text-stone-500 disabled:placeholder-stone-600 sm:px-3"
                   onKeyDown={(e) => e.key === 'Enter' && runAnalysis()}
                 />
               )}
@@ -1094,21 +1106,21 @@ export default function App() {
                   placeholder="Optional instruction for the agent"
                   maxLength={MAX_INSTRUCTION_LENGTH}
                   disabled={running}
-                  className="bg-transparent border-none outline-none flex-1 min-w-0 px-2 py-2 text-stone-200 placeholder-stone-500 transition-colors disabled:text-stone-500 disabled:placeholder-stone-700 sm:px-3"
+                  className="bg-transparent border-none outline-none flex-1 min-w-0 px-2 py-2 text-stone-200 placeholder-stone-400 transition-colors disabled:text-stone-500 disabled:placeholder-stone-600 sm:px-3"
                   onKeyDown={(e) => e.key === 'Enter' && runAnalysis()}
                 />
               )}
               {running ? (
                 <button
                   onClick={() => setShowStopConfirm(true)}
-                  className="bg-[#CC3131] text-white hover:bg-[#aa2929] shrink-0 px-4 py-2 rounded-lg font-medium transition-colors tracking-wide text-sm whitespace-nowrap sm:px-6"
+                  className="bg-[#CC3131] text-white hover:bg-[#aa2929] active:bg-[#8f2222] shrink-0 px-4 py-2 rounded-lg font-medium transition-colors tracking-wide text-sm whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-800 sm:px-6"
                 >
                   Stop
                 </button>
               ) : showRestart ? (
                 <button
                   onClick={restartSession}
-                  className="bg-white text-black hover:bg-stone-200 shrink-0 px-4 py-2 rounded-lg font-medium transition-colors tracking-wide text-sm whitespace-nowrap sm:px-6"
+                  className="bg-white text-black hover:bg-stone-200 active:bg-stone-300 shrink-0 px-4 py-2 rounded-lg font-medium transition-colors tracking-wide text-sm whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-300 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-800 sm:px-6"
                 >
                   Restart
                 </button>
@@ -1116,7 +1128,7 @@ export default function App() {
                 <button
                   onClick={runAnalysis}
                   disabled={!canRunAnalysis}
-                  className="bg-white text-black hover:bg-stone-200 disabled:bg-stone-700 disabled:text-stone-500 disabled:cursor-not-allowed shrink-0 px-4 py-2 rounded-lg font-medium transition-colors tracking-wide text-sm whitespace-nowrap sm:px-6"
+                  className="bg-white text-black hover:bg-stone-200 active:bg-stone-300 disabled:bg-stone-700 disabled:text-stone-400 disabled:cursor-not-allowed shrink-0 px-4 py-2 rounded-lg font-medium transition-colors tracking-wide text-sm whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-300 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-800 sm:px-6"
                 >
                   {actionLabel}
                 </button>
@@ -1131,7 +1143,7 @@ export default function App() {
             */}
             <p
               title="This AI can make mistakes, please verify important information."
-              className="fade-inline-edges mt-4 w-full overflow-hidden whitespace-nowrap text-center font-mono text-[10px] tracking-wide text-stone-500 sm:text-xs sm:tracking-wider"
+              className="fade-inline-edges mt-3 w-full overflow-hidden whitespace-nowrap text-center font-mono text-[10px] tracking-wide text-stone-400 sm:mt-4 sm:text-xs sm:tracking-wider"
             >
               This AI can make mistakes, please verify important information.
             </p>
