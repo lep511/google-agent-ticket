@@ -270,3 +270,119 @@ npm run test:essential      # fast suites only (~21 s)
 npm run test:non-essential  # the four long property suites
 npm run test:watch   # vitest watch mode, essential suites only
 ```
+
+## Troubleshooting
+
+### Agents not loading on Vercel (frontend shows empty or errors)
+
+**Symptom:** The frontend loads but the agent selector is empty or API calls fail.
+
+**Check the backend is reachable:**
+```bash
+curl -v http://<server-ip>:3000/api/agents
+```
+
+If this times out, the problem is on the EC2 side — not Vercel. Walk through the causes below.
+
+---
+
+### EC2 security group not allowing inbound traffic on port 3000
+
+**Symptom:** `curl` to the server IP times out; the server works locally (`curl localhost:3000/api/agents` responds on the instance itself).
+
+**Fix:** In the AWS Console, go to EC2 > Security Groups > select the instance's group, and add an inbound rule:
+
+| Type | Protocol | Port range | Source |
+|------|----------|------------|--------|
+| Custom TCP | TCP | 3000 | `0.0.0.0/0` (or restrict to Vercel IPs) |
+
+---
+
+### Express server not running
+
+**Symptom:** `curl localhost:3000/api/agents` fails on the instance itself.
+
+**Fix:**
+```bash
+pm2 status                # Check if the process is listed and "online"
+pm2 logs tickr            # Look for startup errors
+pm2 restart tickr         # Restart if stopped/errored
+```
+
+If the process isn't in pm2 at all:
+```bash
+cd /path/to/tickr
+pm2 start ./node_modules/.bin/tsx --name tickr -- server.ts
+```
+
+---
+
+### EC2 public IP changed after stop/start
+
+**Symptom:** The frontend was working before, then stopped after an instance restart. The old IP no longer responds.
+
+**Fix:** Find the new public IP in the EC2 console, then update the rewrite destination in `vercel.json` (or Vercel dashboard) and redeploy.
+
+**Prevention:** Attach an Elastic IP to the instance so the address survives stop/start cycles.
+
+---
+
+### `vercel.json` missing from the repo
+
+**Symptom:** All routes return 404 on Vercel, including the root page.
+
+**Fix:** Ensure `vercel.json` is committed to the repo with at minimum the SPA fallback rewrite:
+```json
+{
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
+```
+
+---
+
+### Mixed content or CORS errors in the browser
+
+**Symptom:** Browser console shows `Mixed Content` or `CORS policy` errors.
+
+**Fix:** Ensure `CORS_ORIGINS` is set on the backend to include the Vercel frontend URL:
+```env
+CORS_ORIGINS=https://tickr-bay.vercel.app
+```
+
+The Vercel rewrite handles the proxy server-to-server, so the browser should never call the backend directly. If it does, check that the frontend API client uses relative paths (`/api/...`), not absolute URLs to the backend.
+
+---
+
+### Cognito login redirects fail or loop
+
+**Symptom:** After login, the browser redirects back to the login page or shows an error.
+
+**Fix:**
+1. Verify the Cognito app client has the correct callback URL (`https://tickr-bay.vercel.app/`) in Allowed Callback URLs.
+2. Ensure `VITE_COGNITO_DOMAIN`, `VITE_COGNITO_CLIENT_ID`, `VITE_COGNITO_REGION`, and `VITE_COGNITO_USER_POOL_ID` are set correctly in Vercel environment variables.
+3. Redeploy after changing env vars — Vite embeds them at build time.
+
+---
+
+### Node/tsx not found after SSH into EC2
+
+**Symptom:** `pm2 start` or `tsx` fails with "command not found" after opening a new SSH/SSM session.
+
+**Fix:** Load nvm before running commands:
+```bash
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+nvm use <installed-node-version>
+```
+
+---
+
+### Agent returns `stopReason: limitTurns` (research cut short)
+
+**Symptom:** The run completes but the timeline shows "research was cut short" and results feel incomplete.
+
+**Cause:** The agent hit the `MAX_AGENT_TURNS` ceiling (50 turns). Usually means a tool is failing repeatedly (e.g., rate-limited Brave Search).
+
+**Fix:** Check the run log in `run_logs/` for looping tool calls. If a tool is rate-limited, wait and retry. Raising `MAX_AGENT_TURNS` is rarely the right fix — the issue is usually a stuck loop, not a genuinely long research task.
