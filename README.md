@@ -95,41 +95,24 @@ VITE_COGNITO_REGION=...
 VITE_COGNITO_DOMAIN=...
 ```
 
-**`vercel.json` rewrites:**
-```json
-{
-  "rewrites": [
-    { "source": "/api/:path*", "destination": "http://<server-ip>:3000/api/:path*" },
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
-}
-```
+**Vercel rewrites (configured in the Vercel dashboard, NOT in the repo):**
 
-Deploy:
-```bash
-vercel --prod
-```
+The `/api/*` rewrites are configured in **Vercel Project Settings > Rewrites** to avoid exposing the backend IP in the public repository. Do not commit a `vercel.json` with rewrite destinations — it leaks the server address.
+
+Required rewrites (set in the dashboard):
+
+| Source | Destination |
+|--------|-------------|
+| `/api/:path*` | `http://<server-ip>:3000/api/:path*` |
+| `/:path*` | `/index.html` |
 
 The browser never talks to the backend directly — Vercel handles HTTPS and forwards API requests server-to-server over HTTP.
 
 **When the EC2 IP changes:**
 
-The backend IP is hardcoded in the `destination` of `vercel.json`, which is committed to the repo. Nothing resolves it at runtime, so the deployed frontend keeps pointing at the old address until the file is updated.
+Update the rewrite destination in the Vercel dashboard (Project Settings > Rewrites) and trigger a redeploy. No code change or commit is needed.
 
-If the instance gets a new public IP (a stop/start cycle on an instance without an Elastic IP is enough), every `/api/*` request from the Vercel frontend fails: the rewrite still targets the previous address. Restarting the Express process or redeploying the frontend alone will not fix it.
-
-To recover:
-
-1. Update the IP in `vercel.json`:
-   ```json
-   { "source": "/api/:path*", "destination": "http://<new-server-ip>:3000/api/:path*" }
-   ```
-2. Commit the change, then redeploy so the new rewrite takes effect:
-   ```bash
-   vercel --prod
-   ```
-
-Attach an **Elastic IP** to the instance to avoid this entirely. The address then survives stop/start cycles and `vercel.json` stays valid.
+Attach an **Elastic IP** to the instance to avoid IP changes entirely. The address then survives stop/start cycles and the rewrite stays valid.
 
 **Keeping the backend running (pm2):**
 

@@ -44,6 +44,7 @@ dist-ssr
 # screenshots written while browsing the app. Regenerated on every run.
 .playwright-mcp/
 .vercel
+vercel.json
 api/*.mjs
 certs/
 .env*
