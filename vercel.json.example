@@ -1,0 +1,9 @@
+{
+  "buildCommand": "vite build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "http://<server-ip>:3000/api/:path*" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

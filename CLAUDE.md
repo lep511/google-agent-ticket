@@ -29,7 +29,7 @@ fast-check property tests run at least 100 iterations. Override with `FC_NUM_RUN
 ### Deployment topology
 
 - **Frontend**: Deployed on Vercel (Vite static build) at `https://tickr-bay.vercel.app`
-- **Backend**: Express server running on EC2 (`44.197.184.195:3000`)
+- **Backend**: Express server running on EC2
 - Vercel rewrites `/api/*` to the EC2 backend (configured in `vercel.json`)
 - Auto-deploys on push to `main` via GitHub integration (repo: `lep511/google-agent-ticket`)
 

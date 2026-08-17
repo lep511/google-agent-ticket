@@ -112,6 +112,25 @@ vercel --prod
 
 The browser never talks to the backend directly — Vercel handles HTTPS and forwards API requests server-to-server over HTTP.
 
+**When the EC2 IP changes:**
+
+The backend IP is hardcoded in the `destination` of `vercel.json`, which is committed to the repo. Nothing resolves it at runtime, so the deployed frontend keeps pointing at the old address until the file is updated.
+
+If the instance gets a new public IP (a stop/start cycle on an instance without an Elastic IP is enough), every `/api/*` request from the Vercel frontend fails: the rewrite still targets the previous address. Restarting the Express process or redeploying the frontend alone will not fix it.
+
+To recover:
+
+1. Update the IP in `vercel.json`:
+   ```json
+   { "source": "/api/:path*", "destination": "http://<new-server-ip>:3000/api/:path*" }
+   ```
+2. Commit the change, then redeploy so the new rewrite takes effect:
+   ```bash
+   vercel --prod
+   ```
+
+Attach an **Elastic IP** to the instance to avoid this entirely. The address then survives stop/start cycles and `vercel.json` stays valid.
+
 **Keeping the backend running (pm2):**
 
 The Express server must stay running for the Vercel frontend to work. Use `pm2` for process management.
