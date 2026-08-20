@@ -289,7 +289,7 @@ export function AgentSelector({
 
   const TriggerIcon = activeAgent ? resolveAgentIcon(activeAgent.icon) : FALLBACK_ICON;
   const triggerLabel =
-    activeAgent?.name ?? (status === 'loading' ? 'Cargando agentes…' : 'Sin agente');
+    activeAgent?.name ?? (status === 'loading' ? 'Loading agents…' : 'No agent');
 
   return (
     /*
@@ -306,7 +306,7 @@ export function AgentSelector({
         disabled={running}
         aria-haspopup="listbox"
         aria-expanded={open}
-        aria-label="Seleccionar agente"
+        aria-label="Select agent"
         aria-describedby={running ? 'agent-selector-locked' : undefined}
         /*
           The trigger fills the width the container settled on, so the header does
@@ -370,7 +370,7 @@ export function AgentSelector({
             {status === 'loading' && (
               <div className="p-5 flex items-center gap-3 text-sm text-white/70">
                 <Loader2 className="w-4 h-4 animate-spin text-white/70 shrink-0" />
-                <span>Cargando agentes…</span>
+                <span>Loading agents…</span>
               </div>
             )}
 
@@ -417,7 +417,7 @@ export function AgentSelector({
 
             {/* Requirement 11.2: una tarjeta por agente del catálogo. */}
             {hasOptions && (
-              <div role="listbox" aria-label="Agentes disponibles" aria-orientation="vertical">
+              <div role="listbox" aria-label="Available agents" aria-orientation="vertical">
                 {agents.map((agent, index) => {
                   const Icon = resolveAgentIcon(agent.icon);
                   const isActive = agent.id === activeAgentId;
