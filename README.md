@@ -108,11 +108,22 @@ Required rewrites (set in the dashboard):
 
 The browser never talks to the backend directly — Vercel handles HTTPS and forwards API requests server-to-server over HTTP.
 
-**When the EC2 IP changes:**
+#### When the EC2 IP changes
 
-Update the rewrite destination in the Vercel dashboard (Project Settings > Rewrites) and trigger a redeploy. No code change or commit is needed.
+The `destination` field in `vercel.json` rewrites points directly to the EC2 instance's public IP (`http://<server-ip>:3000/api/:path*`). If the instance is stopped and restarted **without** an Elastic IP attached, this address will change and the API will stop responding until it's updated.
 
-Attach an **Elastic IP** to the instance to avoid IP changes entirely. The address then survives stop/start cycles and the rewrite stays valid.
+**If you're using a static Elastic IP** (recommended — see infra docs), this section normally doesn't apply, since the IP stays fixed across stop/start cycles.
+
+**If the IP does change**, update it manually:
+
+1. Get the instance's current public IP from the EC2 console.
+2. Update the `destination` value in `vercel.json`:
+```json
+   "destination": "http://<new-ip>:3000/api/:path*"
+```
+3. Commit and push — Vercel will redeploy automatically and pick up the new rewrite.
+
+> **Tip:** To avoid manual updates entirely, point the rewrite at a stable domain (e.g. a CloudFront distribution or a Route 53 record) instead of a raw IP. That way the origin can change behind the scenes without ever touching `vercel.json` again.
 
 **Keeping the backend running (pm2):**
 
