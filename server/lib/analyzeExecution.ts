@@ -8,7 +8,7 @@
  *  - The `agent_info` event, emitted exactly once and before any other event of
  *    the run (Requirements 5.3, 5.4).
  *  - The `error` followed by `done` sequence that closes the stream when a run
- *    fails or is interrupted after the SSE headers are written (Requirement 5.10).
+ *    fails or is interrupted after the SSE headers are written ().
  *  - The HTTP answer that rejects a run which never starts, that is, before
  *    those headers are written.
  *
@@ -22,13 +22,13 @@ import type { OutputRenderer, ResolvedAgentDefinition } from './agent/agentTypes
 /*  Evento `agent_info`                                        */
 /* ────────────────────────────────────────────────────────── */
 
-/** Único tipo de evento SSE que esta especificación añade (Requirement 5.4). */
+/** Único tipo de evento SSE que esta especificación añade (). */
 export const AGENT_INFO_EVENT_TYPE = 'agent_info';
 
 /**
  * Primer evento del flujo de una ejecución: identifica el agente resuelto y el
  * renderizador con el que el frontend debe presentar el resultado, aunque el
- * usuario cambie de agente durante el streaming (Requirement 5.3).
+ * usuario cambie de agente durante el streaming ().
  */
 export interface AgentInfoEvent {
   type: typeof AGENT_INFO_EVENT_TYPE;
@@ -38,7 +38,7 @@ export interface AgentInfoEvent {
   outputRenderer: OutputRenderer;
 }
 
-/** Construye el evento `agent_info` del agente resuelto (Requirement 5.3). */
+/** Construye el evento `agent_info` del agente resuelto (). */
 export function buildAgentInfoEvent(definition: ResolvedAgentDefinition): AgentInfoEvent {
   return {
     type: AGENT_INFO_EVENT_TYPE,
@@ -59,7 +59,7 @@ export const DEFAULT_STREAM_FAILURE_MESSAGE =
 /**
  * Sequence that closes the stream when the run fails or is interrupted after the
  * SSE headers are written: an `error` event with the reason and then a `done`
- * event (Requirement 5.10). Events and logs already written are left untouched.
+ * event (). Events and logs already written are left untouched.
  */
 export function buildStreamFailureEvents(reason: unknown): AgentEvent[] {
   return [

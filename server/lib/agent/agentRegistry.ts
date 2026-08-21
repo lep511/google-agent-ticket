@@ -62,7 +62,7 @@ export const DEFAULT_AGENTS_DIR = path.join(process.cwd(), 'agent');
 
 /**
  * snake_case: una o más secuencias de `a`-`z` y `0`-`9` separadas por un único
- * `_` (Requirement 1.4). Esta forma también impide separadores de ruta y
+ * `_` (). Esta forma también impide separadores de ruta y
  * secuencias de recorrido en el agentId.
  */
 export const SNAKE_CASE_PATTERN = /^[a-z0-9]+(?:_[a-z0-9]+)*$/;
@@ -131,7 +131,7 @@ export const consoleWarningLogger: AgentRegistryLogger = (warning) => {
  * El análisis y la validación del manifiesto ocurren en la capa siguiente.
  */
 export interface DiscoveredAgentFolder {
-  /** Nombre de la carpeta, ya comprobado como snake_case (Requirement 1.2). */
+  /** Nombre de la carpeta, ya comprobado como snake_case (). */
   agentId: string;
   /** Ruta absoluta de la carpeta del agente. */
   dir: string;
@@ -151,7 +151,7 @@ export interface AgentDiscoveryResult {
   warnings: AgentRegistryWarning[];
   /**
    * Error de enumeración de `agent/`: cuando está presente, `folders` está
-   * vacío y quien cachea debe conservar el catálogo vigente (Requirement 4.8).
+   * vacío y quien cachea debe conservar el catálogo vigente ().
    */
   enumerationError: string | null;
   /** Manifiestos leídos de disco en esta pasada; sirve para verificar la caché. */
@@ -170,14 +170,14 @@ function errorMessage(error: unknown): string {
 
 /**
  * Enumera hasta `MAX_AGENT_FOLDERS` subcarpetas directas de `agentsDir` y lee
- * el `manifest.json` de cada una (Requirement 1.1).
+ * el `manifest.json` de cada una ().
  *
  * Descarta con una advertencia, conservando el resto del catálogo, las
  * carpetas con nombre fuera de snake_case (1.4), sin `manifest.json` o con un
  * manifiesto mayor de 64 KB (1.5, 9.9) y las que producen un error del sistema
  * de archivos (1.6). Los archivos sueltos de la raíz de `agent/` se ignoran
- * porque solo se recorren directorios (Requirement 6.4), y no se lee ningún
- * archivo de ejecución (Requirement 4.6).
+ * porque solo se recorren directorios (), y no se lee ningún
+ * archivo de ejecución ().
  */
 export function discoverAgentFolders(
   agentsDir: string = DEFAULT_AGENTS_DIR,
@@ -333,7 +333,7 @@ export function discoverAgentFolders(
  * Colación para el desempate por `name`: alfabética y sin distinguir
  * mayúsculas y minúsculas, pero sensible a los acentos, de modo que dos
  * nombres que solo difieren en la caja se consideren iguales y el desempate
- * pase al agentId (Requirement 1.8).
+ * pase al agentId ().
  */
 const CATALOG_NAME_COLLATOR = new Intl.Collator('en', { sensitivity: 'accent' });
 
@@ -358,7 +358,7 @@ export function compareAgentNames(a: string, b: string): number {
  * Orden total del catálogo (Requirements 1.7, 1.8): `order` ascendente, ante
  * empate `name` alfabético sin distinguir mayúsculas y minúsculas, y ante
  * empate de `name` agentId ascendente. Como el agentId es único dentro del
- * catálogo (Requirement 1.11), la comparación solo devuelve 0 para la misma
+ * catálogo (), la comparación solo devuelve 0 para la misma
  * entrada, así que el orden queda determinado sin depender de la estabilidad
  * de `Array.prototype.sort`.
  */
@@ -387,7 +387,7 @@ export function sortAgentDefinitions(
 
 /**
  * agentId que ocupa el segundo lugar de la precedencia del agente por defecto
- * (Requirement 3.2).
+ * ().
  */
 export const FINANCIAL_ANALYST_AGENT_ID = 'financial_analyst_agent';
 
@@ -437,7 +437,7 @@ export function resolveDefaultAgent(
   };
 
   // El orden se reafirma aquí para que la regla de la primera entrada no
-  // dependa de que el llamador haya ordenado el catálogo (Requirement 3.3).
+  // dependa de que el llamador haya ordenado el catálogo ().
   const ordered = sortAgentDefinitions(definitions);
 
   if (ordered.length === 0) {
@@ -605,7 +605,7 @@ export function resolveAgentSelection(
       : definitions.find((definition) => definition.agentId === defaultAgentId);
 
   if (fallback === undefined) {
-    // Requirement 5.6: sin catálogo no hay agente al que caer.
+    //  sin catálogo no hay agente al que caer.
     warn(
       'no_agent_available',
       'agent',
@@ -637,7 +637,7 @@ export function resolveAgentSelection(
   }
 
   if (requested.kind === 'malformed') {
-    // Requirement 16.2: separadores de ruta, recorrido o caracteres fuera de
+    //  separadores de ruta, recorrido o caracteres fuera de
     // snake_case se tratan como desconocidos, nunca como una ruta.
     warn(
       'malformed_agent_id',
@@ -970,7 +970,7 @@ export interface AgentRegistry {
    * su carpeta y el contenido se lee aquí, durante la resolución de una
    * ejecución (Requirements 6.1, 6.2, 6.3, 6.4). Lanza `AgentSourceError` si el
    * agente no está en el catálogo y `AgentInlineSourcesError` si el conjunto
-   * queda vacío tras las exclusiones y los límites (Requirement 6.7).
+   * queda vacío tras las exclusiones y los límites ().
    */
   getInlineSources(agentId: string): AgentInlineSourcesResult;
   /** Fuerza una reconstrucción en la siguiente lectura del catálogo. */
@@ -1005,7 +1005,7 @@ export function createAgentRegistry(options: AgentRegistryOptions = {}): AgentRe
     const result = discoverAgentFolders(agentsDir, logger);
 
     if (result.enumerationError !== null) {
-      // Requirement 4.8: se conserva el catálogo vigente y solo se anota el error.
+      //  se conserva el catálogo vigente y solo se anota el error.
       const previous = snapshot ?? EMPTY_SNAPSHOT;
       snapshot = {
         ...previous,
@@ -1022,7 +1022,7 @@ export function createAgentRegistry(options: AgentRegistryOptions = {}): AgentRe
 
     // Requirements 1.7, 1.8: el catálogo se publica con su orden total.
     const definitions = sortAgentDefinitions(validation.definitions);
-    // Requirement 3.6: el agente por defecto se resuelve de nuevo en cada
+    //  el agente por defecto se resuelve de nuevo en cada
     // reconstrucción, sobre las entradas válidas ya ordenadas.
     const resolvedDefault = resolveDefaultAgent(definitions, logger);
 
@@ -1070,7 +1070,7 @@ export function createAgentRegistry(options: AgentRegistryOptions = {}): AgentRe
     getAgentById: (agentId) => {
       const requested = classifyRequestedAgentId(agentId);
       if (requested.kind !== 'candidate') return null;
-      // Requirement 16.1: coincidencia exacta contra los ids descubiertos.
+      //  coincidencia exacta contra los ids descubiertos.
       return current().definitions.find((entry) => entry.agentId === requested.value) ?? null;
     },
     getDefaultAgent: () => {
@@ -1080,7 +1080,7 @@ export function createAgentRegistry(options: AgentRegistryOptions = {}): AgentRe
         snapshot.definitions.find((entry) => entry.agentId === snapshot.defaultAgentId) ?? null
       );
     },
-    // Requirement 3.5: mismo valor en todas las peticiones sin reconstrucción.
+    //  mismo valor en todas las peticiones sin reconstrucción.
     getDefaultAgentId: () => current().defaultAgentId,
     resolveAgent: (receivedAgentId) => {
       const snapshot = current();
@@ -1094,7 +1094,7 @@ export function createAgentRegistry(options: AgentRegistryOptions = {}): AgentRe
     getPromptTemplate: (agentId) => readAgentPromptTemplate(requireDefinition(agentId)),
     getSchema: (agentId) => readAgentSchema(requireDefinition(agentId)),
     getInstructions: (agentId) => readAgentInstructions(requireDefinition(agentId)),
-    // Requirement 6.4: el contenido de los archivos de ejecución se lee solo
+    //  el contenido de los archivos de ejecución se lee solo
     // aquí, cuando una ejecución resuelve su agente.
     getInlineSources: (agentId) => loadAgentInlineSources(requireDefinition(agentId), logger),
     invalidate: () => {

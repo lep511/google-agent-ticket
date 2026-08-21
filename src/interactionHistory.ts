@@ -15,7 +15,7 @@
 import { isOutputRenderer, type OutputRenderer } from './types';
 import { FALLBACK_OUTPUT_RENDERER } from './resultExtraction';
 
-/** History `localStorage` key (Requirement 6.1). */
+/** History `localStorage` key (). */
 export const HISTORY_STORAGE_KEY = 'tickr.interactionHistory';
 
 export function userHistoryKey(userId?: string | null): string {
@@ -34,7 +34,7 @@ export interface InteractionMetrics {
   toolRuns: number;
 }
 
-/** Persisted History Entry (Requirement 6.7: these nine fields). */
+/** Persisted History Entry ( these nine fields). */
 export interface InteractionHistoryEntry {
   id: string;
   agentId: string;
@@ -102,7 +102,7 @@ export function createHistoryEntry(
   const takenIds = new Set(existing.map((entry) => entry.id));
 
   // The generated identifier is checked instead of trusted, so uniqueness is an
-  // invariant of the store and not a property of the generator (Requirement 3.7).
+  // invariant of the store and not a property of the generator ().
   let id = newHistoryEntryId();
   let guard = 0;
   while (takenIds.has(id)) {
@@ -184,7 +184,7 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-/** Type guard of Requirement 6.3 (includes 5.8: `report` must be an object). */
+/** Type guard of  (includes 5.8: `report` must be an object). */
 export function isHistoryEntry(value: unknown): value is InteractionHistoryEntry {
   if (!isPlainObject(value)) return false;
   return (
@@ -214,7 +214,7 @@ function normalizeMetrics(value: unknown): InteractionMetrics {
  * Completes the four non-essential fields of an already validated entry. A
  * recoverable report is not thrown away over degraded metadata: `agentName`
  * falls back to `agentId`, `outputRenderer` to the fallback renderer,
- * `instruction` to `null` and `metrics` to zeros (Requirement 6.3).
+ * `instruction` to `null` and `metrics` to zeros ().
  */
 function normalizeHistoryEntry(value: InteractionHistoryEntry): InteractionHistoryEntry {
   const raw = value as unknown as Record<string, unknown>;
@@ -237,7 +237,7 @@ function normalizeHistoryEntry(value: InteractionHistoryEntry): InteractionHisto
 /**
  * Interprets the raw content of the History Key.
  * `needsRepair` is true when the content was not valid JSON or was not an
- * array, that is, when the key has to be overwritten (Requirement 6.4).
+ * array, that is, when the key has to be overwritten ().
  */
 export function parseHistoryPayload(raw: string | null): {
   entries: InteractionHistoryEntry[];
@@ -250,11 +250,11 @@ export function parseHistoryPayload(raw: string | null): {
   try {
     parsed = JSON.parse(raw);
   } catch {
-    return { entries: [], needsRepair: true }; // Requirement 6.4: invalid JSON
+    return { entries: [], needsRepair: true }; //  invalid JSON
   }
 
   if (!Array.isArray(parsed)) {
-    return { entries: [], needsRepair: true }; // Requirement 6.4: not an array
+    return { entries: [], needsRepair: true }; //  not an array
   }
 
   // Requirements 5.8, 6.3: element-by-element filtering, then normalization of
@@ -271,10 +271,10 @@ export const DAY_MS = 24 * HOUR_MS;
 export const WEEK_MS = 7 * DAY_MS;
 
 /**
- * Requirement 4.5: `just now` (<60 s), `N minutes ago`, `N hours ago`,
+ *  `just now` (<60 s), `N minutes ago`, `N hours ago`,
  * `N days ago` and the absolute local date from 7 days on. N is the truncated
  * integer. A `createdAt` in the future relative to `now` is treated as a zero
- * difference. The plural stays fixed because Requirement 4.5 pins the texts
+ * difference. The plural stays fixed because  pins the texts
  * literally.
  */
 export function formatRelativeTimestamp(createdAt: number, now: number): string {
@@ -286,7 +286,7 @@ export function formatRelativeTimestamp(createdAt: number, now: number): string 
   return new Date(createdAt).toLocaleDateString();
 }
 
-/** Requirement 4.6: content of the `title` attribute of the timestamp. */
+/**  content of the `title` attribute of the timestamp. */
 export function formatAbsoluteTimestamp(createdAt: number): string {
   return new Date(createdAt).toLocaleString();
 }

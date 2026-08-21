@@ -145,7 +145,7 @@ async function startServer() {
    *
    * La respuesta se construye solo desde el catálogo que el registro mantiene
    * en memoria: no se lee ningún archivo de ejecución, prompt ni esquema
-   * (Requirement 4.6), y solo se exponen los campos de resumen del agente, sin
+   * (), y solo se exponen los campos de resumen del agente, sin
    * rutas del sistema de archivos (Requirements 4.2, 4.5, 16.3). Sigue el mismo
    * modelo de acceso que el resto de `/api/*`: sin token (Requirement 16.5).
    */
@@ -162,10 +162,10 @@ async function startServer() {
    * sin él, el más reciente de esa entrada para cualquier agentId
    * (Requirement 10.4). Se reconocen el patrón nuevo y el heredado, con la
    * entrada comparada sin distinguir mayúsculas y minúsculas y quedándose con el
-   * `runId` más alto (Requirement 9.6). Un `ticker` inválido se rechaza con 400
-   * antes de enumerar la carpeta (Requirement 9.7) y la falta de coincidencias
+   * `runId` más alto (). Un `ticker` inválido se rechaza con 400
+   * antes de enumerar la carpeta () y la falta de coincidencias
    * responde 404 (Requirement 10.5). El archivo se entrega con su nombre
-   * original, sin renombrarlo (Requirement 9.8).
+   * original, sin renombrarlo ().
    */
   app.get("/api/download_jsonl", (req, res) => {
     const runLogsDir = path.join(process.cwd(), 'run_logs');
@@ -173,7 +173,7 @@ async function startServer() {
     const result = resolveRunLogDownload({
       query: req.query as { ticker?: unknown; agent?: unknown },
       // La enumeración es perezosa: solo se lee la carpeta si los parámetros
-      // pasaron la validación (Requirement 9.7).
+      // pasaron la validación ().
       listFileNames: () => (fs.existsSync(runLogsDir) ? fs.readdirSync(runLogsDir) : []),
     });
 
@@ -197,7 +197,7 @@ async function startServer() {
       // de la entrada de catálogo, nunca del valor recibido (Requirement 16.1).
       const resolution = agentRegistry.resolveAgent(body.agentId);
       if (resolution.definition === null) {
-        // Requirement 5.6: sin agentes disponibles no se abre el flujo SSE ni
+        //  sin agentes disponibles no se abre el flujo SSE ni
         // se escribe ningún log de ejecución.
         return res.status(500).json({ error: NO_AGENTS_AVAILABLE_ERROR });
       }
@@ -240,7 +240,7 @@ async function startServer() {
         prompt = buildAgentPrompt({
           definition: agent,
           input,
-          // Requirement 5.7: la instrucción llega al ensamblador solo cuando el
+          //  la instrucción llega al ensamblador solo cuando el
           // agente la declara; en otro caso se descarta sin rechazar la petición.
           instruction: agent.manifest.supportsInstruction ? instruction : null,
         }).prompt;
@@ -287,7 +287,7 @@ async function startServer() {
         return res.status(failure.status).json(failure.body);
       }
 
-      // Requirement 5.4: las cabeceras SSE se conservan tal como estaban.
+      //  las cabeceras SSE se conservan tal como estaban.
       res.setHeader('Content-Type', 'text/event-stream');
       res.setHeader('Cache-Control', 'no-cache');
       res.setHeader('Connection', 'keep-alive');
@@ -299,7 +299,7 @@ async function startServer() {
           fs.mkdirSync(runLogsDir, { recursive: true });
       }
 
-      // Requirement 10.1: los dos archivos de log de la ejecución llevan el
+      //  los dos archivos de log de la ejecución llevan el
       // agentId, la entrada saneada y el mismo `runId`, de modo que dos agentes
       // sobre la misma entrada no se solapen.
       const runId = Date.now();
@@ -323,13 +323,13 @@ async function startServer() {
         }
       };
 
-      // Requirement 5.3: exactamente un evento `agent_info`, con el agentId
+      //  exactamente un evento `agent_info`, con el agentId
       // efectivamente ejecutado, antes de reenviar cualquier otro evento.
       const agentInfoEvent = buildAgentInfoEvent(agent);
       sendEvent(agentInfoEvent);
       appendJsonlLog(agentInfoEvent);
 
-      /** Motivo del fallo del cliente remoto, cuando lo hay (Requirement 5.10). */
+      /** Motivo del fallo del cliente remoto, cuando lo hay (). */
       let streamFailure: string | null = null;
       /** Verdadero cuando el propio flujo ya reenvió un evento `error`. */
       let errorEmitted = false;
@@ -361,7 +361,7 @@ async function startServer() {
 
           if (event.type === 'error') {
             // El cliente remoto informó un fallo: el flujo se cierra con `done`
-            // y se conservan los eventos y los logs escritos (Requirement 5.10).
+            // y se conservan los eventos y los logs escritos ().
             streamFailure = describeStreamFailure(event.message);
             errorEmitted = true;
           } else if (event.type === 'done') {
@@ -448,7 +448,7 @@ async function startServer() {
       }
 
       if (streamFailure !== null) {
-        // Requirement 5.10: `error`, después `done`, y se cierra el flujo sin
+        //  `error`, después `done`, y se cierra el flujo sin
         // `final_stats`; los eventos y los logs ya escritos se conservan.
         const [errorEvent, doneEvent] = buildStreamFailureEvents(streamFailure);
         if (!errorEmitted) {
@@ -467,7 +467,7 @@ async function startServer() {
       // Send final reliable stats to client. A stopped run has no listener left,
       // so nothing is written to its closed connection.
       if (streamFailure === null && !userStopped) {
-        // Requirement 10.2: la URL apunta al `.jsonl` de esta misma ejecución
+        //  la URL apunta al `.jsonl` de esta misma ejecución
         // bajo el estático `/run_logs`.
         sendEvent({
           type: 'final_stats',
@@ -505,7 +505,7 @@ async function startServer() {
       summaryLog += `RAW EXECUTION LOGS:\n\n`;
 
       try {
-        // Requirement 10.1: el `.txt` comparte agentId, entrada y `runId` con el
+        //  el `.txt` comparte agentId, entrada y `runId` con el
         // `.jsonl` de la misma ejecución.
         const finalLog = summaryLog + debugLog;
         fs.writeFileSync(path.join(runLogsDir, runLogNames.txtFileName), finalLog, 'utf-8');
@@ -522,7 +522,7 @@ async function startServer() {
         res.status(500).json({ error: err.message || "Analyze failed" });
         return;
       }
-      // Requirement 5.10: con las cabeceras SSE ya escritas, el motivo viaja en
+      //  con las cabeceras SSE ya escritas, el motivo viaja en
       // un evento `error` seguido de `done`, y el flujo se cierra.
       for (const event of buildStreamFailureEvents(err)) {
         res.write(`data: ${JSON.stringify(event)}\n\n`);

@@ -29,7 +29,7 @@ afterEach(() => {
 });
 
 describe('LandingView', () => {
-  it('renderiza el título, el subtítulo y los grupos de highlights del manifiesto', () => {
+  it('renders the title, subtitle, and highlight groups from the manifest', () => {
     render(
       <LandingView
         agent={entry({
@@ -66,7 +66,7 @@ describe('LandingView', () => {
     expect(screen.getByText('Identify key takeaways and risks')).toBeTruthy();
   });
 
-  it('degrada a name, tagline y description cuando el manifiesto omite landing', () => {
+  it('falls back to name, tagline, and description when the manifest omits landing', () => {
     render(<LandingView agent={entry({ landing: null })} />);
 
     expect(screen.getByRole('heading', { level: 1, name: 'Financial Analyst' })).toBeTruthy();
@@ -76,7 +76,7 @@ describe('LandingView', () => {
     ).toBeTruthy();
   });
 
-  it('muestra contenido neutro mientras no hay agente activo', () => {
+  it('displays neutral content while no agent is active', () => {
     render(<LandingView agent={null} />);
 
     expect(screen.getByRole('heading', { level: 1 }).textContent).toContain('Tickr');

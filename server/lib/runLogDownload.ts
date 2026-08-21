@@ -8,13 +8,13 @@
  * agentId (Requirement 10.4). Se reconocen los dos patrones de nombre: el nuevo
  * `run_log_<agentId>_<input>_<runId>` y el heredado `run_log_<input>_<runId>`,
  * comparando la entrada sin distinguir mayúsculas y minúsculas y quedándose con
- * el `runId` más alto (Requirement 9.6). Sin coincidencias se responde 404
+ * el `runId` más alto (). Sin coincidencias se responde 404
  * (Requirement 10.5).
  *
  * La validación del parámetro `ticker` ocurre antes de mirar el disco: el
  * llamador entrega la enumeración de `run_logs/` como una función perezosa, de
  * modo que un `ticker` ausente, vacío o con caracteres fuera de `A`-`Z`, `a`-`z`
- * y `0`-`9` se rechaza con 400 sin enumerar la carpeta (Requirement 9.7). Los
+ * y `0`-`9` se rechaza con 400 sin enumerar la carpeta (). Los
  * mensajes de error no nombran rutas del sistema de archivos (Requirement 16.3).
  *
  * Sobre la ambigüedad del patrón nuevo: el agentId es snake_case y contiene
@@ -38,7 +38,7 @@ import { RUN_LOG_PREFIX } from './runLogNaming.ts';
 /*  Parámetros y patrones                                      */
 /* ────────────────────────────────────────────────────────── */
 
-/** Parámetro obligatorio con el valor de entrada buscado (Requirement 9.7). */
+/** Parámetro obligatorio con el valor de entrada buscado (). */
 export const TICKER_PARAM = 'ticker';
 
 /** Parámetro opcional con el agentId por el que filtrar (Requirements 10.3, 10.4). */
@@ -104,7 +104,7 @@ export interface RunLogMatch {
 
 /**
  * Comprueba si un nombre de log corresponde al valor de entrada buscado y, en
- * ese caso, deduce el agentId que lo escribió (Requirement 9.6).
+ * ese caso, deduce el agentId que lo escribió ().
  *
  * La comparación de la entrada no distingue mayúsculas y minúsculas, de modo que
  * `run_log_AMZN_1.jsonl` y `run_log_amzn_2.jsonl` cuentan como logs de la misma
@@ -179,7 +179,7 @@ export function selectLatestRunLog(
     if (candidate === null) continue;
 
     if (wantedAgentId !== null) {
-      // Requirement 10.3: con `agent`, solo los logs de ese agentId. Los logs
+      //  con `agent`, solo los logs de ese agentId. Los logs
       // heredados no llevan agentId, así que quedan fuera del filtro.
       if (candidate.agentId === null) continue;
       if (candidate.agentId.toLowerCase() !== wantedAgentId) continue;
@@ -205,11 +205,11 @@ export function selectLatestRunLog(
 
 /** Motivos por los que la petición no llega a mirar la carpeta de logs. */
 export type RunLogDownloadErrorCode =
-  /** `ticker` ausente, nulo o vacío tras recortar (Requirement 9.7). */
+  /** `ticker` ausente, nulo o vacío tras recortar (). */
   | 'missing_ticker'
-  /** `ticker` presente pero no es una cadena (Requirement 9.7). */
+  /** `ticker` presente pero no es una cadena (). */
   | 'invalid_ticker_type'
-  /** `ticker` con caracteres fuera del conjunto admitido (Requirement 9.7). */
+  /** `ticker` con caracteres fuera del conjunto admitido (). */
   | 'invalid_ticker_format'
   /** No hay ningún `.jsonl` para los parámetros recibidos (Requirement 10.5). */
   | 'log_not_found';
@@ -254,7 +254,7 @@ function rejectQuery(
 }
 
 /**
- * Valida los parámetros de la descarga (Requirement 9.7).
+ * Valida los parámetros de la descarga ().
  *
  * `ticker` debe ser una cadena con al menos un carácter tras recortar los
  * espacios y solo con letras y dígitos. `agent` es opcional: se toma como filtro
@@ -317,7 +317,7 @@ export interface ResolveRunLogDownloadOptions {
   /**
    * Nombres de archivo de la carpeta de logs. Se invoca solo si los parámetros
    * son válidos, de modo que un rechazo 400 no enumera la carpeta
-   * (Requirement 9.7). Debe devolver una lista vacía si la carpeta no existe.
+   * (). Debe devolver una lista vacía si la carpeta no existe.
    */
   listFileNames: () => readonly string[];
 }
@@ -337,7 +337,7 @@ export interface RunLogDownloadResult {
 /**
  * Resuelve una petición de descarga contra la carpeta de logs.
  *
- * Valida primero los parámetros (Requirement 9.7) y solo entonces enumera los
+ * Valida primero los parámetros () y solo entonces enumera los
  * nombres, para elegir el `.jsonl` del `runId` más alto entre los que coinciden
  * con la entrada y, si se indicó, con el agentId (Requirements 9.6, 10.3, 10.4).
  * Sin coincidencias devuelve 404 (Requirement 10.5).

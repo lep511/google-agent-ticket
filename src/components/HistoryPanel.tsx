@@ -21,14 +21,14 @@ import {
   type InteractionHistoryEntry,
 } from '../interactionHistory';
 
-/** Requirement 2.4: simultaneous translation and opacity, 200–300 ms. */
+/**  simultaneous translation and opacity, 200–300 ms. */
 export const HISTORY_PANEL_TRANSITION = { duration: 0.24, ease: [0.22, 1, 0.36, 1] } as const;
 
 export interface HistoryPanelProps {
   open: boolean;
   /** Visible Entries already filtered and ordered by the Web_Client. */
   entries: InteractionHistoryEntry[];
-  /** Requirement 5.6: no restoring while a run is in progress. */
+  /**  no restoring while a run is in progress. */
   running: boolean;
   onClose: () => void;
   onRestore: (entry: InteractionHistoryEntry) => void;
@@ -56,10 +56,10 @@ export function HistoryPanel({
   const closeRef = useRef<HTMLButtonElement | null>(null);
 
   // Reference instant of the relative timestamps. Injecting it keeps the
-  // rendered text independent of the clock during the tests (Requirement 4.4).
+  // rendered text independent of the clock during the tests ().
   const referenceNow = now ?? Date.now();
 
-  /** Requirement 2.8: on open, focus moves to an element inside the panel. */
+  /**  on open, focus moves to an element inside the panel. */
   useEffect(() => {
     if (!open) return;
     closeRef.current?.focus();
@@ -97,10 +97,10 @@ export function HistoryPanel({
         return;
       }
       if (confirmClear) {
-        setConfirmClear(false); // Requirement 10.9: the panel stays open
+        setConfirmClear(false); //  the panel stays open
         return;
       }
-      onClose(); // Requirement 2.3
+      onClose(); // 
     };
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
@@ -137,7 +137,7 @@ export function HistoryPanel({
               <h2 className="font-display text-sm uppercase tracking-wider text-stone-200">
                 History
               </h2>
-              {/* Requirement 2.10: close control with its accessible text. */}
+              {/*  close control with its accessible text. */}
               <button
                 ref={closeRef}
                 type="button"
@@ -149,7 +149,7 @@ export function HistoryPanel({
               </button>
             </header>
 
-            {/* Requirement 5.6: English notice above the list while a run runs. */}
+            {/*  English notice above the list while a run runs. */}
             {running && (
               <p className="border-b border-stone-800 bg-stone-800/40 px-4 py-2 font-sans text-xs text-stone-400">
                 Restoring is paused while a run is in progress.
@@ -159,7 +159,7 @@ export function HistoryPanel({
             {/* Requirements 9.1, 9.3: list and empty state are exclusive branches. */}
             {entries.length > 0 ? (
               <ul className="flex-1 space-y-2 overflow-y-auto p-3">
-                {/* Requirement 4.1: the received order is the descending order. */}
+                {/*  the received order is the descending order. */}
                 {entries.map((entry) => (
                   <li key={entry.id} className="group relative">
                     <button
@@ -172,7 +172,7 @@ export function HistoryPanel({
                       <p className="truncate font-sans text-sm text-stone-100" title={entry.query}>
                         {entry.query}
                       </p>
-                      {/* Requirement 4.3: the instruction is the secondary line. */}
+                      {/*  the instruction is the secondary line. */}
                       {entry.instruction && (
                         <p
                           className="truncate font-serif text-xs italic text-stone-400"
@@ -210,7 +210,7 @@ export function HistoryPanel({
                 ))}
               </ul>
             ) : (
-              /* Requirement 9.1: empty state with its supporting line. */
+              /*  empty state with its supporting line. */
               <div className="flex flex-1 flex-col items-center justify-center gap-2 px-6 text-center">
                 <Clock className="h-6 w-6 text-stone-600" />
                 <p className="font-display text-sm text-stone-300">No history yet</p>
@@ -237,7 +237,7 @@ export function HistoryPanel({
             )}
           </motion.aside>
 
-          {/* Requirement 10.6: confirmation layer above the drawer. */}
+          {/*  confirmation layer above the drawer. */}
           {confirmClear && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
               <div className="mx-4 w-full max-w-sm rounded-xl border border-stone-800 bg-stone-900 p-6 shadow-2xl">
@@ -246,7 +246,7 @@ export function HistoryPanel({
                   This removes every saved report from this browser. It cannot be undone.
                 </p>
                 <div className="flex justify-end gap-3">
-                  {/* Requirement 10.8: cancelling changes nothing. */}
+                  {/*  cancelling changes nothing. */}
                   <button
                     type="button"
                     onClick={() => setConfirmClear(false)}

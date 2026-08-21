@@ -7,7 +7,7 @@
  *  1. Read the template and the schema from the paths of the catalog entry
  *     (`agentRegistry.readAgentPromptTemplate` and `readAgentSchema`), which
  *     already fail with an explicit error naming the file when the read or the
- *     parse fails, or when the file exceeds 256 KiB (Requirement 7.9).
+ *     parse fails, or when the file exceeds 256 KiB ().
  *  2. Look for unsupported placeholders **in the template text only**, before
  *     substituting anything, so an input value, an instruction or a schema that
  *     happens to contain the `{{...}}` shape does not break the build
@@ -15,7 +15,7 @@
  *  3. Replace every occurrence of `{{input}}`, `{{instruction}}` and
  *     `{{schema}}` (Requirements 7.1, 7.2, 7.6, 7.7).
  *  4. Leave the shared JSON output rules block present exactly once in the final
- *     prompt (Requirement 7.3).
+ *     prompt ().
  *
  * On step 4: the block is appended at the end, after all the text coming from
  * the template, unless the template itself already declares those two rules
@@ -43,16 +43,16 @@ import type { ResolvedAgentDefinition } from './agent/agentTypes.ts';
 /*  Marcadores soportados                                      */
 /* ────────────────────────────────────────────────────────── */
 
-/** Marcador del valor de entrada efectivo (Requirement 7.1). */
+/** Marcador del valor de entrada efectivo (). */
 export const INPUT_PLACEHOLDER = '{{input}}';
 
 /** Marcador de la instrucción opcional (Requirements 7.1, 7.6, 7.7). */
 export const INSTRUCTION_PLACEHOLDER = '{{instruction}}';
 
-/** Marcador del contenido literal del archivo de esquema (Requirement 7.2). */
+/** Marcador del contenido literal del archivo de esquema (). */
 export const SCHEMA_PLACEHOLDER = '{{schema}}';
 
-/** Únicos marcadores admitidos en una plantilla (Requirement 7.4). */
+/** Únicos marcadores admitidos en una plantilla (). */
 export const SUPPORTED_PLACEHOLDERS = [
   INPUT_PLACEHOLDER,
   INSTRUCTION_PLACEHOLDER,
@@ -71,7 +71,7 @@ const PLACEHOLDER_PATTERN = /\{\{[^{}]*\}\}/g;
 /* ────────────────────────────────────────────────────────── */
 
 /**
- * Reglas de salida comunes a todos los agentes (Requirement 7.3): el resultado
+ * Reglas de salida comunes a todos los agentes (): el resultado
  * final va envuelto en un bloque ```json y las claves del esquema no se
  * renombran. Así cada `prompt.md` solo describe lo específico de su agente.
  */
@@ -111,7 +111,7 @@ export type PromptBuildErrorCode = 'unsupported_placeholder';
  *
  * Los fallos de lectura, de análisis y de tamaño de la plantilla y del esquema
  * se propagan como `AgentSourceError` desde el registro, que ya nombra el
- * archivo afectado (Requirement 7.9).
+ * archivo afectado ().
  */
 export class PromptBuildError extends Error {
   constructor(
@@ -134,7 +134,7 @@ export class PromptBuildError extends Error {
 export interface BuildAgentPromptOptions {
   /** Agente resuelto por el registro; de él salen el manifiesto y las rutas. */
   definition: ResolvedAgentDefinition;
-  /** Valor de entrada efectivo, ya validado por el endpoint (Requirement 7.1). */
+  /** Valor de entrada efectivo, ya validado por el endpoint (). */
   input: string;
   /**
    * Instrucción recibida en la petición. Se aplica solo cuando el manifiesto
@@ -159,7 +159,7 @@ export interface BuiltAgentPrompt {
   effectiveInstruction: string;
   /** Verdadero cuando el bloque común se añadió al final del prompt. */
   jsonRulesBlockAppended: boolean;
-  /** Duración del ensamblado en milisegundos (Requirement 7.10). */
+  /** Duración del ensamblado en milisegundos (). */
   durationMs: number;
 }
 
@@ -202,14 +202,14 @@ function replaceAll(text: string, placeholder: string, value: string): string {
  *
  * @throws {PromptBuildError} si la plantilla contiene un marcador no soportado.
  * @throws {AgentSourceError} si la lectura o el análisis de la plantilla o del
- * esquema falla, o si alguno supera 256 KiB (Requirement 7.9).
+ * esquema falla, o si alguno supera 256 KiB ().
  */
 export function buildAgentPrompt(options: BuildAgentPromptOptions): BuiltAgentPrompt {
   const startedAt = Date.now();
   const { definition, input, instruction } = options;
   const { agentId, manifest } = definition;
 
-  // Requirement 7.9: las lecturas ya fallan nombrando el archivo afectado.
+  //  las lecturas ya fallan nombrando el archivo afectado.
   const template = options.template ?? readAgentPromptTemplate(definition);
   const schema = options.schema ?? readAgentSchema(definition);
 
@@ -225,7 +225,7 @@ export function buildAgentPrompt(options: BuildAgentPromptOptions): BuiltAgentPr
   prompt = replaceAll(prompt, INSTRUCTION_PLACEHOLDER, effectiveInstruction);
   prompt = replaceAll(prompt, SCHEMA_PLACEHOLDER, schema.text);
 
-  // Requirement 7.3: el bloque común queda exactamente una vez, al final del
+  //  el bloque común queda exactamente una vez, al final del
   // prompt, salvo que la plantilla ya declare esas mismas reglas.
   const jsonRulesBlockAppended = !declaresJsonOutputRules(template.text);
   if (jsonRulesBlockAppended) {

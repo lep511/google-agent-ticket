@@ -1,11 +1,11 @@
 /* ──────────────────────────────────────────────────────────── */
 /*  LandingView                                                 */
 /*                                                              */
-/*  Vista de aterrizaje derivada del agente activo. Renderiza    */
-/*  `title`, `subtitle` y los grupos de `highlights` del campo   */
-/*  `landing` del manifiesto con la composición de dos tarjetas  */
-/*  existente, y degrada a `name`, `tagline` y `description`     */
-/*  cuando el manifiesto omite `landing`.                        */
+/*  Landing view derived from the active agent. Renders the     */
+/*  `title`, `subtitle`, and `highlights` groups from the       */
+/*  manifest's `landing` field with the existing two-card       */
+/*  composition, and falls back to `name`, `tagline`, and       */
+/*  `description` when the manifest omits `landing`.            */
 /*                                                              */
 
 /* ──────────────────────────────────────────────────────────── */
@@ -20,7 +20,7 @@ import type {
   AgentLandingHighlightGroup,
 } from './types';
 
-/** Copia neutra mientras no hay agente activo (catálogo cargando, vacío o fallido). */
+/** Neutral copy while no agent is active (catalog loading, empty, or failed). */
 const PLACEHOLDER_CONTENT: LandingContent = {
   title: 'Tickr, your intelligent research workspace',
   subtitle: 'Pick an agent to start a run.',
@@ -34,9 +34,9 @@ interface LandingContent {
 }
 
 /**
- * Contenido efectivo de la vista: el bloque `landing` del manifiesto cuando
- * está presente (Requirement 13.1) y, si se omite, la identidad del agente
- * con su `description` como único grupo destacado (Requirement 13.2).
+ * Effective view content: the manifest's `landing` block when present
+ * (Requirement 13.1) and, if omitted, the agent's identity with its
+ * `description` as the sole highlighted group (Requirement 13.2).
  */
 export function landingContent(agent: AgentCatalogEntry | null): LandingContent {
   if (!agent) return PLACEHOLDER_CONTENT;
@@ -79,7 +79,7 @@ function HighlightWithSubtitle({ item }: { item: AgentLandingHighlight }) {
   );
 }
 
-/** Punto destacado sin subtítulo: marca de comprobación y título. */
+/** Highlight with subtitle: icon in circle, title, and subtitle. */
 function HighlightPlain({ item }: { item: AgentLandingHighlight }) {
   const Icon = item.icon ? resolveAgentIcon(item.icon) : CheckCircle2;
   return (
@@ -94,8 +94,8 @@ function HighlightPlain({ item }: { item: AgentLandingHighlight }) {
 
 function HighlightCard({ group }: { group: AgentLandingHighlightGroup }) {
   const items = group.items ?? [];
-  // Los grupos con subtítulos usan la retícula de filas con icono en círculo;
-  // los grupos de una sola línea, la lista de comprobación centrada.
+  // Groups with subtitles use the row grid with icon in circle;
+  // single-line groups use the centered checklist.
   const hasSubtitles = items.some((item) => Boolean(item.subtitle));
 
   return (
@@ -134,7 +134,7 @@ function HighlightCard({ group }: { group: AgentLandingHighlightGroup }) {
 }
 
 export interface LandingViewProps {
-  /** Agente activo; nulo mientras el catálogo no resuelve. */
+  /** Active agent; null while the catalog does not resolve. */
   agent?: AgentCatalogEntry | null;
 }
 
@@ -154,7 +154,7 @@ export function LandingView({ agent = null }: LandingViewProps) {
       <div className="flex min-h-full items-center justify-center px-4 py-[clamp(1rem,3vh,2rem)] sm:px-8">
         <AnimatePresence mode="wait">
           <motion.div
-            // La clave por agente reanima la vista en cada cambio de selección.
+            // The agent key reanimates the view on each selection change.
             key={agent?.id ?? '__no_agent__'}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}

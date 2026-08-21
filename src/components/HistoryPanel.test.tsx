@@ -75,15 +75,15 @@ function HistoryPanelHarness({
   running = false,
 }: {
   entries: InteractionHistoryEntry[];
-  /** Reference instant of the relative timestamps (Requirement 4.4). */
+  /** Reference instant of the relative timestamps (). */
   now?: number;
-  /** Run-in-progress flag of the Web_Client (Requirement 5.6). */
+  /** Run-in-progress flag of the Web_Client (). */
   running?: boolean;
 }) {
   const [entries, setEntries] = useState(initialEntries);
   const [open, setOpen] = useState(true);
   // Restoration intents received from the panel, in order. Recording them makes
-  // "no restoration happened" observable (Requirement 5.6).
+  // "no restoration happened" observable ().
   const [restoredIds, setRestoredIds] = useState<string[]>([]);
 
   return (
@@ -149,7 +149,7 @@ describe('History_Panel layered Escape handling', () => {
           render(<HistoryPanelHarness entries={entries} />);
 
           if (confirmationOpen) {
-            // Requirement 10.5: the `Clear all` control raises the top layer.
+            //  the `Clear all` control raises the top layer.
             await user.click(screen.getByRole('button', { name: 'Clear all' }));
             expect(isConfirmationOpen()).toBe(true);
           }
@@ -160,13 +160,13 @@ describe('History_Panel layered Escape handling', () => {
           await user.keyboard('{Escape}');
 
           if (confirmationOpen) {
-            // Requirement 10.9: only the confirmation closes; the panel stays open.
+            //  only the confirmation closes; the panel stays open.
             expect(isConfirmationOpen()).toBe(false);
             expect(isPanelOpen()).toBe(true);
             expect(screen.getByRole('dialog', { name: 'History' })).toBeInTheDocument();
             expect(screen.getAllByRole('listitem')).toHaveLength(entries.length);
           } else {
-            // Requirement 2.3: with no layer above it, the panel itself closes.
+            //  with no layer above it, the panel itself closes.
             expect(isPanelOpen()).toBe(false);
             expect(isConfirmationOpen()).toBe(false);
           }
@@ -189,7 +189,7 @@ describe('History_Panel layered Escape handling', () => {
  * Chronological sequence of runs of a single agent: a base instant plus a
  * non-negative gap before each run. Real runs finish one after another, so a
  * new History Entry never predates the ones already stored; that is the input
- * space Requirement 3.8 describes. Ties are allowed on purpose (a gap of 0),
+ * space  describes. Ties are allowed on purpose (a gap of 0),
  * because the newest entry has to stay first even when it shares `createdAt`.
  */
 const chronologicalDraftsArb: fc.Arbitrary<HistoryEntryDraft[]> = fc
@@ -248,10 +248,10 @@ describe('History_Panel ordering by descending age', () => {
           const inserted = createHistoryEntry(draft, stored);
           stored = insertEntry(stored, inserted);
 
-          // Requirement 3.8: the new entry takes the first position.
+          //  the new entry takes the first position.
           expect(stored[0].id).toBe(inserted.id);
 
-          // Requirement 3.8: the `createdAt` sequence stays monotonically
+          //  the `createdAt` sequence stays monotonically
           // non-increasing, so the list is ordered newest first.
           for (let index = 1; index < stored.length; index += 1) {
             expect(stored[index - 1].createdAt).toBeGreaterThanOrEqual(stored[index].createdAt);
@@ -265,7 +265,7 @@ describe('History_Panel ordering by descending age', () => {
 
           const rows = screen.getAllByRole('listitem');
 
-          // Requirement 4.1: the rendered order matches the stored order.
+          //  the rendered order matches the stored order.
           expect(rows).toHaveLength(stored.length);
           expect(rows.map(rowQueryText)).toEqual(stored.map((entry) => entry.query));
           expect(rows.map(rowInstant)).toEqual(
@@ -285,7 +285,7 @@ describe('History_Panel ordering by descending age', () => {
 /* ── Property 10 ─────────────────────────────────────────────── */
 
 /**
- * Ages that land on every branch of Requirement 4.5, including a negative one
+ * Ages that land on every branch of , including a negative one
  * (a `createdAt` in the future relative to the render instant), so the rendered
  * timestamp is exercised across the whole boundary space instead of a single
  * bucket.
@@ -301,7 +301,7 @@ const ageArb: fc.Arbitrary<number> = fc.oneof(
 /**
  * Visible Entries paired with the render instant. `instruction` stays nullable
  * so each case covers both the presence and the absence of the secondary line
- * (Requirement 4.3).
+ * ().
  */
 const renderedEntriesArb: fc.Arbitrary<{ entries: InteractionHistoryEntry[]; now: number }> = fc
   .tuple(
@@ -318,7 +318,7 @@ const renderedEntriesArb: fc.Arbitrary<{ entries: InteractionHistoryEntry[]; now
   }));
 
 /**
- * Relative Timestamp required by Requirement 4.5, recomputed here instead of
+ * Relative Timestamp required by , recomputed here instead of
  * reusing the store helper, so the assertion checks the specification and not
  * the implementation against itself.
  */
@@ -357,10 +357,10 @@ describe('History_Panel rendered content of each entry', () => {
             const row = rows[index];
             const paragraphs = rowParagraphTexts(row);
 
-            // Requirement 4.2: the row shows the `query` value.
+            //  the row shows the `query` value.
             expect(paragraphs[0]).toBe(entry.query);
 
-            // Requirement 4.3: the instruction appears as the secondary line if
+            //  the instruction appears as the secondary line if
             // and only if the field is not null.
             if (entry.instruction === null) {
               expect(paragraphs).toHaveLength(1);
@@ -371,11 +371,11 @@ describe('History_Panel rendered content of each entry', () => {
 
             const timestamp = rowTimestamp(row);
 
-            // Requirement 4.4: the Relative Timestamp of `createdAt` against the
+            //  the Relative Timestamp of `createdAt` against the
             // render instant.
             expect(timestamp.textContent).toBe(expectedRelativeText(entry.createdAt, now));
 
-            // Requirement 4.6: the `title` attribute carries the full local
+            //  the `title` attribute carries the full local
             // date and time of `createdAt`.
             expect(timestamp.getAttribute('title')).toBe(
               new Date(entry.createdAt).toLocaleString(),
@@ -393,7 +393,7 @@ describe('History_Panel rendered content of each entry', () => {
 });
 /* ── Property 13 ─────────────────────────────────────────────── */
 
-/** English notice required by Requirement 5.6, pinned literally. */
+/** English notice required by , pinned literally. */
 const RUNNING_NOTICE = 'Restoring is paused while a run is in progress.';
 
 /** Restore control of a rendered row: the first button inside the list item. */
@@ -419,7 +419,7 @@ describe('History_Panel restoration blocked during a run', () => {
           const rows = screen.getAllByRole('listitem');
           expect(rows).toHaveLength(entries.length);
 
-          // Requirement 5.6: the English notice explaining the reason appears
+          //  the English notice explaining the reason appears
           // while a run is in progress, and only then.
           if (running) {
             expect(screen.getByText(RUNNING_NOTICE)).toBeInTheDocument();
@@ -430,7 +430,7 @@ describe('History_Panel restoration blocked during a run', () => {
           for (const row of rows) {
             const control = rowRestoreControl(row);
 
-            // Requirement 5.6: every Visible Entry refuses restoration while a
+            //  every Visible Entry refuses restoration while a
             // run is in progress.
             expect(control).toHaveProperty('disabled', running);
 
@@ -438,7 +438,7 @@ describe('History_Panel restoration blocked during a run', () => {
           }
 
           if (running) {
-            // Requirement 5.6: not a single restoration intent reached the
+            //  not a single restoration intent reached the
             // Web_Client.
             expect(restoredEntryIds()).toBe('');
           } else {
@@ -447,7 +447,7 @@ describe('History_Panel restoration blocked during a run', () => {
             expect(restoredEntryIds()).toBe(expectedIds);
           }
 
-          // Requirement 5.6: blocking restoration is not destructive and does
+          //  blocking restoration is not destructive and does
           // not dismiss the panel.
           expect(currentEntryIds()).toBe(expectedIds);
           expect(isPanelOpen()).toBe(true);

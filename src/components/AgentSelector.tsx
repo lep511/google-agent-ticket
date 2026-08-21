@@ -1,9 +1,9 @@
 /* ──────────────────────────────────────────────────────────── */
 /*  AgentSelector                                               */
 /*                                                              */
-/*  Selector del agente activo para la cabecera. Muestra un     */
-/*  disparador con el icono y el `name` del agente activo y un  */
-/*  panel emergente con una tarjeta por agente del catálogo.    */
+/*  Active agent selector for the header. Displays a trigger    */
+/*  with the icon and `name` of the active agent and a popup    */
+/*  panel with a card for each agent in the catalog.            */
 /*                                                              */
 
 /*                11.8, 11.9, 11.10                             */
@@ -53,10 +53,10 @@ import {
 import type { AgentCatalogEntry, InputMode } from '../types';
 
 /**
- * Iconos que el selector sabe pintar. Es el espejo en el cliente de la lista
- * blanca del registro de agentes (`server/lib/agentTypes.ts`): un manifiesto
- * con un icono fuera de esta lista ni siquiera entra en el catálogo, así que
- * aquí nunca se resuelve un nombre arbitrario (Requirements 11.10, 16.4).
+ * Icons that the selector can render. This is the client-side mirror of the
+ * agent registry's whitelist (`server/lib/agentTypes.ts`): a manifest with an
+ * icon outside this list won't even enter the catalog, so an arbitrary name
+ * is never resolved here (Requirements 11.10, 16.4).
  */
 const AGENT_ICONS: Record<string, LucideIcon> = {
   Activity,
@@ -95,26 +95,26 @@ const AGENT_ICONS: Record<string, LucideIcon> = {
   Wallet,
 };
 
-/** Icono de reserva cuando el nombre declarado no está en la lista permitida. */
+/** Fallback icon when the declared name is not in the allowed list. */
 const FALLBACK_ICON: LucideIcon = Bot;
 
-/** Resuelve un nombre de icono contra la lista permitida (Requirement 11.10). */
+/** Resolves an icon name against the allowed list (Requirement 11.10). */
 export function resolveAgentIcon(iconName: string | undefined): LucideIcon {
   if (!iconName) return FALLBACK_ICON;
   return AGENT_ICONS[iconName] ?? FALLBACK_ICON;
 }
 
-/** Etiqueta visible del tipo de entrada de cada agente (Requirement 11.2). */
+/** Visible label for each agent's input type (Requirement 11.2). */
 const INPUT_MODE_LABELS: Record<InputMode, string> = {
   ticker: 'Ticker',
-  text: 'Texto libre',
+  text: 'Free text',
 };
 
 function inputModeLabel(inputMode: string): string {
   return INPUT_MODE_LABELS[inputMode as InputMode] ?? inputMode;
 }
 
-/** Estado de la petición del catálogo (Requirements 11.7, 11.8, 11.9). */
+/** Catalog request state (Requirements 11.7, 11.8, 11.9). */
 export type AgentCatalogStatus = 'loading' | 'ready' | 'error';
 
 export interface AgentSelectorProps {
@@ -123,19 +123,19 @@ export interface AgentSelectorProps {
    * re-orders it for display so the default agent is listed first.
    */
   agents: AgentCatalogEntry[];
-  /** Agente activo; nulo mientras no hay catálogo. */
+  /** Active agent; null while there is no catalog. */
   activeAgentId: string | null;
-  /** Agente por defecto del catálogo, para la marca "Predeterminado". */
+  /** Default agent from the catalog, for the "Default" badge. */
   defaultAgentId: string | null;
-  /** Estado de la petición del catálogo. */
+  /** Catalog request state. */
   status: AgentCatalogStatus;
-  /** Mensaje del fallo del catálogo, si lo hay. */
+  /** Catalog failure message, if any. */
   errorMessage?: string | null;
-  /** Requirement 11.4: con una ejecución en curso el cambio está bloqueado. */
+  /**  switching is blocked during a run in progress. */
   running?: boolean;
-  /** Selección confirmada por el usuario. */
+  /** User-confirmed selection. */
   onSelect: (agentId: string) => void;
-  /** Requirement 11.8: reintento de la petición del catálogo. */
+  /**  catalog request retry. */
   onRetry: () => void;
 }
 
@@ -187,7 +187,7 @@ export function AgentSelector({
     if (returnFocus) triggerRef.current?.focus();
   }, []);
 
-  /** Requirement 11.5: seleccionar un agente cierra el panel. */
+  /**  selecting an agent closes the panel. */
   const confirmSelection = useCallback(
     (agent: AgentCatalogEntry) => {
       onSelect(agent.id);
@@ -196,12 +196,12 @@ export function AgentSelector({
     [onSelect, closePanel],
   );
 
-  // Requirement 11.4: si arranca una ejecución con el panel abierto, se cierra.
+  //  if a run starts with the panel open, it closes.
   useEffect(() => {
     if (running && open) closePanel(false);
   }, [running, open, closePanel]);
 
-  // Requirement 11.5: clic fuera del panel.
+  //  click outside the panel.
   useEffect(() => {
     if (!open) return;
     const handlePointerDown = (event: MouseEvent | TouchEvent) => {
@@ -218,7 +218,7 @@ export function AgentSelector({
     };
   }, [open, closePanel]);
 
-  // Requirement 11.5: `Escape` cierra el panel desde cualquier punto del foco.
+  //  `Escape` closes the panel from any focus point.
   useEffect(() => {
     if (!open) return;
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -231,7 +231,7 @@ export function AgentSelector({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [open, closePanel]);
 
-  // Requirement 11.6: al abrir, el foco arranca en el agente activo.
+  //  on open, focus starts on the active agent.
   useEffect(() => {
     if (!open) return;
     if (!hasOptions) {
@@ -247,7 +247,7 @@ export function AgentSelector({
     optionRefs.current[focusIndex]?.focus();
   }, [open, focusIndex]);
 
-  /** Requirement 11.6: flechas, `Home`, `End`, `Enter` y `Espacio`. */
+  /**  arrows, `Home`, `End`, `Enter`, and `Space`. */
   const handlePanelKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (!hasOptions) return;
     const lastIndex = agents.length - 1;
@@ -275,8 +275,8 @@ export function AgentSelector({
       case 'Enter':
       case ' ':
       case 'Spacebar': {
-        // `preventDefault` evita el clic sintético del botón: la selección se
-        // confirma exactamente una vez.
+        // `preventDefault` prevents the synthetic button click: the selection is
+        // confirmed exactly once.
         event.preventDefault();
         const agent = agents[current];
         if (agent) confirmSelection(agent);
@@ -289,7 +289,7 @@ export function AgentSelector({
 
   const TriggerIcon = activeAgent ? resolveAgentIcon(activeAgent.icon) : FALLBACK_ICON;
   const triggerLabel =
-    activeAgent?.name ?? (status === 'loading' ? 'Cargando agentes…' : 'Sin agente');
+    activeAgent?.name ?? (status === 'loading' ? 'Loading agents…' : 'No agent');
 
   return (
     /*
@@ -298,7 +298,7 @@ export function AgentSelector({
       75% of that base. The label truncates once the floor is reached.
     */
     <div ref={containerRef} className="group relative w-56 min-w-42 shrink font-sans">
-      {/* Requirement 11.1: icono, `name` e indicador de despliegue. */}
+      {/*  icon, `name`, and expand indicator. */}
       <button
         ref={triggerRef}
         type="button"
@@ -306,7 +306,7 @@ export function AgentSelector({
         disabled={running}
         aria-haspopup="listbox"
         aria-expanded={open}
-        aria-label="Seleccionar agente"
+        aria-label="Select agent"
         aria-describedby={running ? 'agent-selector-locked' : undefined}
         /*
           The trigger fills the width the container settled on, so the header does
@@ -338,12 +338,11 @@ export function AgentSelector({
       </button>
 
       {/*
-        Requirement 11.4: motivo del bloqueo durante una ejecución. Se presenta
-        como tooltip sobre el disparador: sigue en el DOM mientras `running` es
-        verdadero (para `aria-describedby`) y sólo se oculta visualmente, así
-        que los lectores de pantalla lo anuncian igual. El hover se toma del
-        contenedor porque los botones deshabilitados no emiten eventos de ratón
-        en todos los navegadores.
+         reason for blocking during a run. Presented as a
+        tooltip over the trigger: it stays in the DOM while `running` is true
+        (for `aria-describedby`) and is only visually hidden, so screen readers
+        announce it the same way. The hover is taken from the container because
+        disabled buttons do not emit mouse events in all browsers.
       */}
       {running && (
         <p
@@ -366,15 +365,15 @@ export function AgentSelector({
             /* Never wider than the viewport, so the panel stays on screen at 320px. */
             className="absolute left-0 top-full mt-2 z-50 w-[min(20rem,calc(100vw-1.5rem))] max-h-[60vh] overflow-y-auto overscroll-contain bg-stone-800 border border-stone-700 rounded-xl shadow-2xl shadow-black/50"
           >
-            {/* Requirement 11.7: estado de carga del catálogo. */}
+            {/*  catalog loading state. */}
             {status === 'loading' && (
               <div className="p-5 flex items-center gap-3 text-sm text-white/70">
                 <Loader2 className="w-4 h-4 animate-spin text-white/70 shrink-0" />
-                <span>Cargando agentes…</span>
+                <span>Loading agents…</span>
               </div>
             )}
 
-            {/* Requirement 11.8: estado de error con acción de reintento. */}
+            {/*  error state with retry action. */}
             {status === 'error' && (
               <div className="p-5 flex flex-col gap-3">
                 <div className="flex items-start gap-3">
@@ -401,7 +400,7 @@ export function AgentSelector({
               </div>
             )}
 
-            {/* Requirement 11.9: estado vacío explicativo. */}
+            {/*  explanatory empty state. */}
             {isEmptyCatalog && (
               <div className="p-5 flex items-start gap-3">
                 <Info className="w-4 h-4 text-white/70 shrink-0 mt-0.5" />
@@ -415,9 +414,9 @@ export function AgentSelector({
               </div>
             )}
 
-            {/* Requirement 11.2: una tarjeta por agente del catálogo. */}
+            {/*  one card per agent in the catalog. */}
             {hasOptions && (
-              <div role="listbox" aria-label="Agentes disponibles" aria-orientation="vertical">
+              <div role="listbox" aria-label="Available agents" aria-orientation="vertical">
                 {agents.map((agent, index) => {
                   const Icon = resolveAgentIcon(agent.icon);
                   const isActive = agent.id === activeAgentId;
@@ -438,7 +437,7 @@ export function AgentSelector({
                         className={`w-full text-left p-4 flex items-start gap-3 transition-colors hover:bg-white/5 active:bg-white/10 focus:outline-none focus-visible:bg-white/10 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-stone-400 ${
                           isActive ? 'bg-white/5 border-l-2' : 'border-l-2 border-transparent'
                         }`}
-                        // Requirement 11.3: el acento del agente marca el activo.
+                        //  the agent's accent marks the active one.
                         style={isActive ? { borderLeftColor: agent.accentColor } : undefined}
                       >
                         <span
@@ -455,7 +454,7 @@ export function AgentSelector({
                             </span>
                             {isDefault && (
                               <span className="text-[10px] uppercase tracking-wide font-medium text-white/70 px-1.5 py-0.5 bg-white/10 rounded shrink-0">
-                                Predeterminado
+                                Default
                               </span>
                             )}
                           </span>
@@ -467,7 +466,7 @@ export function AgentSelector({
                           </span>
                         </span>
 
-                        {/* Requirement 11.3: icono de comprobación en el activo. */}
+                        {/*  checkmark icon on the active one. */}
                         {isActive && (
                           <CheckCircle2
                             className="w-4 h-4 shrink-0 mt-0.5"

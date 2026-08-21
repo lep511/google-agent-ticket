@@ -76,14 +76,14 @@ describe('createHistoryEntry field derivation', () => {
       fc.property(draftArb, (draft) => {
         const entry = createHistoryEntry(draft, []);
 
-        // Requirement 3.3: query trimmed of leading and trailing whitespace.
+        //  query trimmed of leading and trailing whitespace.
         expect(entry.query).toBe(draft.query.trim());
 
-        // Requirement 3.3: createdAt is the finite completion timestamp in ms.
+        //  createdAt is the finite completion timestamp in ms.
         expect(Number.isFinite(entry.createdAt)).toBe(true);
         expect(entry.createdAt).toBe(draft.createdAt);
 
-        // Requirement 3.3: metrics carried over field by field.
+        //  metrics carried over field by field.
         expect(entry.metrics).toEqual({
           durationSecs: draft.metrics.durationSecs,
           tokenCount: draft.metrics.tokenCount,
@@ -141,7 +141,7 @@ describe('history entry identifiers', () => {
             for (const draft of drafts) {
               entries = insertEntry(entries, createHistoryEntry(draft, entries));
 
-              // Requirement 3.7: every identifier present in the list is
+              //  every identifier present in the list is
               // distinct from every other one, so the count of distinct
               // identifiers equals the length of the list.
               const distinctIds = new Set(entries.map((entry) => entry.id));
@@ -160,7 +160,7 @@ describe('history entry identifiers', () => {
 /* ── Property 11 ─────────────────────────────────────────────── */
 
 /**
- * Boundary durations re-derived from Requirement 4.5 in plain literals instead
+ * Boundary durations re-derived from  in plain literals instead
  * of reusing the store constants, so the test keeps an independent oracle.
  */
 const ONE_MINUTE_MS = 60 * 1000;
@@ -168,7 +168,7 @@ const ONE_HOUR_MS = 60 * ONE_MINUTE_MS;
 const ONE_DAY_MS = 24 * ONE_HOUR_MS;
 const ONE_WEEK_MS = 7 * ONE_DAY_MS;
 
-/** Every threshold named by Requirement 4.5, plus the zero-difference edge. */
+/** Every threshold named by , plus the zero-difference edge. */
 const BOUNDARIES_MS = [0, ONE_MINUTE_MS, ONE_HOUR_MS, ONE_DAY_MS, ONE_WEEK_MS];
 
 /** Instants just below, exactly at, and just above each boundary. */
@@ -194,7 +194,7 @@ describe('relative timestamp formatting', () => {
         const createdAt = now - delta;
         const label = formatRelativeTimestamp(createdAt, now);
 
-        // Requirement 4.5: a future `createdAt` counts as a zero difference.
+        //  a future `createdAt` counts as a zero difference.
         const effectiveDelta = Math.max(0, delta);
 
         if (effectiveDelta < ONE_MINUTE_MS) {
@@ -241,7 +241,7 @@ describe('relative timestamp formatting', () => {
 
 /**
  * Agents a generated history mixes under the single History Key
- * (Requirement 8.3). Three of them can become the Active Agent; the fourth
+ * (). Three of them can become the Active Agent; the fourth
  * never does, so it always contributes entries that must stay out of the
  * Visible Entries.
  */
@@ -309,7 +309,7 @@ const multiAgentHistoryArb: fc.Arbitrary<InteractionHistoryEntry[]> = fc
 
 /**
  * Active Agents of the input space: an agent that owns entries, an agent that
- * may own none, and null (Requirement 8.5 folded into the generator).
+ * may own none, and null ( folded into the generator).
  */
 const activeAgentIdArb = fc.oneof(
   fc.constantFrom<string | null>(...FILTER_AGENT_IDS),
@@ -376,7 +376,7 @@ describe('Visible Entries of the Active Agent', () => {
           const stored = JSON.parse(raw as string) as InteractionHistoryEntry[];
 
           /*
-            Requirement 8.3: the entries of every agent stay in the same History
+             the entries of every agent stay in the same History
             Key, so the persisted list is agent-for-agent the one that was
             handed over, whatever the Active Agent filters out of the view.
           */

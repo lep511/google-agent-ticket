@@ -223,7 +223,7 @@ describe('orden total del catálogo', () => {
 
   it('sitúa el order por defecto 100 entre los valores menores y mayores', () => {
     const catalog = createTempCatalog({
-      // `order` ausente y fuera de rango degradan ambos a 100 (Requirement 1.7).
+      // `order` ausente y fuera de rango degradan ambos a 100 ().
       omitted_agent: { manifest: validManifest('omitted_agent', { name: 'Bravo' }) },
       out_of_range_agent: {
         manifest: validManifest('out_of_range_agent', { name: 'Alfa', order: 99999 }),

@@ -7,7 +7,7 @@
  *
  * Reglas que aplica:
  *  - Los campos obligatorios se validan en el orden declarado, de modo que la
- *    advertencia nombra el primer campo causante (Requirement 2.5).
+ *    advertencia nombra el primer campo causante ().
  *  - `inputMode`, `outputRenderer` e `icon` se comparan de forma exacta contra
  *    sus valores permitidos y contra la lista blanca de iconos (2.2, 2.3, 16.4).
  *  - `id` debe coincidir carácter a carácter con el nombre de la carpeta (1.3).
@@ -104,7 +104,7 @@ export interface AgentValidationResult {
 
 /**
  * Campos obligatorios en el orden en que se validan: la advertencia de una
- * carpeta descartada nombra el primero que falla (Requirement 2.5).
+ * carpeta descartada nombra el primero que falla ().
  */
 export const REQUIRED_STRING_FIELDS = [
   'id',
@@ -175,7 +175,7 @@ export interface OrderNormalization {
 
 /**
  * Interpreta `order` como entero entre 0 y 9999, aplicando 100 cuando falta,
- * no es un entero o queda fuera de rango (Requirement 1.7).
+ * no es un entero o queda fuera de rango ().
  */
 export function normalizeOrder(value: unknown): OrderNormalization {
   if (value === undefined || value === null) return { order: DEFAULT_ORDER, degraded: 'omitted' };
@@ -499,7 +499,7 @@ function readOptionalFields(
 
 /**
  * Comprueba que el archivo existe, es un archivo regular, es legible y tiene
- * más de 0 bytes (Requirement 2.4).
+ * más de 0 bytes ().
  */
 function assertReadableNonEmptyFile(filePath: string, label: string): void {
   let stat: fs.Stats;
@@ -542,7 +542,7 @@ function assertReadableNonEmptyFile(filePath: string, label: string): void {
   }
 }
 
-/** El esquema, además, debe contener JSON válido (Requirement 2.4). */
+/** El esquema, además, debe contener JSON válido (). */
 function assertValidSchemaFile(filePath: string, label: string): void {
   assertReadableNonEmptyFile(filePath, label);
 
@@ -650,7 +650,7 @@ export function validateAgentFolder(folder: DiscoveredAgentFolder): ManifestVali
       warnings: degradations,
     };
   } catch (error) {
-    // Requirement 2.5 y 2.8: exactamente una advertencia por carpeta omitida.
+    //  y 2.8: exactamente una advertencia por carpeta omitida.
     const isKnown = error instanceof ManifestValidationError;
     return {
       ok: false,

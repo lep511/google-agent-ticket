@@ -198,7 +198,7 @@ describe('History_Trigger toggling', () => {
 
           const trigger = await findHistoryTrigger();
 
-          // Requirement 1.6: the attribute reflects the closed initial state.
+          //  the attribute reflects the closed initial state.
           expect(trigger).toHaveAttribute('aria-expanded', 'false');
           expect(isHistoryPanelPresent()).toBe(false);
 
@@ -209,7 +209,7 @@ describe('History_Trigger toggling', () => {
             // number of activations so far is odd.
             const expectedOpen = activation % 2 === 1;
 
-            // Requirement 1.6: `aria-expanded` matches that state on every step.
+            //  `aria-expanded` matches that state on every step.
             expect(trigger).toHaveAttribute('aria-expanded', String(expectedOpen));
 
             if (expectedOpen) {
@@ -257,7 +257,7 @@ function makeCatalogAgent(id: string): AgentCatalogEntry {
  * Catalog for a generated case. A null Active Agent is produced with an empty
  * catalog, the only state in which `resolveActiveAgentId` yields null; any other
  * choice becomes the catalog `defaultAgentId`, so the Active Agent is exactly
- * the generated one (Requirement 8.5 folded into the input space).
+ * the generated one ( folded into the input space).
  */
 function makeCatalog(activeAgentId: string | null): AgentCatalogResponse {
   if (activeAgentId === null) {
@@ -277,7 +277,7 @@ const historyMetricsArb = fc.record({
 
 /** History Entry body; the list generator assigns the unique identifiers. */
 const historyEntryBodyArb: fc.Arbitrary<Omit<InteractionHistoryEntry, 'id'>> = fc.record({
-  // Several agents share the History Key (Requirement 8.3), so the generated
+  // Several agents share the History Key (), so the generated
   // list mixes catalog agents with one that is never active.
   agentId: fc.constantFrom(...CATALOG_AGENT_IDS, ORPHAN_AGENT_ID),
   agentName: fc.string({ minLength: 1, maxLength: 20 }),
@@ -334,13 +334,13 @@ describe('Visible count and the History_Panel branches', () => {
             const trigger = await findHistoryTrigger();
 
             // Visible Entries: exact `agentId` match, and none at all while the
-            // Active Agent is null (Requirement 8.5).
+            // Active Agent is null ().
             const visibleCount =
               activeAgentId === null
                 ? 0
                 : entries.filter((entry) => entry.agentId === activeAgentId).length;
 
-            // Requirement 1.7: the number appears only above zero. The wait
+            //  the number appears only above zero. The wait
             // covers the catalog request that resolves the Active Agent.
             await waitFor(() => {
               expect(historyTriggerCount(trigger)).toBe(
@@ -356,17 +356,17 @@ describe('Visible count and the History_Panel branches', () => {
             const emptyState = within(panel).queryByText('No history yet');
 
             if (visibleCount > 0) {
-              // Requirement 9.3: the list replaces the empty state, one Visible
+              //  the list replaces the empty state, one Visible
               // Entry per row.
               expect(rows).toHaveLength(visibleCount);
               expect(emptyState).toBeNull();
-              // Requirement 10.5: the clear-all control exists above zero.
+              //  the clear-all control exists above zero.
               expect(clearAll).not.toBeNull();
             } else {
-              // Requirement 9.1: zero Visible Entries means the empty state.
+              //  zero Visible Entries means the empty state.
               expect(emptyState).not.toBeNull();
               expect(rows).toHaveLength(0);
-              // Requirement 9.2: and no clear-all control.
+              //  and no clear-all control.
               expect(clearAll).toBeNull();
             }
           } finally {
@@ -430,21 +430,21 @@ async function closeHistoryPanel(
   user: ReturnType<typeof userEvent.setup>,
 ): Promise<void> {
   if (mode === 'overlay') {
-    // Requirement 2.2
+    // 
     await user.click(getHistoryOverlay());
     return;
   }
   if (mode === 'escape') {
-    // Requirement 2.3
+    // 
     await user.keyboard('{Escape}');
     return;
   }
   if (mode === 'close-control') {
-    // Requirement 2.10
+    // 
     await user.click(within(panel).getByRole('button', { name: 'Close history' }));
     return;
   }
-  // Requirement 5.1: activating an entry restores its report and closes the
+  //  activating an entry restores its report and closes the
   // panel. The row's own button is the first one of the row; the second is the
   // `Delete entry` sibling.
   const row = within(panel).getAllByRole('listitem')[0];
@@ -473,7 +473,7 @@ describe('Keyboard focus around the History_Panel', () => {
           await user.click(trigger);
           const panel = await screen.findByRole('dialog', { name: 'History' });
 
-          // Requirement 2.8: on open, focus lands on an element inside the panel.
+          //  on open, focus lands on an element inside the panel.
           await waitFor(() => {
             expect(document.activeElement).not.toBeNull();
             expect(panel.contains(document.activeElement)).toBe(true);
@@ -489,16 +489,16 @@ describe('Keyboard focus around the History_Panel', () => {
 
           if (mode === 'restore') {
             /*
-              Requirement 5.1 switches the whole view to the restored report, so
+               switches the whole view to the restored report, so
               the header and its History_Trigger leave the document and there is
-              no trigger left to receive the focus. What Requirement 2.9 protects
+              no trigger left to receive the focus. What  protects
               in this mode is that the focus does not stay inside the panel that
               was just removed.
             */
             expect(screen.queryByRole('button', { name: 'History' })).toBeNull();
             expect(panel.contains(document.activeElement)).toBe(false);
           } else {
-            // Requirement 2.9: focus returns to the History_Trigger.
+            //  focus returns to the History_Trigger.
             await waitFor(() => {
               expect(document.activeElement).toBe(trigger);
             });
@@ -734,7 +734,7 @@ describe('Recording a run in the interaction history', () => {
           await driveRun(user, ticker, outcome);
 
           if (outcome === 'promoted') {
-            // Requirement 3.1: exactly one History Entry is added, and the
+            //  exactly one History Entry is added, and the
             // count of the trigger is what makes the addition observable.
             await waitFor(() => {
               expect(historyTriggerCount(trigger)).toBe('2');
@@ -742,14 +742,14 @@ describe('Recording a run in the interaction history', () => {
 
             const after = readPersistedHistory() ?? [];
             expect(after).toHaveLength(2);
-            // Requirement 3.1: the added entry carries this run's snapshot.
+            //  the added entry carries this run's snapshot.
             expect(after[0].query).toBe(ticker);
             expect(after[0].report).toEqual(PROMOTED_RUN_REPORT);
             // Nothing but the insertion happened: the previous list is intact.
             expect(after.slice(1)).toEqual([PRE_EXISTING_ENTRY]);
           } else {
             /*
-              Requirement 3.6: a run that finished with an error, was stopped by
+               a run that finished with an error, was stopped by
               the user or promoted no report leaves the History Entries
               identical, in memory and in the History Key.
             */
@@ -818,7 +818,7 @@ function streamAgentName(agent: AgentCatalogEntry): string {
   return `${agent.name} (informed by the stream)`;
 }
 
-/** Identity the History Entry of this run must carry (Requirement 3.2). */
+/** Identity the History Entry of this run must carry (). */
 function expectedRunIdentity(
   agent: AgentCatalogEntry,
   source: RunIdentitySource,
@@ -966,7 +966,7 @@ describe('Run identity of a recorded History Entry', () => {
             expect(persisted).toHaveLength(1);
 
             /*
-              Requirement 3.2: the stored entry carries the identity and the
+               the stored entry carries the identity and the
               renderer of the run that produced the report.
             */
             expect(persisted[0].agentId).toBe(expected.agentId);
@@ -974,7 +974,7 @@ describe('Run identity of a recorded History Entry', () => {
             expect(persisted[0].outputRenderer).toBe(expected.outputRenderer);
 
             /*
-              Requirement 3.2: and not those of the Active Agent at the moment of
+               and not those of the Active Agent at the moment of
               saving, which is now a different agent in all three fields.
             */
             expect(persisted[0].agentId).not.toBe(laterAgent.id);
@@ -983,7 +983,7 @@ describe('Run identity of a recorded History Entry', () => {
 
             // The frozen tag is what the panel filters on, so the entry left
             // the Visible Entries of the new Active Agent instead of following
-            // it (Requirement 8.1 seen from Requirement 3.2).
+            // it ( seen from ).
             expect(historyTriggerCount(trigger)).toBeNull();
           } finally {
             cleanup();
@@ -1077,7 +1077,7 @@ describe('Restoring a report from the interaction history', () => {
     await fc.assert(
       fc.asyncProperty(
         fc.record({
-          // Both renderers, so the branch of Requirement 5.2 is generated
+          // Both renderers, so the branch of  is generated
           // instead of being fixed by the test.
           outputRenderer: fc.constantFrom(...OUTPUT_RENDERERS),
           // Distinct prefixes keep the title, the identifier and the two report
@@ -1090,7 +1090,7 @@ describe('Restoring a report from the interaction history', () => {
             Every metric is strictly positive, while the live run state of a
             freshly mounted application holds zeros. Reading back these values is
             therefore what separates "the metrics of the entry" from "the metrics
-            of the live run" (Requirement 5.3).
+            of the live run" ().
           */
           durationSecs: fc.integer({ min: 1, max: 3600 }),
           tokenCount: fc.integer({ min: 1, max: 999_999 }),
@@ -1136,7 +1136,7 @@ describe('Restoring a report from the interaction history', () => {
             const row = within(panel).getAllByRole('listitem')[0];
             await user.click(within(row).getAllByRole('button')[0]);
 
-            // Requirement 5.1: the History_Panel ends up closed. Its exit
+            //  the History_Panel ends up closed. Its exit
             // animation is awaited instead of asserted on the same frame.
             await waitFor(() => {
               expect(isHistoryPanelPresent()).toBe(false);
@@ -1144,7 +1144,7 @@ describe('Restoring a report from the interaction history', () => {
 
             if (generated.outputRenderer === 'simple_report') {
               /*
-                Requirement 5.2: `simple_report` is rendered by
+                 `simple_report` is rendered by
                 `SimpleReportView`, identified by its `Summary` card, and never
                 by `ReportTemplate`.
               */
@@ -1152,13 +1152,13 @@ describe('Restoring a report from the interaction history', () => {
               expect(screen.queryByRole('heading', { name: 'Executive Summary' })).toBeNull();
               expect(screen.queryByText('Conviction Score')).toBeNull();
 
-              // Requirement 5.4: the stored `agentName` is the title and the
+              //  the stored `agentName` is the title and the
               // stored `query` the subtitle of that view.
               expect(screen.getAllByText(entry.agentName).length).toBeGreaterThan(0);
               expect(screen.getAllByText(entry.query).length).toBeGreaterThan(0);
             } else {
               /*
-                Requirement 5.2: any other renderer is rendered by
+                 any other renderer is rendered by
                 `ReportTemplate`, identified by its `Executive Summary` card, and
                 never by `SimpleReportView`.
               */
@@ -1166,18 +1166,18 @@ describe('Restoring a report from the interaction history', () => {
               expect(screen.queryByRole('heading', { name: 'Summary' })).toBeNull();
 
               /*
-                Requirement 5.4: the stored `query` is the header identifier of
+                 the stored `query` is the header identifier of
                 this view. `ReportTemplate` exposes no separate title slot, so
                 the identifier is where the entry's own text has to show up.
               */
               expect(screen.getByText(`${entry.query} Document Analysis`)).toBeInTheDocument();
             }
 
-            // Requirement 5.1: the view shows the `report` object of the entry.
+            //  the view shows the `report` object of the entry.
             expect(screen.getByText(`Summary ${generated.summarySuffix}`)).toBeInTheDocument();
             expect(screen.getByText(`Highlight ${generated.highlightSuffix}`)).toBeInTheDocument();
 
-            // Requirement 5.3: the three metrics are the ones frozen in the
+            //  the three metrics are the ones frozen in the
             // entry, not the zeros of the untouched live run state.
             expect(readReportMetric('Time')).toBe(`${entry.metrics.durationSecs}s`);
             expect(readReportMetric('Runs')).toBe(String(entry.metrics.toolRuns));
@@ -1185,7 +1185,7 @@ describe('Restoring a report from the interaction history', () => {
               `${(entry.metrics.tokenCount / 1000).toFixed(1)}k`,
             );
 
-            // Requirement 5.5: the whole restoration ran without a single
+            //  the whole restoration ran without a single
             // request to `/api/analyze`.
             expect(requestedUrls().filter((url) => url.includes('/api/analyze'))).toEqual([]);
           } finally {
@@ -1204,7 +1204,7 @@ describe('Restoring a report from the interaction history', () => {
 
 /**
  * The interface states a restoration can start from, and therefore the states
- * closing the restored report has to give back (Requirement 5.7):
+ * closing the restored report has to give back ():
  *
  * - `landing`: nothing has run yet, so the landing view is on screen.
  * - `run-panel`: a run finished without a Promoted Report, so the execution
@@ -1268,7 +1268,7 @@ function captureInterfaceState(): InterfaceStateSnapshot {
  * Brings the mounted application to the generated prior state. The landing
  * state needs no interaction; the other two drive a run whose outcome decides
  * whether a report is promoted, and a run without a Promoted Report leaves the
- * History Entries untouched (Requirement 3.6).
+ * History Entries untouched ().
  */
 async function reachPriorState(
   state: PriorInterfaceState,
@@ -1296,7 +1296,7 @@ describe('Closing a report restored from the interaction history', () => {
           // The prior interface state the restoration starts from.
           priorState: fc.constantFrom(...PRIOR_INTERFACE_STATES),
           // Both renderers, so the restored view that gets closed is generated
-          // instead of fixed (Requirement 5.2 folded into the input space).
+          // instead of fixed ( folded into the input space).
           outputRenderer: fc.constantFrom(...OUTPUT_RENDERERS),
           // Distinct texts per case, so the row activated below and the report
           // it opens belong to this generated entry only.
@@ -1382,7 +1382,7 @@ describe('Closing a report restored from the interaction history', () => {
             await screen.findByRole('heading', { name: restoredHeading });
             expect(screen.getByText(`Summary ${generated.summarySuffix}`)).toBeInTheDocument();
 
-            // Requirement 5.7: closing the restored report.
+            //  closing the restored report.
             await user.click(screen.getByTitle('Close report'));
 
             await waitFor(() => {
@@ -1394,7 +1394,7 @@ describe('Closing a report restored from the interaction history', () => {
               expect(captureInterfaceState()).toEqual(before);
             });
 
-            // Requirement 5.7: and no History Entry was deleted along the way.
+            //  and no History Entry was deleted along the way.
             expect(readPersistedHistory()).toEqual(historyBefore);
           } finally {
             cleanup();
@@ -1433,7 +1433,7 @@ function makeFilteredEntry(agentId: string, index: number): InteractionHistoryEn
 /**
  * Multi-agent stored histories, the empty one included. The orphan agent is
  * never selectable, so its entries have to stay out of every Visible Entries
- * list while remaining in the History Key (Requirement 8.3).
+ * list while remaining in the History Key ().
  */
 const multiAgentStoredHistoryArb: fc.Arbitrary<InteractionHistoryEntry[]> = fc
   .array(fc.constantFrom<string>(...CATALOG_AGENT_IDS, ORPHAN_AGENT_ID), {
@@ -1512,7 +1512,7 @@ describe('Filtering the interaction history by the Active Agent', () => {
     await fc.assert(
       fc.asyncProperty(
         multiAgentStoredHistoryArb,
-        // Active Agent the case starts from, null included (Requirement 8.5).
+        // Active Agent the case starts from, null included ().
         fc.option(fc.constantFrom(...CATALOG_AGENT_IDS), { nil: null }),
         // Active Agent the case switches to; it may be the same one, in which
         // case the displayed list has to stay put.
@@ -1539,7 +1539,7 @@ describe('Filtering the interaction history by the Active Agent', () => {
 
             const initialQueries = expectedVisibleQueries(entries, initialAgentId);
 
-            // Requirement 1.7 seen from the filtering: the count of the trigger
+            //  seen from the filtering: the count of the trigger
             // is the number of Visible Entries of the Active Agent.
             expect(historyTriggerCount(trigger)).toBe(
               initialQueries.length > 0 ? String(initialQueries.length) : null,
@@ -1559,7 +1559,7 @@ describe('Filtering the interaction history by the Active Agent', () => {
               /*
                 With no catalog there is no Agent_Selector option to pick, so
                 this case ends here: the zero Visible Entries above are the whole
-                of Requirement 8.5.
+                of .
               */
               expect(readPersistedHistory()).toEqual(entries);
               return;
@@ -1567,7 +1567,7 @@ describe('Filtering the interaction history by the Active Agent', () => {
 
             await closeHistoryPanelWithControl(user, panel);
 
-            // Requirement 8.2: the user changes the Active Agent.
+            //  the user changes the Active Agent.
             await selectActiveAgent(user, makeCatalogAgent(nextAgentId));
             await waitFor(() => {
               expect(agentSelectorLabel()).toContain(`Agent ${nextAgentId}`);
@@ -1576,7 +1576,7 @@ describe('Filtering the interaction history by the Active Agent', () => {
             const nextQueries = expectedVisibleQueries(entries, nextAgentId);
 
             /*
-              Requirement 8.2: the interface follows the new Active Agent right
+               the interface follows the new Active Agent right
               away, with no reload and no extra interaction — the count of the
               trigger already reports the Visible Entries of the new agent.
             */
@@ -1584,13 +1584,13 @@ describe('Filtering the interaction history by the Active Agent', () => {
               nextQueries.length > 0 ? String(nextQueries.length) : null,
             );
 
-            // Requirement 8.2: and the displayed list is the one of the new
+            //  and the displayed list is the one of the new
             // Active Agent, again as the exact ordered subsequence.
             const refreshedPanel = await openHistoryPanel(user, trigger);
             expect(renderedRowQueries(refreshedPanel)).toEqual(nextQueries);
 
             /*
-              Requirement 8.3: filtering only narrows the view. Every entry of
+               filtering only narrows the view. Every entry of
               every agent, including the ones no Active Agent ever displays, is
               still in the single History Key.
             */
@@ -1720,14 +1720,14 @@ describe('Clearing the whole interaction history', () => {
             const panel = await openHistoryPanel(user, trigger);
             expect(renderedRowQueries(panel)).toHaveLength(visibleCount);
 
-            // Requirement 10.6: the footer control opens the confirmation layer.
+            //  the footer control opens the confirmation layer.
             await user.click(within(panel).getByRole('button', { name: 'Clear all' }));
             const confirmation = getClearAllConfirmation();
 
-            // Requirement 10.7: the user confirms the full deletion.
+            //  the user confirms the full deletion.
             await user.click(within(confirmation).getByRole('button', { name: 'Clear all' }));
 
-            // Requirement 10.7: the History Key ends up holding an empty list.
+            //  the History Key ends up holding an empty list.
             await waitFor(() => {
               expect(readPersistedHistory()).toEqual([]);
             });
@@ -1736,16 +1736,16 @@ describe('Clearing the whole interaction history', () => {
             expect(screen.queryByRole('heading', { name: 'Clear all history?' })).toBeNull();
 
             /*
-              Requirement 10.7: the History_Panel stays open and shows the empty
+               the History_Panel stays open and shows the empty
               state, which is only possible with the in-memory list emptied too.
             */
             expect(isHistoryPanelPresent()).toBe(true);
             expect(within(panel).getByText('No history yet')).toBeInTheDocument();
             expect(renderedRowQueries(panel)).toEqual([]);
-            // Requirement 9.2: with no Visible Entry left there is no control to
+            //  with no Visible Entry left there is no control to
             // clear either, so the footer left with the rows.
             expect(within(panel).queryByRole('button', { name: 'Clear all' })).toBeNull();
-            // Requirement 1.7: and the trigger reports no number anymore.
+            //  and the trigger reports no number anymore.
             expect(historyTriggerCount(trigger)).toBeNull();
 
             /*
@@ -1766,7 +1766,7 @@ describe('Clearing the whole interaction history', () => {
             expect(renderedRowQueries(refreshedPanel)).toEqual([]);
             expect(within(refreshedPanel).getByText('No history yet')).toBeInTheDocument();
 
-            // Requirement 10.7: and the History Key is still an empty list.
+            //  and the History Key is still an empty list.
             expect(readPersistedHistory()).toEqual([]);
           } finally {
             cleanup();
@@ -1821,9 +1821,9 @@ async function restoreThenDelete(
   deletionButton: HTMLElement,
 ): Promise<void> {
   await act(async () => {
-    // Requirement 5.1: the restoration comes first, as the requirement orders it.
+    //  the restoration comes first, as the requirement orders it.
     restoreButton.click();
-    // Requirement 10.10: and the deletion of that same entry follows it, either
+    //  and the deletion of that same entry follows it, either
     // through its row control or through the confirmed clear-all action.
     deletionButton.click();
   });
@@ -1895,14 +1895,14 @@ describe('Independence of a restored report from the interaction history', () =>
 
             let deletionButton: HTMLElement;
             if (generated.deletionMode === 'single-entry') {
-              // Requirement 10.3: the delete control of that same row, whose
+              //  the delete control of that same row, whose
               // confirmation layer has to be open before it deletes anything.
               await user.click(within(row).getByRole('button', { name: 'Delete entry' }));
               deletionButton = within(getDeleteEntryConfirmation()).getByRole('button', {
                 name: 'Delete',
               });
             } else {
-              // Requirement 10.6: the clear-all action needs its confirmation
+              //  the clear-all action needs its confirmation
               // layer open before it can delete anything.
               await user.click(within(panel).getByRole('button', { name: 'Clear all' }));
               deletionButton = within(getClearAllConfirmation()).getByRole('button', {
@@ -1926,7 +1926,7 @@ describe('Independence of a restored report from the interaction history', () =>
             expect(screen.queryByRole('heading', { name: 'Delete this entry?' })).toBeNull();
 
             /*
-              Requirement 10.10: the report of the deleted entry is still the one
+               the report of the deleted entry is still the one
               on screen, under the view its stored renderer selects, with the
               same title and subtitle it was restored with.
             */
@@ -1943,14 +1943,14 @@ describe('Independence of a restored report from the interaction history', () =>
               expect(screen.getByText(`${entry.query} Document Analysis`)).toBeInTheDocument();
             }
 
-            // Requirement 10.10: and the same report body, taken from the copy
+            //  and the same report body, taken from the copy
             // the restoration made instead of from the deleted entry.
             expect(screen.getByText(`Summary ${generated.summarySuffix}`)).toBeInTheDocument();
             expect(
               screen.getByText(`Highlight ${generated.highlightSuffix}`),
             ).toBeInTheDocument();
 
-            // Requirement 10.10: and the same three metrics, still the frozen
+            //  and the same three metrics, still the frozen
             // ones and not the zeros of the live run state.
             expect(readReportMetric('Time')).toBe(`${entry.metrics.durationSecs}s`);
             expect(readReportMetric('Runs')).toBe(String(entry.metrics.toolRuns));
@@ -1988,7 +1988,7 @@ describe('Independence of a restored report from the interaction history', () =>
  * Direct children of the header. `justify-between` distributes exactly two
  * groups: the left one carries the `Tickr` logo, the Agent_Selector and the
  * History_Trigger, and the right one carries the session controls. The order
- * Requirement 1.1 is about is read from the DOM instead of from the class list.
+ *  is about is read from the DOM instead of from the class list.
  */
 function headerGroups(): HTMLElement[] {
   const header = document.querySelector('header');
@@ -2005,7 +2005,7 @@ describe('History_Trigger in the header', () => {
     const trigger = await findHistoryTrigger();
     const groups = headerGroups();
 
-    // Requirement 1.1: the header distributes two groups, and the trigger
+    //  the header distributes two groups, and the trigger
     // travels with the logo and the Agent_Selector in the leading one.
     expect(groups).toHaveLength(2);
 
@@ -2028,7 +2028,7 @@ describe('History_Trigger in the header', () => {
     expect(accountMenu).toHaveTextContent('tester@example.com');
     expect(accountMenu.contains(screen.getByRole('menuitem', { name: 'Sign Out' }))).toBe(true);
 
-    // Requirement 1.1: document order confirms the placement, right after the
+    //  document order confirms the placement, right after the
     // Agent_Selector and ahead of the session group.
     expect(agentSelector.compareDocumentPosition(trigger)).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
@@ -2043,12 +2043,12 @@ describe('History_Trigger in the header', () => {
 
     const trigger = await findHistoryTrigger();
 
-    // Requirement 1.2: the accessible text comes from `aria-label`, so the
+    //  the accessible text comes from `aria-label`, so the
     // trigger keeps its name even when the visible label is hidden on narrow
     // viewports.
     expect(trigger).toHaveAttribute('aria-label', 'History');
 
-    // Requirement 1.2: the `History` icon of `lucide-react`, which renders as an
+    //  the `History` icon of `lucide-react`, which renders as an
     // SVG carrying its own icon class.
     const icon = trigger.querySelector('svg.lucide-history');
     expect(icon).not.toBeNull();
@@ -2061,7 +2061,7 @@ describe('History_Trigger in the header', () => {
 
     const trigger = await findHistoryTrigger();
 
-    // Requirement 1.3: rounded shape, translucent border of the `border-white/10`
+    //  rounded shape, translucent border of the `border-white/10`
     // family, `font-sans` typography and a `text-stone-*` color.
     expect(trigger).toHaveClass('rounded');
     expect(trigger).toHaveClass('border');
@@ -2108,7 +2108,7 @@ describe('Hydrating the interaction history on mount', () => {
 
     const trigger = await findHistoryTrigger();
 
-    // Requirement 6.2: the mount reads the History Key, so the stored entries
+    //  the mount reads the History Key, so the stored entries
     // are already counted before the panel is ever opened.
     await waitFor(() => {
       expect(historyTriggerCount(trigger)).toBe('2');
@@ -2116,7 +2116,7 @@ describe('Hydrating the interaction history on mount', () => {
 
     const panel = await openHistoryPanel(user, trigger);
 
-    // Requirement 6.2: the hydrated entries are the ones the drawer lists, in
+    //  the hydrated entries are the ones the drawer lists, in
     // their stored order.
     expect(renderedRowQueries(panel)).toEqual([
       HYDRATED_ENTRIES[0].query,
@@ -2125,7 +2125,7 @@ describe('Hydrating the interaction history on mount', () => {
     // A non-null `instruction` survived the round trip through storage.
     expect(within(panel).getByText(HYDRATED_ENTRIES[0].instruction as string)).toBeInTheDocument();
 
-    // Requirement 6.2: hydration is a read, so the History Key still holds
+    //  hydration is a read, so the History Key still holds
     // exactly what was seeded.
     expect(readPersistedHistory()).toEqual(HYDRATED_ENTRIES);
   });
@@ -2150,7 +2150,7 @@ describe('Hydrating the interaction history on mount', () => {
     const panel = await openHistoryPanel(user, trigger);
     expect(within(panel).getByText('No history yet')).toBeInTheDocument();
 
-    // Requirement 6.4: the unreadable content was repaired into an empty list.
+    //  the unreadable content was repaired into an empty list.
     expect(readPersistedHistory()).toEqual([]);
   });
 });
@@ -2167,7 +2167,7 @@ describe('Recording a run under React StrictMode', () => {
     /*
       StrictMode double-invokes render, effects and state updaters in development,
       which is exactly the shape that turns a careless recording into two
-      entries. Mounting the application inside it keeps Requirement 3.1 honest
+      entries. Mounting the application inside it keeps  honest
       about "exactly one" instead of "at least one".
     */
     render(
@@ -2187,7 +2187,7 @@ describe('Recording a run under React StrictMode', () => {
 
     await driveRun(user, 'AMZN', 'promoted');
 
-    // Requirement 3.1: the promoted run added exactly one History Entry.
+    //  the promoted run added exactly one History Entry.
     await waitFor(() => {
       expect(historyTriggerCount(trigger)).toBe('2');
     });

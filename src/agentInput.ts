@@ -1,45 +1,46 @@
 /* ──────────────────────────────────────────────────────────── */
-/*  Barra de entrada adaptativa                                 */
+/*  Adaptive input bar                                          */
 /*                                                              */
-/*  Lógica pura que deriva del manifiesto del agente activo la   */
-/*  presentación del campo de entrada y la validación previa que */
-/*  gobierna el botón de ejecución. Las reglas replican las del  */
-/*  backend (`server/lib/analyzeInput.ts`) para que el cliente   */
-/*  no ofrezca ejecuciones que el servidor va a rechazar.        */
+/*  Pure logic that derives the input field presentation and    */
+/*  preliminary validation from the active agent's manifest,    */
+/*  which governs the execution button. The rules replicate     */
+/*  those of the backend (`server/lib/analyzeInput.ts`) so that */
+/*  the client does not offer executions that the server will   */
+/*  reject.                                                     */
 /*                                                              */
 
 /* ──────────────────────────────────────────────────────────── */
 
 import type { AgentCatalogEntry, InputMode } from './types';
 
-/** Longitud mínima de un símbolo en modo `ticker` (Requirement 8.1). */
+/** Minimum length of a symbol in `ticker` mode (). */
 export const TICKER_MIN_LENGTH = 1;
 
-/** Longitud máxima de un símbolo en modo `ticker` (Requirement 8.1). */
+/** Maximum length of a symbol in `ticker` mode (). */
 export const TICKER_MAX_LENGTH = 10;
 
 /**
- * Símbolo admitido en modo `ticker`: de 1 a 10 caracteres `A`-`Z` y `0`-`9`,
- * comprobado sobre el valor ya recortado y en mayúsculas (Requirement 8.1).
+ * Valid symbol in `ticker` mode: 1 to 10 characters `A`-`Z` and `0`-`9`,
+ * checked on the already trimmed and uppercased value ().
  */
 export const TICKER_PATTERN = /^[A-Z0-9]{1,10}$/;
 
-/** Longitud mínima del texto en modo `text` (Requirement 8.2). */
+/** Minimum text length in `text` mode (). */
 export const TEXT_MIN_LENGTH = 1;
 
-/** Longitud máxima del texto en modo `text` (Requirement 8.2). */
+/** Maximum text length in `text` mode (). */
 export const TEXT_MAX_LENGTH = 2000;
 
-/** Longitud máxima de la instrucción tras recortar (Requirements 5.9, 8.6). */
+/** Maximum instruction length after trimming (Requirements 5.9, 8.6). */
 export const MAX_INSTRUCTION_LENGTH = 2000;
 
-/** Presentación de la barra de entrada derivada del manifiesto. */
+/** Input bar presentation derived from the manifest. */
 export interface InputBarConfig {
-  /** Tipo de campo: corto y monoespaciado, o ancho de texto libre (13.3, 13.4). */
+  /** Field type: short and monospaced, or free-text width (13.3, 13.4). */
   inputMode: InputMode;
-  /** Texto de ayuda del campo de entrada (Requirement 13.5). */
+  /** Input field help text (Requirement 13.5). */
   inputPlaceholder: string;
-  /** Etiqueta del botón de ejecución (Requirement 13.7). */
+  /** Execution button label (Requirement 13.7). */
   actionLabel: string;
   /**
    * Instruction field visible only when true (Requirement 13.6). Reserved for
@@ -50,9 +51,9 @@ export interface InputBarConfig {
 }
 
 /**
- * Presentación usada mientras no hay agente activo (catálogo cargando, vacío o
- * fallido). Conserva el comportamiento histórico de la barra: símbolo corto,
- * sin campo de instrucción y botón "Analyze".
+ * Presentation used while no agent is active (catalog loading, empty, or
+ * failed). Preserves the historical bar behavior: short symbol,
+ * no instruction field, and "Analyze" button.
  */
 export const FALLBACK_INPUT_BAR_CONFIG: InputBarConfig = {
   inputMode: 'ticker',
@@ -93,20 +94,18 @@ export function inputBarConfig(agent: AgentCatalogEntry | null): InputBarConfig 
 }
 
 /**
- * Longitud máxima admitida por el campo de entrada según el modo, para que el
- * campo no acepte más caracteres de los que el servidor validaría.
+ * Maximum length allowed by the input field according to mode, so that the
+ * field does not accept more characters than the server would validate.
  */
 export function inputMaxLength(inputMode: InputMode): number {
   return inputMode === 'ticker' ? TICKER_MAX_LENGTH : TEXT_MAX_LENGTH;
 }
 
 /**
- * Reglas de longitud y conjunto de caracteres del `inputMode` activo, las
- * mismas que aplica el endpoint de ejecución: en modo `ticker`, de 1 a 10
- * caracteres `A`-`Z` y `0`-`9` tras recortar y pasar a mayúsculas; en modo
- * `text`, de 1 a 2.000 caracteres tras recortar.
- *
- 
+ * Length and character set rules for the active `inputMode`, the same as
+ * those applied by the execution endpoint: in `ticker` mode, 1 to 10
+ * characters `A`-`Z` and `0`-`9` after trimming and converting to uppercase;
+ * in `text` mode, 1 to 2,000 characters after trimming.
  */
 export function isInputValid(value: string, inputMode: InputMode): boolean {
   const trimmed = typeof value === 'string' ? value.trim() : '';
@@ -119,7 +118,7 @@ export function isInputValid(value: string, inputMode: InputMode): boolean {
 }
 
 /**
- * Instrucción admisible: vacía, o de hasta 2.000 caracteres tras recortar
+ * Valid instruction: empty, or up to 2,000 characters after trimming
  * (Requirements 5.9, 8.6).
  */
 export function isInstructionValid(instruction: string): boolean {
@@ -128,8 +127,8 @@ export function isInstructionValid(instruction: string): boolean {
 }
 
 /**
- * Estado del botón de ejecución: habilitado solo con el catálogo disponible y
- * una entrada que cumple las reglas del `inputMode` activo
+ * Execution button state: enabled only with the catalog available and
+ * an input that meets the active `inputMode` rules
  * (Requirements 8.7, 8.8, 11.9).
  */
 export function canRun(params: {

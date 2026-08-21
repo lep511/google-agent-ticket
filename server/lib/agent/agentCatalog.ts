@@ -3,7 +3,7 @@
  *
  * Este módulo proyecta el catálogo que el registro mantiene en memoria a la
  * superficie mínima que consume la interfaz: exactamente los campos declarados
- * en el Requirement 4.2, sin rutas del sistema de archivos ni contenido de
+ * en el , sin rutas del sistema de archivos ni contenido de
  * `AGENTS.md`, del archivo de prompt o del archivo de esquema
  * (Requirements 4.5, 4.6, 16.3). La proyección es pura y no toca el disco: el
  * registro ya cacheó las definiciones válidas y su orden total, y el contenido
@@ -12,7 +12,7 @@
  * El campo `isDefault` de la respuesta no reproduce lo que declaró cada
  * manifiesto: se calcula comparando el agentId con el `defaultAgentId` que
  * resolvió el registro, de modo que exactamente una entrada lo lleve verdadero
- * aunque varios manifiestos lo declaren (Requirement 3.7).
+ * aunque varios manifiestos lo declaren ().
  *
  
  */
@@ -37,7 +37,7 @@ export const CATALOG_UNAVAILABLE_ERROR =
 
 /**
  * Copia el bloque `landing` campo a campo: `title`, `subtitle` y los grupos de
- * `highlights` con sus elementos (Requirement 4.4). Al reconstruir el objeto en
+ * `highlights` con sus elementos (). Al reconstruir el objeto en
  * lugar de reenviar la referencia del manifiesto, ningún campo añadido al
  * manifiesto puede colarse en la respuesta, y el llamador no puede mutar el
  * catálogo cacheado. Devuelve `null` cuando el manifiesto omite el campo.
@@ -60,7 +60,7 @@ function toLandingSummary(landing: AgentLanding | null): AgentLanding | null {
 
 /**
  * Proyecta una definición del catálogo a su entrada pública, con los valores
- * por defecto ya resueltos por la validación del manifiesto (Requirement 4.3)
+ * por defecto ya resueltos por la validación del manifiesto ()
  * y sin las rutas de `definition.paths` (Requirements 4.5, 16.3).
  */
 export function toAgentCatalogEntry(
@@ -77,7 +77,7 @@ export function toAgentCatalogEntry(
     icon: manifest.icon,
     accentColor: manifest.accentColor,
     order: manifest.order,
-    // Requirement 3.7: verdadero solo en el agente por defecto resuelto.
+    //  verdadero solo en el agente por defecto resuelto.
     isDefault: definition.agentId === defaultAgentId,
     inputMode: manifest.inputMode,
     inputPlaceholder: manifest.inputPlaceholder,
@@ -92,9 +92,9 @@ export function toAgentCatalogEntry(
  * Construye la respuesta del catálogo a partir del catálogo en memoria
  * (Requirements 4.1, 4.6). Las definiciones llegan ya ordenadas según el orden
  * total del catálogo y solo contienen las entradas válidas, así que las carpetas
- * descartadas por la validación no aparecen y el resto sí (Requirement 2.9).
+ * descartadas por la validación no aparecen y el resto sí ().
  * Con un catálogo vacío la respuesta es una lista vacía y `defaultAgentId` nulo
- * (Requirement 3.8).
+ * ().
  */
 export function buildAgentCatalogResponse(
   snapshot: Pick<AgentCatalogSnapshot, 'definitions' | 'defaultAgentId'>,
@@ -139,12 +139,12 @@ const consoleErrorLogger: CatalogErrorLogger = (message) => {
  * Atiende una petición del catálogo contra el registro recibido.
  *
  * Devuelve 200 con la lista ordenada y el `defaultAgentId` vigente, incluidos
- * los casos de catálogo vacío (Requirement 3.8) y de catálogo con carpetas
- * descartadas (Requirement 2.9). Si la enumeración de `agent/` falló, devuelve
+ * los casos de catálogo vacío () y de catálogo con carpetas
+ * descartadas (). Si la enumeración de `agent/` falló, devuelve
  * 500 con un mensaje sin rutas y registra el detalle en consola; el registro
  * conserva en memoria el catálogo vigente anterior al error, así que una
  * petición posterior vuelve a responderlo en cuanto la enumeración se recupera
- * (Requirement 4.8).
+ * ().
  */
 export function buildAgentCatalogHttpResult(
   registry: AgentRegistry,

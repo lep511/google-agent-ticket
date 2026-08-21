@@ -12,12 +12,12 @@
 /*  Enumeraciones del manifiesto                               */
 /* ────────────────────────────────────────────────────────── */
 
-/** Tipos de entrada principal admitidos por un agente (Requirement 2.2). */
+/** Tipos de entrada principal admitidos por un agente (). */
 export const INPUT_MODES = ['ticker', 'text'] as const;
 
 export type InputMode = (typeof INPUT_MODES)[number];
 
-/** Renderizadores de salida admitidos por un agente (Requirement 2.2). */
+/** Renderizadores de salida admitidos por un agente (). */
 export const OUTPUT_RENDERERS = ['financial_report', 'simple_report'] as const;
 
 export type OutputRenderer = (typeof OUTPUT_RENDERERS)[number];
@@ -85,28 +85,28 @@ export const AGENTS_FILE_NAME = 'AGENTS.md';
 /*  Límites                                                    */
 /* ────────────────────────────────────────────────────────── */
 
-/** Máximo de subcarpetas directas de `agent/` que se enumeran (Requirement 1.1). */
+/** Máximo de subcarpetas directas de `agent/` que se enumeran (). */
 export const MAX_AGENT_FOLDERS = 100;
 
-/** Tamaño máximo de `manifest.json`, 64 KB (Requirement 1.5). */
+/** Tamaño máximo de `manifest.json`, 64 KB (). */
 export const MAX_MANIFEST_BYTES = 64 * 1000;
 
-/** Tamaño máximo de la plantilla de prompt, 256 KiB (Requirement 7.9). */
+/** Tamaño máximo de la plantilla de prompt, 256 KiB (). */
 export const MAX_PROMPT_BYTES = 256 * 1024;
 
-/** Tamaño máximo del archivo de esquema, 256 KiB (Requirement 7.9). */
+/** Tamaño máximo del archivo de esquema, 256 KiB (). */
 export const MAX_SCHEMA_BYTES = 256 * 1024;
 
-/** Tamaño máximo de un archivo de ejecución subido como fuente inline, 1 MB (Requirement 6.6). */
+/** Tamaño máximo de un archivo de ejecución subido como fuente inline, 1 MB (). */
 export const MAX_RUNTIME_FILE_BYTES = 1024 * 1024;
 
-/** Profundidad máxima de subcarpetas recorridas por agente (Requirement 6.1). */
+/** Profundidad máxima de subcarpetas recorridas por agente (). */
 export const MAX_RUNTIME_DIR_DEPTH = 5;
 
-/** Número máximo de archivos de ejecución por agente (Requirement 6.1). */
+/** Número máximo de archivos de ejecución por agente (). */
 export const MAX_RUNTIME_FILE_COUNT = 200;
 
-/** Longitudes máximas de los campos obligatorios del manifiesto (Requirement 2.1). */
+/** Longitudes máximas de los campos obligatorios del manifiesto (). */
 export const FIELD_MAX_LENGTHS = {
   id: 64,
   name: 64,
@@ -119,7 +119,7 @@ export const FIELD_MAX_LENGTHS = {
   description: 1000,
 } as const;
 
-/** Rango admitido para `order` antes de aplicar el valor por defecto (Requirement 1.7). */
+/** Rango admitido para `order` antes de aplicar el valor por defecto (). */
 export const ORDER_MIN = 0;
 export const ORDER_MAX = 9999;
 
@@ -173,7 +173,7 @@ export interface AgentLandingHighlightGroup {
   items: AgentLandingHighlight[];
 }
 
-/** Contenido de la vista de aterrizaje declarado por el manifiesto (Requirement 4.4). */
+/** Contenido de la vista de aterrizaje declarado por el manifiesto (). */
 export interface AgentLanding {
   title: string;
   subtitle: string;
@@ -188,7 +188,7 @@ export type RawAgentManifest = Record<string, unknown>;
 
 /**
  * Manifiesto validado y normalizado: los campos obligatorios están presentes
- * y los opcionales llevan su valor por defecto resuelto (Requirement 2.6).
+ * y los opcionales llevan su valor por defecto resuelto ().
  */
 export interface AgentManifest {
   id: string;
@@ -268,12 +268,12 @@ export interface ResolvedAgentDefinition {
 /*  Guardas de tipo de las enumeraciones                       */
 /* ────────────────────────────────────────────────────────── */
 
-/** Comparación exacta y sensible a mayúsculas y minúsculas (Requirement 2.2). */
+/** Comparación exacta y sensible a mayúsculas y minúsculas (). */
 export function isInputMode(value: unknown): value is InputMode {
   return typeof value === 'string' && (INPUT_MODES as readonly string[]).includes(value);
 }
 
-/** Comparación exacta y sensible a mayúsculas y minúsculas (Requirement 2.2). */
+/** Comparación exacta y sensible a mayúsculas y minúsculas (). */
 export function isOutputRenderer(value: unknown): value is OutputRenderer {
   return typeof value === 'string' && (OUTPUT_RENDERERS as readonly string[]).includes(value);
 }
