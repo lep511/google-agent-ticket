@@ -169,10 +169,15 @@ export function HistoryPanel({
                       className="w-full rounded-lg border border-stone-800 bg-stone-800/40 px-3 py-2.5 pr-10 text-left transition-colors hover:bg-stone-800 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {/* Requirements 4.2, 4.7: query clipped visually, value intact. */}
-                      <p className="truncate font-sans text-sm text-stone-100">{entry.query}</p>
+                      <p className="truncate font-sans text-sm text-stone-100" title={entry.query}>
+                        {entry.query}
+                      </p>
                       {/* Requirement 4.3: the instruction is the secondary line. */}
                       {entry.instruction && (
-                        <p className="truncate font-serif text-xs italic text-stone-400">
+                        <p
+                          className="truncate font-serif text-xs italic text-stone-400"
+                          title={entry.instruction}
+                        >
                           {entry.instruction}
                         </p>
                       )}
