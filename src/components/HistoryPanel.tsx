@@ -134,7 +134,7 @@ export function HistoryPanel({
             transition={HISTORY_PANEL_TRANSITION}
           >
             <header className="flex items-center justify-between border-b border-stone-800 px-4 py-3">
-              <h2 className="font-display text-sm uppercase tracking-wider text-stone-200">
+              <h2 className="font-display text-sm font-medium text-white">
                 History
               </h2>
               {/*  close control with its accessible text. */}
@@ -185,7 +185,7 @@ export function HistoryPanel({
                       <time
                         dateTime={new Date(entry.createdAt).toISOString()}
                         title={formatAbsoluteTimestamp(entry.createdAt)}
-                        className="mt-1 block font-mono text-[11px] text-stone-500"
+                        className="mt-1 block font-mono text-[11px] text-stone-400"
                       >
                         {formatRelativeTimestamp(entry.createdAt, referenceNow)}
                       </time>
