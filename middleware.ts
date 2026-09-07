@@ -1,4 +1,4 @@
-import { next } from "@vercel/edge";
+import { rewrite } from "@vercel/functions";
 
 export const config = {
   matcher: "/api/:path*",
@@ -13,7 +13,5 @@ export default function middleware(request: Request) {
   const url = new URL(request.url);
   const destination = new URL(`${url.pathname}${url.search}`, backendUrl);
 
-  return next({
-    rewrite: destination,
-  });
+  return rewrite(destination);
 }
