@@ -95,11 +95,16 @@ VITE_COGNITO_REGION=...
 VITE_COGNITO_DOMAIN=...
 ```
 
-**Vercel rewrites (`vercel.json`):**
+**Vercel proxy (Edge Middleware):**
 
-The `/api/*` rewrites are defined in `vercel.json` with the EC2 backend address hardcoded in the `destination` field. Vercel does not support environment variable interpolation in rewrite destinations, so the IP must be set directly.
+A `middleware.ts` at the repo root intercepts all `/api/*` requests and rewrites them to the backend using the `BACKEND_URL` environment variable (set in the Vercel dashboard, not in the repo). This avoids exposing the EC2 IP in the codebase.
 
-See the [Vercel-to-EC2 proxy configuration](#vercel-to-ec2-proxy-configuration-verceljson) section in Troubleshooting for details on updating the address when the EC2 IP changes.
+Set `BACKEND_URL` in **Vercel Project Settings > Environment Variables**:
+- **Name:** `BACKEND_URL`
+- **Value:** `http://<EC2-public-IP>:3000` (e.g. `http://44.204.106.116:3000`)
+- **Environments:** Production, Preview, Development
+
+When the EC2 IP changes, update only the `BACKEND_URL` variable in Vercel and redeploy — no code change or commit needed.
 
 The browser never talks to the backend directly — Vercel handles HTTPS and forwards API requests server-to-server over HTTP.
 
@@ -306,28 +311,19 @@ pm2 start ./node_modules/.bin/tsx --name tickr -- server.ts
 
 ---
 
-### Vercel-to-EC2 proxy configuration (`vercel.json`)
+### Vercel-to-EC2 proxy configuration (Edge Middleware)
 
-The `vercel.json` file contains a rewrite that proxies `/api/*` requests to the EC2 backend. The backend IP is hardcoded in the `destination` field because Vercel does not support environment variable interpolation in rewrite destinations.
+The `/api/*` proxy is handled by `middleware.ts` (Vercel Edge Middleware), which reads the `BACKEND_URL` environment variable at runtime. The EC2 IP is never committed to the repo.
 
-**Current configuration:**
+**Setup:**
 
-```json
-{
-  "rewrites": [
-    { "source": "/api/:path*", "destination": "http://<EC2-IP>:3000/api/:path*" },
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
-}
-```
+1. In Vercel dashboard: **Project Settings > Environment Variables**
+2. Add `BACKEND_URL` = `http://<EC2-public-IP>:3000`
+3. Redeploy
 
-**When the EC2 IP changes:**
+**When the EC2 IP changes**, update only the `BACKEND_URL` variable in Vercel and redeploy — no commit needed.
 
-1. Get the new public IP from the EC2 console
-2. Update the `destination` in `vercel.json`
-3. Commit and push — Vercel redeploys automatically
-
-**Prevention:** Attach an Elastic IP to the EC2 instance so the address survives stop/start cycles and never needs updating.
+**Prevention:** Attach an Elastic IP to the EC2 instance so the address survives stop/start cycles.
 
 ---
 
