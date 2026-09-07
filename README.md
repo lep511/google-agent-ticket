@@ -15,7 +15,7 @@ AI-powered agent platform that runs multi-step tasks with tool use and streams r
                                  └─────────────────────────────┘
 ```
 
-Vercel rewrites proxy all `/api/*` requests to the backend server-to-server. The browser only communicates with Vercel over HTTPS — no mixed content, no self-signed certificates.
+Vercel Routing Middleware (`middleware.ts`) proxies all `/api/*` requests to the backend server-to-server using the `BACKEND_URL` environment variable. The browser only communicates with Vercel over HTTPS — no mixed content, no self-signed certificates.
 
 ### Runtime stack
 
@@ -95,9 +95,9 @@ VITE_COGNITO_REGION=...
 VITE_COGNITO_DOMAIN=...
 ```
 
-**Vercel proxy (Edge Middleware):**
+**Vercel proxy (Routing Middleware):**
 
-A `middleware.ts` at the repo root intercepts all `/api/*` requests and rewrites them to the backend using the `BACKEND_URL` environment variable (set in the Vercel dashboard, not in the repo). This avoids exposing the EC2 IP in the codebase.
+A `middleware.ts` at the repo root intercepts all `/api/*` requests and rewrites them to the backend using `rewrite()` from `@vercel/functions` and the `BACKEND_URL` environment variable (set in the Vercel dashboard, not in the repo). This is a platform-level rewrite that supports SSE streaming and avoids exposing the EC2 IP in the codebase.
 
 Set `BACKEND_URL` in **Vercel Project Settings > Environment Variables**:
 - **Name:** `BACKEND_URL`
@@ -311,9 +311,9 @@ pm2 start ./node_modules/.bin/tsx --name tickr -- server.ts
 
 ---
 
-### Vercel-to-EC2 proxy configuration (Edge Middleware)
+### Vercel-to-EC2 proxy configuration (Routing Middleware)
 
-The `/api/*` proxy is handled by `middleware.ts` (Vercel Edge Middleware), which reads the `BACKEND_URL` environment variable at runtime. The EC2 IP is never committed to the repo.
+The `/api/*` proxy is handled by `middleware.ts` (Vercel Routing Middleware with `rewrite()` from `@vercel/functions`), which reads the `BACKEND_URL` environment variable at runtime. The EC2 IP is never committed to the repo.
 
 **Setup:**
 
@@ -331,7 +331,7 @@ The `/api/*` proxy is handled by `middleware.ts` (Vercel Edge Middleware), which
 
 **Symptom:** The frontend was working before, then stopped after an instance restart. The old IP no longer responds.
 
-**Fix:** Find the new public IP in the EC2 console, then update the rewrite destination in `vercel.json` (or Vercel dashboard) and redeploy.
+**Fix:** Find the new public IP in the EC2 console, then update the `BACKEND_URL` environment variable in **Vercel Project Settings > Environment Variables** and redeploy. No code change or commit needed.
 
 **Prevention:** Attach an Elastic IP to the instance so the address survives stop/start cycles.
 
