@@ -18,7 +18,7 @@ import { configDefaults, defineConfig } from 'vitest/config';
  * in `tests/setup/fastCheck.ts` and is loaded by all of them.
  */
 const sharedAlias = {
-  '@': path.resolve(__dirname, '.'),
+  '@': path.resolve(import.meta.dirname, '.'),
 };
 
 /*
@@ -69,7 +69,7 @@ const serverProject = ({ name, include, exclude = [] }: ProjectSpec) => ({
     name,
     environment: 'node' as const,
     globals: false,
-    setupFiles: [path.resolve(__dirname, 'tests/setup/fastCheck.ts')],
+    setupFiles: [path.resolve(import.meta.dirname, 'tests/setup/fastCheck.ts')],
     include,
     exclude: excluding(exclude),
   },
@@ -83,7 +83,7 @@ const webProject = ({ name, include, exclude = [] }: ProjectSpec) => ({
       ...sharedAlias,
       // Animations add nothing to the assertions but dominate the cost of
       // mounting the tree inside a 100-iteration property test.
-      'motion/react': path.resolve(__dirname, 'tests/helpers/motionStub.tsx'),
+      'motion/react': path.resolve(import.meta.dirname, 'tests/helpers/motionStub.tsx'),
     },
   },
   define: { global: 'window' },
@@ -92,8 +92,8 @@ const webProject = ({ name, include, exclude = [] }: ProjectSpec) => ({
     environment: 'jsdom' as const,
     globals: false,
     setupFiles: [
-      path.resolve(__dirname, 'tests/setup/fastCheck.ts'),
-      path.resolve(__dirname, 'tests/setup/dom.ts'),
+      path.resolve(import.meta.dirname, 'tests/setup/fastCheck.ts'),
+      path.resolve(import.meta.dirname, 'tests/setup/dom.ts'),
     ],
     include,
     exclude: excluding(exclude),

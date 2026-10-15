@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
     "target": "ES2022",
+    // TypeScript 7 defaults `strict` to true; the project never ran under strict
+    // mode, so the previous behaviour is kept explicit. Enabling it surfaces nine
+    // errors (server.ts, src/ReportTemplate.tsx, src/main.tsx) to fix first.
+    "strict": false,
     "experimentalDecorators": true,
     "useDefineForClassFields": false,
     "module": "ESNext",

@@ -899,8 +899,8 @@ async function selectActiveAgent(
   user: ReturnType<typeof userEvent.setup>,
   agent: AgentCatalogEntry,
 ): Promise<void> {
-  await user.click(screen.getByRole('button', { name: 'Seleccionar agente' }));
-  const listbox = await screen.findByRole('listbox', { name: 'Agentes disponibles' });
+  await user.click(screen.getByRole('button', { name: 'Select agent' }));
+  const listbox = await screen.findByRole('listbox', { name: 'Available agents' });
   const option = within(listbox)
     .getAllByRole('option')
     .find((candidate) => (candidate.textContent ?? '').includes(agent.name));
@@ -941,7 +941,7 @@ describe('Run identity of a recorded History Entry', () => {
             // which is the agent this run is tagged with.
             await screen.findByRole('button', { name: runAgent.actionLabel });
             await waitFor(() => {
-              expect(screen.getByRole('button', { name: 'Seleccionar agente' }).textContent).toContain(
+              expect(screen.getByRole('button', { name: 'Select agent' }).textContent).toContain(
                 runAgent.name,
               );
             });
@@ -957,7 +957,7 @@ describe('Run identity of a recorded History Entry', () => {
             // The later change of Active Agent named by the property.
             await selectActiveAgent(user, laterAgent);
             await waitFor(() => {
-              expect(screen.getByRole('button', { name: 'Seleccionar agente' }).textContent).toContain(
+              expect(screen.getByRole('button', { name: 'Select agent' }).textContent).toContain(
                 laterAgent.name,
               );
             });
@@ -1504,7 +1504,7 @@ async function closeHistoryPanelWithControl(
 
 /** Text shown by the Agent_Selector trigger, which names the Active Agent. */
 function agentSelectorLabel(): string {
-  return screen.getByRole('button', { name: 'Seleccionar agente' }).textContent ?? '';
+  return screen.getByRole('button', { name: 'Select agent' }).textContent ?? '';
 }
 
 describe('Filtering the interaction history by the Active Agent', () => {
@@ -1533,7 +1533,7 @@ describe('Filtering the interaction history by the Active Agent', () => {
             // empty catalog is the only state that yields a null Active Agent.
             await waitFor(() => {
               expect(agentSelectorLabel()).toContain(
-                initialAgentId === null ? 'Sin agente' : `Agent ${initialAgentId}`,
+                initialAgentId === null ? 'No agent' : `Agent ${initialAgentId}`,
               );
             });
 
@@ -2010,7 +2010,7 @@ describe('History_Trigger in the header', () => {
     expect(groups).toHaveLength(2);
 
     const [leadingGroup, sessionGroup] = groups;
-    const agentSelector = screen.getByRole('button', { name: 'Seleccionar agente' });
+    const agentSelector = screen.getByRole('button', { name: 'Select agent' });
 
     expect(leadingGroup).toHaveTextContent('Tickr');
     expect(leadingGroup.contains(agentSelector)).toBe(true);

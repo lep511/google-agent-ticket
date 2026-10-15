@@ -549,7 +549,9 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     app.use(express.static(distPath));
-    app.get('*', (req, res) => {
+    // Express 5 (path-to-regexp v8) no longer accepts a bare '*'; the SPA fallback
+    // needs a named wildcard parameter.
+    app.get('/{*splat}', (_req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }
