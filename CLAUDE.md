@@ -40,14 +40,20 @@ Motion library is stubbed in web tests (`tests/helpers/motionStub.tsx`).
 ## Environment
 
 Required in `.env`:
-- `NVIDIA_API_KEY` — NVIDIA NGC API key for NIM models
 - `VITE_COGNITO_USER_POOL_ID` — Cognito user pool ID
 - `VITE_COGNITO_CLIENT_ID` — Cognito app client ID
 - `VITE_COGNITO_REGION` — AWS region (e.g. `us-east-1`)
 - `VITE_COGNITO_DOMAIN` — Cognito Managed Login domain prefix
 
+Model (Claude Opus 5.5 through the Strands SDK):
+- `ANTHROPIC_API_KEY` — selects the Anthropic API transport. Without it the server uses Amazon Bedrock with the default AWS credential chain (instance role on EC2).
+- `CLAUDE_PROVIDER` — force `anthropic` or `bedrock`
+- `CLAUDE_MODEL_ID` — override model (default: `claude-opus-5-5`; on Bedrock bare ids get the `us.anthropic.` inference profile prefix)
+- `BEDROCK_REGION` — Bedrock region (default: `AWS_REGION`, then `us-east-1`)
+- `BEDROCK_MODEL_PREFIX` — inference profile prefix (default `us.`; e.g. `global.`)
+- `CLAUDE_EFFORT` — reasoning effort `low|medium|high|xhigh|max` (default `high`)
+
 Optional:
-- `NVIDIA_MODEL_ID` — override model (default: `deepseek-ai/deepseek-v4-flash-0731`)
 - `BRAVE_API_KEY` — Brave Search API key (required for `web_search_agent`)
 - `HOST` — bind address (default `127.0.0.1`; non-loopback requires `API_ACCESS_TOKEN`)
 - `API_ACCESS_TOKEN` — shared secret (≥32 chars) required when HOST is not loopback

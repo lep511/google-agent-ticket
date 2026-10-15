@@ -14,9 +14,11 @@
     "test": "vitest --run",
     "test:essential": "vitest --run --project server --project web",
     "test:non-essential": "vitest --run --project server-slow --project web-slow",
-    "test:watch": "vitest --project server --project web"
+    "test:watch": "vitest --project server --project web",
+    "smoke:claude": "tsx scripts/claude-smoke.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.109.1",
     "@strands-agents/sdk": "1.21.0",
     "@tailwindcss/typography": "^0.5.20",
     "@tailwindcss/vite": "^4.3.3",
@@ -30,7 +32,6 @@
     "jszip": "^3.10.2",
     "lucide-react": "^1.57.0",
     "motion": "^14.3.0",
-    "openai": "^6.49.0",
     "pako": "^3.0.2",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",

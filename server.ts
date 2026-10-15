@@ -41,7 +41,7 @@ const NO_AGENTS_AVAILABLE_ERROR =
 const AGENT_NOT_EXECUTABLE_ERROR = "The selected agent cannot be executed.";
 
 const MODEL_NOT_CONFIGURED_ERROR =
-  "The server does not have the model credential configured (NVIDIA_API_KEY).";
+  "The server has no model credential configured (ANTHROPIC_API_KEY or AWS credentials for Bedrock).";
 
 async function startServer() {
   const app = express();
@@ -225,7 +225,7 @@ async function startServer() {
       console.log(`[analyze] Starting analysis for ${input} with agent ${agent.agentId}, model ${effectiveModel || 'default'}`);
 
       if (!isStrandsConfigured()) {
-        console.error(`[analyze] NVIDIA_API_KEY is not configured.`);
+        console.error(`[analyze] No Claude credential: set ANTHROPIC_API_KEY or provide AWS credentials for Bedrock.`);
         return res.status(500).json({ error: MODEL_NOT_CONFIGURED_ERROR });
       }
 

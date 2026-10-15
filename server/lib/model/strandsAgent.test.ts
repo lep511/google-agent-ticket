@@ -35,7 +35,7 @@ function textDelta(text: string): AgentStreamEvent {
 
 describe('mapStrandsEvent', () => {
   it('maps text deltas to text events', () => {
-    expect(mapStrandsEvent(textDelta('Nvidia '))).toEqual({ type: 'text', text: 'Nvidia ' });
+    expect(mapStrandsEvent(textDelta('Claude '))).toEqual({ type: 'text', text: 'Claude ' });
   });
 
   it('maps reasoning deltas to thinking events', () => {

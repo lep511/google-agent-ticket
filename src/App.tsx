@@ -117,8 +117,8 @@ async function describeAnalyzeFailure(resp: Response): Promise<string> {
 // Toggle this to true if you want the JSON logs to be downloaded automatically after a run.
 const ENABLE_JSON_DOWNLOAD = false;
 
-const MODEL_ID = 'deepseek-ai/deepseek-v4-flash-0731';
-const MODEL_DISPLAY_NAME = 'DeepSeek V4 Flash';
+const MODEL_ID = 'claude-opus-5-5';
+const MODEL_DISPLAY_NAME = 'Claude Opus 5.5';
 
 export type CatalogStatus = 'loading' | 'ready' | 'error';
 
@@ -1000,7 +1000,7 @@ export default function App() {
              <div className="flex-1 flex flex-col bg-stone-900 rounded-xl border border-stone-800 overflow-hidden min-h-0 max-w-4xl mx-auto w-full">
                 <div className="p-3 bg-stone-800 border-b border-stone-700 font-bold text-stone-200 text-sm flex justify-between items-center">
                   <div className="flex items-center gap-2 min-w-0">
-                    <img src="/deepseek-logo.svg" alt="DeepSeek" className="w-5 h-5 shrink-0" />
+                    <img src="/anthropic.svg" alt="Anthropic" className="w-5 h-5 shrink-0" />
                     <span className="truncate">{executionPanelAgentName}</span>
                     <span className="text-xs font-normal text-stone-400 shrink-0">{MODEL_DISPLAY_NAME}</span>
                   </div>

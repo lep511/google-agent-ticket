@@ -10,7 +10,7 @@ AI-powered agent platform that runs multi-step tasks with tool use and streams r
 ┌─────────────────────┐  proxy   ┌─────────────────────────────┐
 │  Vercel (frontend)  │  /api/*  │  EC2 / Server (backend)     │
 │  Static React app   │ ───────► │  Express + Strands Agents   │
-│  HTTPS only         │  HTTP    │  NVIDIA NIM (DeepSeek)      │
+│  HTTPS only         │  HTTP    │  Claude Opus 5.5 (Bedrock)  │
 └─────────────────────┘          │  Brave Search               │
                                  └─────────────────────────────┘
 ```
@@ -19,8 +19,8 @@ Vercel Routing Middleware (`middleware.ts`) proxies all `/api/*` requests to the
 
 ### Runtime stack
 
-- **Agent SDK**: `@strands-agents/sdk` with `OpenAIModel` adapter
-- **Model**: NVIDIA NIM via `NVIDIA_API_KEY` (default: `deepseek-ai/deepseek-v4-flash-0731`)
+- **Agent SDK**: `@strands-agents/sdk` with the `AnthropicModel` or `BedrockModel` adapter
+- **Model**: Claude Opus 5.5 (`claude-opus-5-5`). The Anthropic API is used when `ANTHROPIC_API_KEY` is set; otherwise Amazon Bedrock with the default AWS credential chain (`us.anthropic.claude-opus-5-5`)
 - **Tools**: `search_web` (Brave Search), `calculate` (arithmetic)
 - **Frontend**: React 19, Tailwind CSS 4, Recharts, motion, lucide-react
 - **Auth**: Amazon Cognito (Hosted UI, authorization code grant)
@@ -36,7 +36,9 @@ Vercel Routing Middleware (`middleware.ts`) proxies all `/api/*` requests to the
 
 2. Configure `.env` (copy from `.env.example`):
    ```env
-   NVIDIA_API_KEY=your_nvidia_api_key
+   # Claude Opus 5.5: set ANTHROPIC_API_KEY, or leave it out to use Amazon Bedrock
+   # with your AWS credentials (AWS_REGION / BEDROCK_REGION, default us-east-1).
+   ANTHROPIC_API_KEY=your_anthropic_api_key
    BRAVE_API_KEY=your_brave_api_key
 
    VITE_COGNITO_USER_POOL_ID=your_user_pool_id
@@ -83,7 +85,8 @@ Frontend deploys to Vercel as a static site. Vercel proxies `/api/*` to the back
 HOST=0.0.0.0
 API_ACCESS_TOKEN=<generated-secret>
 CORS_ORIGINS=https://your-app.vercel.app
-NVIDIA_API_KEY=...
+# Optional: without it the server calls Claude through Amazon Bedrock using the EC2 instance role.
+ANTHROPIC_API_KEY=...
 BRAVE_API_KEY=...
 ```
 
@@ -204,7 +207,7 @@ Agents run in-process with the Strands SDK. One run is assembled from:
 | --- | --- |
 | System prompt | `AGENTS.md` |
 | User prompt | `prompt.md` with placeholders replaced |
-| Model | request `model` field → `NVIDIA_MODEL_ID` env → default |
+| Model | request `model` field → `CLAUDE_MODEL_ID` env → `claude-opus-5-5` |
 | Tools | per-agent (`search_web`, `calculate`, or none) |
 
 `search_web` serializes its requests and keeps ~1.1 s between them, because Brave's free tier allows about one per second. A failed search returns an `error` field with empty results instead of throwing: a thrown tool error comes back to the model with nothing to act on, and the retries it triggers each cost a turn.
@@ -263,6 +266,7 @@ npm test             # vitest --run, every suite (~4 min)
 npm run test:essential      # fast suites only (~21 s)
 npm run test:non-essential  # the four long property suites
 npm run test:watch   # vitest watch mode, essential suites only
+npm run smoke:claude # live run of a Strands agent against Claude Opus 5.5 (needs credentials)
 ```
 
 ## Troubleshooting

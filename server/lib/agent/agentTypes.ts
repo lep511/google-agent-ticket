@@ -23,7 +23,7 @@ export const OUTPUT_RENDERERS = ['financial_report', 'simple_report'] as const;
 export type OutputRenderer = (typeof OUTPUT_RENDERERS)[number];
 
 /** Model providers an agent can declare in its manifest. */
-export const MODEL_PROVIDERS = ['gemini', 'nvidia'] as const;
+export const MODEL_PROVIDERS = ['anthropic', 'bedrock'] as const;
 
 export type ModelProviderType = (typeof MODEL_PROVIDERS)[number];
 
@@ -135,8 +135,8 @@ export const DEFAULT_IS_DEFAULT = false;
 export const DEFAULT_SUPPORTS_INSTRUCTION = false;
 export const DEFAULT_PROMPT_FILE = 'prompt.md';
 export const DEFAULT_SCHEMA_FILE = 'output.schema.json';
-export const DEFAULT_MODEL_PROVIDER: ModelProviderType = 'nvidia';
-export const DEFAULT_MODEL_NAME = 'deepseek-ai/deepseek-v4-flash-0731';
+export const DEFAULT_MODEL_PROVIDER: ModelProviderType = 'anthropic';
+export const DEFAULT_MODEL_NAME = 'claude-opus-5-5';
 export const DEFAULT_TOOLS: readonly string[] = [];
 
 /**

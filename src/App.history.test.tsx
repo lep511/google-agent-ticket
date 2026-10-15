@@ -1248,7 +1248,7 @@ interface InterfaceStateSnapshot {
  * landing view. It names the model provider, so switching providers in `App.tsx`
  * has to be reflected here.
  */
-const RUN_PANEL_MODEL_BADGE_ALT = 'DeepSeek';
+const RUN_PANEL_MODEL_BADGE_ALT = 'Anthropic';
 
 function captureInterfaceState(): InterfaceStateSnapshot {
   const trigger = screen.queryByRole('button', { name: 'History' });

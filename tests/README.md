@@ -222,7 +222,7 @@ their own:
 - Server: `promptBuilder.ts`, `runLogNaming.ts`, `runLogDownload.ts`,
   `jsonExtractor.ts`, `debugFiles.ts`, `cognitoAuth.ts`,
   `agent/agentCatalog.ts`, `agent/agentInlineSources.ts`, `agent/agentEvents.ts`,
-  `model/nvidiaProvider.ts`, `tools/*`
+  `tools/*`
 - Web: `src/data.ts`, `src/types.ts`, `src/cognito.ts`, `ReportTemplate.tsx`,
   and the `AgentSelector`, `AgentTimeline`, `CookieConsent`, `DebugPanel`,
   `FormattedMarkdown` and `PulsatingDots` components

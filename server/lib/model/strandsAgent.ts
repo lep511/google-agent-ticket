@@ -4,9 +4,9 @@
  * This is the only runner: `/api/analyze` builds an agent here and streams it to
  * the browser. The agent loop runs in this process.
  *
- * Model provider: NVIDIA NIM via the OpenAI-compatible endpoint at
- * integrate.api.nvidia.com, using the Strands `OpenAIModel` in Chat Completions
- * mode. Configured through `NVIDIA_API_KEY` and `NVIDIA_MODEL_ID` env vars.
+ * Model: Claude Opus 5.5, through the Anthropic API when `ANTHROPIC_API_KEY` is
+ * set and through Amazon Bedrock otherwise. See `claudeProvider.ts` for the
+ * transport choice and the request fields the model needs.
  *
  * Docs: https://strandsagents.com/docs/user-guide/quickstart/typescript/
  */
@@ -19,15 +19,12 @@ import {
   type AgentStreamEvent,
   type ToolList,
 } from '@strands-agents/sdk';
-import { OpenAIModel } from '@strands-agents/sdk/models/openai';
 import type { ZodType } from 'zod';
 
 import type { AgentEvent, AgentUsage } from '../agent/agentEvents.ts';
-import {
-  NVIDIA_BASE_URL,
-  isNvidiaConfigured,
-  resolveNvidiaModelId,
-} from './nvidiaProvider.ts';
+import { createClaudeModel, isClaudeConfigured } from './claudeProvider.ts';
+
+export { DEFAULT_MAX_OUTPUT_TOKENS } from './claudeProvider.ts';
 
 /* ────────────────────────────────────────────────────────── */
 /*  Configuration                                              */
@@ -36,10 +33,8 @@ import {
 export interface StrandsAgentOptions {
   /** System prompt guiding the agent, normally the agent's `AGENTS.md`. */
   systemPrompt?: string;
-  /** Model id override. Falls back to NVIDIA_MODEL_ID env var. */
+  /** Model id override. Falls back to the `CLAUDE_MODEL_ID` env var. */
   modelId?: string;
-  /** Sampling temperature forwarded to the model. */
-  temperature?: number;
   /** Extra function tools created with the SDK's `tool()` helper. */
   tools?: ToolList;
   /** Zod schema the final answer must satisfy, exposed as `result.structuredOutput`. */
@@ -51,12 +46,9 @@ export interface StrandsAgentOptions {
 /** Model attempts before a run gives up, counting the first one. */
 export const MAX_MODEL_ATTEMPTS = 4;
 
-/** Output token ceiling passed to the model on every call. */
-export const DEFAULT_MAX_OUTPUT_TOKENS = 65_536;
-
-/** True when the server has the NVIDIA API key configured. */
+/** True when a Claude model can be built with the current environment. */
 export function isStrandsConfigured(): boolean {
-  return isNvidiaConfigured();
+  return isClaudeConfigured();
 }
 
 /**
@@ -72,20 +64,13 @@ export class RetryStrategy extends DefaultModelRetryStrategy {
 }
 
 /**
- * Builds an agent backed by NVIDIA NIM (OpenAI-compatible).
+ * Builds an agent backed by Claude Opus 5.5.
  *
  * Console printing is disabled: this server streams events to the browser and
  * writes its own run logs, so the SDK's stdout printer would only duplicate them.
  */
 export function createStrandsAgent(options: StrandsAgentOptions = {}): Agent {
-  const model = new OpenAIModel({
-    api: 'chat',
-    modelId: resolveNvidiaModelId(options.modelId),
-    apiKey: process.env.NVIDIA_API_KEY,
-    maxTokens: DEFAULT_MAX_OUTPUT_TOKENS,
-    clientConfig: { baseURL: NVIDIA_BASE_URL },
-    ...(options.temperature === undefined ? {} : { temperature: options.temperature }),
-  });
+  const model = createClaudeModel({ modelId: options.modelId });
 
   const tools: ToolList = [...(options.tools ?? [])];
 
@@ -348,10 +333,15 @@ export function classifyAgentFailureStatus(error: unknown): number {
   return 0;
 }
 
-/** Reads a provider status code, which the AI SDK exposes as `statusCode`. */
+/**
+ * Reads a provider status code. The Anthropic SDK exposes it as `status`, the
+ * AWS SDK (Bedrock) as `$metadata.httpStatusCode`.
+ */
 function readStatusCode(value: unknown): number | null {
-  const candidate = (value as { statusCode?: unknown; status?: unknown } | null)?.statusCode ??
-    (value as { status?: unknown } | null)?.status;
+  const record = value as
+    | { statusCode?: unknown; status?: unknown; $metadata?: { httpStatusCode?: unknown } }
+    | null;
+  const candidate = record?.statusCode ?? record?.status ?? record?.$metadata?.httpStatusCode;
   if (typeof candidate !== 'number' || !Number.isFinite(candidate)) return null;
   return candidate >= 400 && candidate <= 599 ? Math.trunc(candidate) : null;
 }
