@@ -161,7 +161,7 @@ export default function SimpleReportView({
     !summary && keyPoints.length === 0 && sections.length === 0 && sources.length === 0;
 
   return (
-    <div className="min-h-full bg-[#F6F4F0] text-stone-900 font-sans w-full flex flex-col h-full overflow-y-auto print:h-auto print:overflow-visible print:bg-white print:p-0">
+    <div className="print-report min-h-full bg-[#F6F4F0] text-stone-900 font-sans w-full flex flex-col h-full overflow-y-auto print:h-auto print:overflow-visible print:bg-white print:p-0">
       {/* Cabecera */}
       <div className="w-full border-b border-stone-200 px-[40px] py-4 flex items-center justify-between sticky top-0 z-50 bg-[#F6F4F0] print:hidden">
         <div className="flex items-center gap-3 min-w-0">

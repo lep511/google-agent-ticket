@@ -234,6 +234,33 @@
     widows: 3;
   }
 
+  /*
+    Smaller body copy on paper. The screen sizes are tuned for reading at arm's
+    length; printed, they pushed a report onto an extra page or two. Headings
+    keep their size so the hierarchy still reads at a glance.
+  */
+  .print-report .text-lg {
+    font-size: 14px !important;
+    line-height: 1.45 !important;
+  }
+  .print-report .text-base,
+  .print-report .text-\[15px\] {
+    font-size: 12.5px !important;
+    line-height: 1.45 !important;
+  }
+  .print-report .text-sm {
+    font-size: 11.5px !important;
+    line-height: 1.4 !important;
+  }
+  .print-report .text-xs {
+    font-size: 10px !important;
+    line-height: 1.35 !important;
+  }
+  .print-report .markdown-body {
+    font-size: 12.5px !important;
+    line-height: 1.45 !important;
+  }
+
   /* Recharts & SVG print scaling */
   svg {
     max-width: 100% !important;

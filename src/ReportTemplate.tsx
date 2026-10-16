@@ -68,7 +68,7 @@ export default function ReportTemplate({ data, ticker, agentName, onClose, durat
   const distributionsChart = isDistributionsSeries(quarters);
   
   return (
-    <div className="min-h-full bg-[#F6F4F0] text-stone-900 font-sans w-full flex flex-col h-full overflow-y-auto print:h-auto print:overflow-visible print:bg-white print:p-0">
+    <div className="print-report min-h-full bg-[#F6F4F0] text-stone-900 font-sans w-full flex flex-col h-full overflow-y-auto print:h-auto print:overflow-visible print:bg-white print:p-0">
       <div className="w-full border-b border-stone-200 px-[40px] py-4 flex items-center justify-between sticky top-0 z-50 bg-[#F6F4F0] print:hidden">
         <div className="font-display uppercase font-bold text-stone-900 text-lg tracking-wider flex items-center gap-2">
           {ticker} Document Analysis
@@ -172,9 +172,9 @@ export default function ReportTemplate({ data, ticker, agentName, onClose, durat
           </AnalysisCard>
         </div>
 
-        {/* Financial Charts */}
+        {/* Financial Charts. In print the two charts open a fresh page and stay on it together. */}
         {data.financial_charts && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 print:mt-8 print:block print:w-full print:clear-both print:break-before-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 print:mt-0 print:block print:w-full print:clear-both print:break-before-page print:break-inside-avoid">
             <AnalysisCard title="Stock Price" subtext="This chart shows the closing price on the last trading date for the most recent months of 2026." className="print:break-inside-avoid print:w-full print:mb-6">
               <div className="h-64 mt-4 print:h-64 print:w-full">
                 {!hasChartData(stockPrices) ? (
