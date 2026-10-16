@@ -6,7 +6,6 @@ import { afterEach } from 'vitest';
 import {
   AGENTS_FILE_NAME,
   DEFAULT_PROMPT_FILE,
-  DEFAULT_SCHEMA_FILE,
   MANIFEST_FILE_NAME,
   type AllowedIconName,
   type InputMode,
@@ -73,7 +72,7 @@ export interface TempCatalog {
   cleanup(): void;
 }
 
-export { DEFAULT_PROMPT_FILE, DEFAULT_SCHEMA_FILE };
+export { DEFAULT_PROMPT_FILE };
 
 /**
  * Field values of the default manifest, typed against the production unions so
@@ -88,7 +87,6 @@ export const REQUIRED_AGENT_FILES = [
   MANIFEST_FILE_NAME,
   AGENTS_FILE_NAME,
   DEFAULT_PROMPT_FILE,
-  DEFAULT_SCHEMA_FILE,
 ] as const;
 
 const createdCatalogs = new Set<TempCatalog>();
@@ -120,8 +118,7 @@ export function validManifest(
 export function defaultAgentFiles(folderName: string): Record<string, string> {
   return {
     [AGENTS_FILE_NAME]: `# ${folderName}\n\nTest instructions.\n`,
-    [DEFAULT_PROMPT_FILE]: 'Input: {{input}}\nInstruction: {{instruction}}\nSchema: {{schema}}\n',
-    [DEFAULT_SCHEMA_FILE]: JSON.stringify({ type: 'object', properties: {} }, null, 2),
+    [DEFAULT_PROMPT_FILE]: 'Input: {{input}}\nInstruction: {{instruction}}\n',
   };
 }
 

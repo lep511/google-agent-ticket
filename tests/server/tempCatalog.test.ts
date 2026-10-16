@@ -23,7 +23,6 @@ import {
   createTempCatalog,
   defaultAgentFiles,
   DEFAULT_PROMPT_FILE,
-  DEFAULT_SCHEMA_FILE,
   REQUIRED_AGENT_FILES,
   validManifest,
   type CatalogSpec,
@@ -63,7 +62,6 @@ describe('default agent folder', () => {
     // "valid" when the server accepts it without complaining about anything.
     expect(result.warnings).toEqual([]);
     expect(result.definition.manifest.promptFile).toBe(DEFAULT_PROMPT_FILE);
-    expect(result.definition.manifest.schemaFile).toBe(DEFAULT_SCHEMA_FILE);
   });
 
   it('writes a prompt template that only uses supported placeholders', () => {
@@ -71,13 +69,8 @@ describe('default agent folder', () => {
 
     expect(template).toContain('{{input}}');
     expect(template).toContain('{{instruction}}');
-    expect(template).toContain('{{schema}}');
     // Anything else would make `buildAgentPrompt` reject the fixture.
-    expect(template?.match(/\{\{[^{}]*\}\}/g)).toEqual([
-      '{{input}}',
-      '{{instruction}}',
-      '{{schema}}',
-    ]);
+    expect(template?.match(/\{\{[^{}]*\}\}/g)).toEqual(['{{input}}', '{{instruction}}']);
   });
 
   it('writes no file the real catalog folders do not ship', () => {

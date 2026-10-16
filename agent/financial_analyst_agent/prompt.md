@@ -10,6 +10,3 @@ For financial_performance_4q, provide only the quarters of 2026 that are already
 
 CRITICAL INSTRUCTIONS FOR QUALITATIVE DATA (INSIGHTS & SUMMARIES):
 Leverage BOTH findings from SEC filings AND insights from broader web searches for the Executive Summary, Key Takeaways, and Deep Insights. Format text fields using Markdown (e.g. **bolding** key terms, lists, links).
-
-Output your analysis as a JSON object matching this schema:
-{{schema}}

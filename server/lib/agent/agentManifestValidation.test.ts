@@ -19,7 +19,6 @@ import {
   DEFAULT_ACCENT_COLOR,
   DEFAULT_ORDER,
   DEFAULT_PROMPT_FILE,
-  DEFAULT_SCHEMA_FILE,
 } from './agentTypes.ts';
 
 /** Valida una única carpeta materializada en un catálogo temporal. */
@@ -47,7 +46,6 @@ describe('campos obligatorios del manifiesto', () => {
     expect(result.definition.manifest.name).toBe('Agent good_agent');
     expect(result.definition.paths.agentsFilePath).toContain('AGENTS.md');
     expect(result.definition.paths.promptPath).toContain('prompt.md');
-    expect(result.definition.paths.schemaPath).toContain('output.schema.json');
   });
 
   it('omite la carpeta cuando manifest.json no es JSON válido', () => {
@@ -159,32 +157,28 @@ describe('archivos requeridos del agente', () => {
     expect(warning.message).toContain('prompt.md');
   });
 
-  it('omite la carpeta cuando el esquema no contiene JSON válido', () => {
-    const warning = expectSkipped(
-      validateSingle('bad_schema_agent', { files: { 'output.schema.json': '{ "type": ' } }),
-    );
+  it('ignores a legacy schemaFile field: the output schema is no longer a file', () => {
+    const result = validateSingle('legacy_schema_agent', {
+      manifest: validManifest('legacy_schema_agent', { schemaFile: 'output.schema.json' }),
+    });
 
-    expect(warning.code).toBe('invalid_schema_json');
-    expect(warning.message).toContain('output.schema.json');
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.warnings).toEqual([]);
+    expect(result.definition.manifest).not.toHaveProperty('schemaFile');
+    expect(result.definition.paths).not.toHaveProperty('schemaPath');
   });
 
-  it('usa los archivos declarados en promptFile y schemaFile', () => {
+  it('usa el archivo declarado en promptFile', () => {
     const result = validateSingle('custom_files_agent', {
-      manifest: validManifest('custom_files_agent', {
-        promptFile: 'plantilla.md',
-        schemaFile: 'salida.json',
-      }),
-      files: {
-        'plantilla.md': 'Entrada: {{input}}\n',
-        'salida.json': '{"type":"object"}',
-      },
+      manifest: validManifest('custom_files_agent', { promptFile: 'plantilla.md' }),
+      files: { 'plantilla.md': 'Entrada: {{input}}\n' },
     });
 
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.definition.manifest.promptFile).toBe('plantilla.md');
     expect(result.definition.paths.promptPath).toContain('plantilla.md');
-    expect(result.definition.paths.schemaPath).toContain('salida.json');
   });
 });
 
@@ -199,7 +193,6 @@ describe('valores por defecto y degradación de campos opcionales', () => {
     expect(manifest.isDefault).toBe(false);
     expect(manifest.supportsInstruction).toBe(false);
     expect(manifest.promptFile).toBe(DEFAULT_PROMPT_FILE);
-    expect(manifest.schemaFile).toBe(DEFAULT_SCHEMA_FILE);
     expect(manifest.accentColor).toBe(DEFAULT_ACCENT_COLOR);
     expect(manifest.landing).toBeNull();
     expect(result.warnings).toEqual([]);

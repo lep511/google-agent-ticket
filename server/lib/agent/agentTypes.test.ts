@@ -14,7 +14,6 @@ import {
   MAX_RUNTIME_DIR_DEPTH,
   MAX_RUNTIME_FILE_BYTES,
   MAX_RUNTIME_FILE_COUNT,
-  MAX_SCHEMA_BYTES,
   OUTPUT_RENDERERS,
   isAllowedIconName,
   isInputMode,
@@ -71,7 +70,6 @@ describe('valores por defecto y límites', () => {
       isDefault: false,
       supportsInstruction: false,
       promptFile: 'prompt.md',
-      schemaFile: 'output.schema.json',
       landing: null,
     });
     expect(MANIFEST_DEFAULTS.accentColor).toMatch(/^#FFFFFF[0-9A-F]{2}$/);
@@ -81,7 +79,6 @@ describe('valores por defecto y límites', () => {
     expect(MAX_AGENT_FOLDERS).toBe(100);
     expect(MAX_MANIFEST_BYTES).toBe(64_000);
     expect(MAX_PROMPT_BYTES).toBe(262_144);
-    expect(MAX_SCHEMA_BYTES).toBe(262_144);
     expect(MAX_RUNTIME_FILE_BYTES).toBe(1_048_576);
     expect(MAX_RUNTIME_DIR_DEPTH).toBe(5);
     expect(MAX_RUNTIME_FILE_COUNT).toBe(200);

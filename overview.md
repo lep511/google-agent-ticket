@@ -1,6 +1,6 @@
 # App Overview: Multi-Agent Financial Research System
 
-> **Scope note:** the pipeline described below is the behavior of the default agent, `financial_analyst_agent`. The app hosts a **catalog of agents** discovered from the `agent/` folder, each with its own prompt, output schema and renderer. See [Agent Catalog](#agent-catalog) for how the catalog works and how to add an agent.
+> **Scope note:** the pipeline described below is the behavior of the default agent, `financial_analyst_agent`. The app hosts a **catalog of agents** discovered from the `agent/` folder, each with its own prompt and renderer; the renderer selects the output schema. See [Agent Catalog](#agent-catalog) for how the catalog works and how to add an agent.
 
 ## Overall Logic
 This application functions as an autonomous, multi-agent research research committee. When a user requests an analysis of a stock ticker, the app does not rely on a single, monolithic AI query. Instead, it orchestrates a structured pipeline where analytical workloads are distributed across specialized sub-agents. 
@@ -72,7 +72,8 @@ The agent that runs is not hardcoded. `server/lib/agentRegistry.ts` discovers th
 ### Runtime pieces
 
 * **Agent Registry** (`server/lib/agentRegistry.ts`): enumerates up to 100 direct subfolders of `agent/`, validates each `manifest.json`, applies defaults, sorts the catalog and resolves the default agent. The catalog is cached in memory and rebuilt only when the modification timestamp of `agent/` changes. An invalid folder is skipped with a single warning; the rest of the catalog keeps serving.
-* **Prompt Builder** (`server/lib/promptBuilder.ts`): replaces `{{input}}`, `{{instruction}}` and `{{schema}}` in the agent's template and appends the shared JSON output rules block once. Any other `{{...}}` marker in the template aborts the run before any remote interaction is created.
+* **Prompt Builder** (`server/lib/promptBuilder.ts`): replaces `{{input}}` and `{{instruction}}` in the agent's template. Any other `{{...}}` marker in the template aborts the run before the agent starts.
+* **Output contract** (`server/lib/agent/outputSchemas.ts`): one Zod schema per `outputRenderer`, passed to the Strands agent as `structuredOutputSchema`. The SDK registers it as a tool, feeds validation errors back to the model, and the validated object arrives on the `complete` event as `interaction.structuredOutput`.
 * **`GET /api/agents`**: returns the ordered catalog plus the resolved `defaultAgentId`, built only from the in-memory catalog. No filesystem paths and no file contents are exposed.
 * **`POST /api/analyze`**: resolves the agent from the `agentId` field (falling back to the default agent when it is missing or unknown), validates the input according to that agent's `inputMode`, loads only that agent's files as inline sources, and emits a single `agent_info` event (`agentId`, `agentName`, `outputRenderer`) before any other SSE event.
 * **Frontend** (`src/App.tsx`, `src/components/AgentSelector.tsx`): the header selector lists the catalog, the selection is persisted in `localStorage` under `tickr.selectedAgentId`, the landing view and the input bar adapt to the active manifest, and the result is rendered by `ReportTemplate` (`financial_report`) or `SimpleReportView` (`simple_report`) according to the `agent_info` of the run that produced it.
@@ -85,13 +86,12 @@ The folder name is the `agentId`: snake_case, and identical to the manifest's `i
 agent/<agent_id>/
 ├── manifest.json        # catalog + UI metadata (server only, not uploaded)
 ├── prompt.md            # prompt template (server only, not uploaded)
-├── output.schema.json   # expected JSON output shape (server only, not uploaded)
 ├── AGENTS.md            # workspace rules for the remote agent (uploaded)
 ├── agent.yaml           # base agent, remote environment and tools (uploaded)
 └── requirements.txt     # python dependencies of the remote environment (uploaded)
 ```
 
-`AGENTS.md`, the prompt file and the schema file must exist, be readable and be non-empty, and the schema must parse as JSON.
+`AGENTS.md` and the prompt file must exist, be readable and be non-empty.
 
 ### Manifest fields
 
@@ -105,7 +105,6 @@ Optional fields and their defaults (a wrong type degrades to the same default wi
 | `isDefault` | `false` |
 | `supportsInstruction` | `false` |
 | `promptFile` | `prompt.md` |
-| `schemaFile` | `output.schema.json` |
 | `accentColor` (hex) | `#FFFFFF1A`, translucent white |
 | `landing` (`title`, `subtitle`, `highlights[]`) | `null`, falls back to `name` / `tagline` / `description` |
 
@@ -117,7 +116,7 @@ Ordering is `order` ascending, then `name` case-insensitively, then `agentId`. T
 
 1. Create `agent/<agent_id>/` with a snake_case folder name.
 2. Write `manifest.json` with the required fields, `id` matching the folder name, an `icon` from the allowed list, and the `inputMode` / `outputRenderer` pair the agent needs.
-3. Write `prompt.md` using `{{input}}`, `{{instruction}}` and `{{schema}}`, and `output.schema.json` with the exact JSON shape the model must return. For `simple_report` the contract is `summary`, `key_points`, `sections` (`title`, `body`) and `sources` (`title`, `url`, `date`).
+3. Write `prompt.md` using `{{input}}` and `{{instruction}}`. The report shape comes from the renderer's Zod schema in `server/lib/agent/outputSchemas.ts`: for `simple_report` it is `summary`, `key_points`, `sections` (`title`, `body`) and `sources` (`title`, `url`, `date`).
 4. Add `AGENTS.md`, `agent.yaml` and `requirements.txt`, using an existing agent as the template (`base_agent`, remote environment without preconfigured sources, `google_search` as the tool).
 5. Touch or restart so `agent/` gets a new modification timestamp; the registry rebuilds the catalog and the agent appears in `GET /api/agents` and in the header selector.
 
@@ -127,7 +126,6 @@ The agent folder is uploaded as inline sources under `/.agents`, preserving rela
 
 * `manifest.json`
 * the prompt file declared in `promptFile` (default `prompt.md`)
-* the schema file declared in `schemaFile` (default `output.schema.json`)
 
 Only the resolved agent's folder is traversed (max depth 5, max 200 files, 1 MB per file). Other agents' folders, loose files at the root of `agent/` and symlinks resolving outside the folder are never uploaded, so agents cannot contaminate each other.
 

@@ -517,12 +517,14 @@ describe('Keyboard focus around the History_Panel', () => {
 
 /**
  * The four run outcomes named by Property 5. Only `promoted` finishes with a
- * Promoted Report; `stream-error` and `http-error` are the two ways a run
- * finishes with an error, `stopped` is the user stop and `not-promoted` is a run
+ * Promoted Report, `promoted-structured` is the same outcome delivered as the
+ * validated object on the `complete` event instead of as text; `stream-error`
+ * and `http-error` are the two ways a run finishes with an error, `stopped` is the user stop and `not-promoted` is a run
  * that completes with text no renderer can structure.
  */
 const RUN_OUTCOMES = [
   'promoted',
+  'promoted-structured',
   'stream-error',
   'http-error',
   'stopped',
@@ -530,6 +532,11 @@ const RUN_OUTCOMES = [
 ] as const;
 
 type RunOutcome = (typeof RUN_OUTCOMES)[number];
+
+/** Both ways a run can end with a Promoted Report. */
+function isPromotedOutcome(outcome: RunOutcome): boolean {
+  return outcome === 'promoted' || outcome === 'promoted-structured';
+}
 
 /** Tickers accepted by the `ticker` input mode: 1 to 10 characters of `A-Z0-9`. */
 const tickerArb: fc.Arbitrary<string> = fc
@@ -561,6 +568,12 @@ function sseFrame(payload: Record<string, unknown>): string {
 function runFrames(outcome: RunOutcome): string[] {
   if (outcome === 'promoted') {
     return [sseFrame({ type: 'text', text: PROMOTED_RUN_TEXT }), 'data: [DONE]\n\n'];
+  }
+  if (outcome === 'promoted-structured') {
+    return [
+      sseFrame({ type: 'complete', interaction: { stopReason: 'toolUse', structuredOutput: PROMOTED_RUN_REPORT } }),
+      'data: [DONE]\n\n',
+    ];
   }
   if (outcome === 'not-promoted') {
     return [sseFrame({ type: 'text', text: UNSTRUCTURED_RUN_TEXT }), 'data: [DONE]\n\n'];
@@ -702,7 +715,7 @@ async function driveRun(
     run that promoted a report clears the input bar and offers "Restart" there;
     every other outcome keeps the query and the agent's own action label.
   */
-  const finishedLabel = outcome === 'promoted' ? 'Restart' : CATALOG_AGENT.actionLabel;
+  const finishedLabel = isPromotedOutcome(outcome) ? 'Restart' : CATALOG_AGENT.actionLabel;
   await waitFor(() => {
     expect(screen.getByRole('button', { name: finishedLabel })).toBeInTheDocument();
   });
@@ -733,7 +746,7 @@ describe('Recording a run in the interaction history', () => {
 
           await driveRun(user, ticker, outcome);
 
-          if (outcome === 'promoted') {
+          if (isPromotedOutcome(outcome)) {
             //  exactly one History Entry is added, and the
             // count of the trigger is what makes the addition observable.
             await waitFor(() => {
@@ -2256,5 +2269,73 @@ describe('Thinking deltas in the timeline', () => {
       'Analyzing Amazon is a corporate stock.',
       'Analyzing Now the quarterly figures.',
     ]);
+  });
+});
+
+/* ── Structured output on the complete event ─────────────────── */
+
+/**
+ * The server validates the report with the SDK and sends it as
+ * `interaction.structuredOutput` on `complete`. That object is the report;
+ * the text of the run is only a fallback for a model that answered in prose
+ * with a JSON block inside.
+ */
+describe('Structured output from the complete event', () => {
+  function serveFrames(frames: string[]): void {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
+        if (url.includes('/api/agents')) {
+          return new Response(JSON.stringify(CATALOG_RESPONSE), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+          });
+        }
+        if (url.includes('/api/analyze')) return makeSseResponse(frames, null);
+        throw new Error(`Unexpected request to ${url}`);
+      }),
+    );
+  }
+
+  async function runAndWaitForReport(): Promise<void> {
+    render(<App />);
+    await screen.findByLabelText('Agent input');
+    await driveRun(userEvent.setup(), 'AMZN', 'promoted-structured');
+  }
+
+  it('promotes the validated object with no text at all and records it in the history', async () => {
+    serveFrames(runFrames('promoted-structured'));
+
+    await runAndWaitForReport();
+
+    expect(screen.queryByText('Unstructured response')).toBeNull();
+    const persisted = readPersistedHistory() ?? [];
+    expect(persisted).toHaveLength(1);
+    expect(persisted[0].report).toEqual(PROMOTED_RUN_REPORT);
+  });
+
+  it('prefers the validated object over prose streamed before it', async () => {
+    serveFrames([
+      sseFrame({ type: 'text', text: UNSTRUCTURED_RUN_TEXT }),
+      ...runFrames('promoted-structured'),
+    ]);
+
+    await runAndWaitForReport();
+
+    expect(screen.queryByText('Unstructured response')).toBeNull();
+    expect((readPersistedHistory() ?? [])[0]?.report).toEqual(PROMOTED_RUN_REPORT);
+  });
+
+  it('falls back to the JSON block in the text when the object is not for this renderer', async () => {
+    serveFrames([
+      sseFrame({ type: 'text', text: PROMOTED_RUN_TEXT }),
+      sseFrame({ type: 'complete', interaction: { stopReason: 'toolUse', structuredOutput: { summary: 'wrong renderer' } } }),
+      'data: [DONE]\n\n',
+    ]);
+
+    await runAndWaitForReport();
+
+    expect((readPersistedHistory() ?? [])[0]?.report).toEqual(PROMOTED_RUN_REPORT);
   });
 });

@@ -11,9 +11,8 @@
  *  - Recorrido recursivo de la carpeta del agente hasta 5 niveles de
  *    subcarpetas y 200 archivos; lo que excede un límite se descarta con una
  *    advertencia que indica la ruta y el límite ().
- *  - Los archivos de metadata del servidor no se suben: `manifest.json` y los
- *    nombres declarados en `promptFile` y `schemaFile` del manifiesto, por
- *    comparación exacta de nombre ().
+ *  - Server metadata files are not uploaded: `manifest.json` and the name
+ *    declared in the manifest's `promptFile`, by exact name comparison.
  *  - Todo archivo cuya ruta resuelta quede fuera de la carpeta del agente se
  *    excluye. Como el recorrido parte de la carpeta del agente, los archivos
  *    sueltos de la raíz de `agent/` y los de otras carpetas de agente quedan
@@ -183,15 +182,10 @@ export function loadAgentInlineSources(
   };
 
   /**
-   *  se excluyen `manifest.json` y los nombres declarados en
-   * `promptFile` y `schemaFile`, por comparación exacta de nombre en cualquier
-   * nivel de la carpeta, igual que hacía `loadAgentFiles`.
+   * `manifest.json` and the name declared in `promptFile` are excluded, by
+   * exact name comparison at any level of the folder, as `loadAgentFiles` did.
    */
-  const excludedFileNames = new Set<string>([
-    MANIFEST_FILE_NAME,
-    definition.manifest.promptFile,
-    definition.manifest.schemaFile,
-  ]);
+  const excludedFileNames = new Set<string>([MANIFEST_FILE_NAME, definition.manifest.promptFile]);
 
   // La raíz se resuelve una vez: la contención de cada archivo se comprueba
   // contra la carpeta real del agente (6.3).

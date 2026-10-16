@@ -94,9 +94,6 @@ export const MAX_MANIFEST_BYTES = 64 * 1000;
 /** Tamaño máximo de la plantilla de prompt, 256 KiB (). */
 export const MAX_PROMPT_BYTES = 256 * 1024;
 
-/** Tamaño máximo del archivo de esquema, 256 KiB (). */
-export const MAX_SCHEMA_BYTES = 256 * 1024;
-
 /** Tamaño máximo de un archivo de ejecución subido como fuente inline, 1 MB (). */
 export const MAX_RUNTIME_FILE_BYTES = 1024 * 1024;
 
@@ -134,7 +131,6 @@ export const DEFAULT_ORDER = 100;
 export const DEFAULT_IS_DEFAULT = false;
 export const DEFAULT_SUPPORTS_INSTRUCTION = false;
 export const DEFAULT_PROMPT_FILE = 'prompt.md';
-export const DEFAULT_SCHEMA_FILE = 'output.schema.json';
 export const DEFAULT_MODEL_PROVIDER: ModelProviderType = 'anthropic';
 export const DEFAULT_MODEL_NAME = 'claude-opus-5-5';
 export const DEFAULT_TOOLS: readonly string[] = [];
@@ -148,7 +144,6 @@ export const MANIFEST_DEFAULTS = {
   isDefault: DEFAULT_IS_DEFAULT,
   supportsInstruction: DEFAULT_SUPPORTS_INSTRUCTION,
   promptFile: DEFAULT_PROMPT_FILE,
-  schemaFile: DEFAULT_SCHEMA_FILE,
   accentColor: DEFAULT_ACCENT_COLOR,
   modelProvider: DEFAULT_MODEL_PROVIDER,
   modelName: DEFAULT_MODEL_NAME,
@@ -205,7 +200,6 @@ export interface AgentManifest {
   supportsInstruction: boolean;
   outputRenderer: OutputRenderer;
   promptFile: string;
-  schemaFile: string;
   modelProvider: ModelProviderType;
   modelName: string;
   tools: readonly string[];
@@ -250,13 +244,13 @@ export interface AgentPaths {
   manifestPath: string;
   agentsFilePath: string;
   promptPath: string;
-  schemaPath: string;
 }
 
 /**
- * Definición resuelta de un agente: su manifiesto normalizado más las rutas
- * de disco desde las que se cargan la plantilla, el esquema y las fuentes
- * inline (Requirements 5.1, 16.1).
+ * Resolved definition of an agent: its normalized manifest plus the disk paths
+ * the template and the inline sources are loaded from (Requirements 5.1,
+ * 16.1). The output shape is not a file of the folder: it is the Zod schema of
+ * the renderer, see `outputSchemas.ts`.
  */
 export interface ResolvedAgentDefinition {
   agentId: string;

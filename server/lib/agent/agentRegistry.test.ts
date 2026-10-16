@@ -624,30 +624,20 @@ describe('operaciones del catálogo por identificador', () => {
     expect(empty.getDefaultAgent()).toBeNull();
   });
 
-  it('entrega la plantilla y el esquema desde los archivos declarados en el manifiesto', () => {
+  it('entrega la plantilla desde el archivo declarado en el manifiesto', () => {
     const catalog = createTempCatalog({
       alpha_agent: {
-        manifest: validManifest('alpha_agent', {
-          promptFile: 'custom_prompt.md',
-          schemaFile: 'custom_schema.json',
-        }),
-        files: {
-          'custom_prompt.md': 'Entrada: {{input}}\nEsquema: {{schema}}\n',
-          'custom_schema.json': '{ "type": "object" }',
-        },
+        manifest: validManifest('alpha_agent', { promptFile: 'custom_prompt.md' }),
+        files: { 'custom_prompt.md': 'Entrada: {{input}}\n' },
       },
     });
     const registry = createAgentRegistry({ agentsDir: catalog.agentsDir, logger: null });
 
     const template = registry.getPromptTemplate('alpha_agent');
-    const schema = registry.getSchema('alpha_agent');
 
     expect(template.fileName).toBe('custom_prompt.md');
     expect(template.relativePath).toBe('agent/alpha_agent/custom_prompt.md');
     expect(template.text).toContain('{{input}}');
-    expect(schema.fileName).toBe('custom_schema.json');
-    expect(schema.text).toBe('{ "type": "object" }');
-    expect(schema.json).toEqual({ type: 'object' });
   });
 
   it('falla con un error explícito cuando el agente no está en el catálogo', () => {
@@ -655,7 +645,7 @@ describe('operaciones del catálogo por identificador', () => {
     const registry = createAgentRegistry({ agentsDir: catalog.agentsDir, logger: null });
 
     expect(() => registry.getPromptTemplate('../beta_agent')).toThrowError(AgentSourceError);
-    expect(() => registry.getSchema('gamma_agent')).toThrowError(/not in the catalog/);
+    expect(() => registry.getInstructions('gamma_agent')).toThrowError(/not in the catalog/);
   });
 
   it('falla nombrando el archivo cuando la plantilla supera su límite de tamaño', () => {

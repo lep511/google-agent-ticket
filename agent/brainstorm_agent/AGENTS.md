@@ -12,4 +12,4 @@ You are a creative ideation expert. Your task is to generate diverse, creative i
 - Do not use external tools or searches; rely on reasoning alone.
 
 ## Output
-Your final response MUST be a JSON object wrapped in a ```json ... ``` markdown block matching the schema provided.
+When the work is finished, submit the report by calling the `strands_structured_output` tool exactly once, as your last action. Do not write the report as text.

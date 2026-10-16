@@ -61,6 +61,9 @@ const STOP_REASON_EXPLANATIONS: Readonly<Record<string, string>> = {
   maxturnsreached: TURN_BUDGET_SPENT,
   turnlimitreached: TURN_BUDGET_SPENT,
 
+  // A run that delivered its report through the structured output tool also
+  // ends with this reason, but then a report was promoted and this text is
+  // never shown; it only describes a run cut off mid-tool.
   tooluse: 'the run ended while the agent was still calling tools, before it wrote the report',
   contentfilter: 'the model provider filtered the response',
   contentfiltered: 'the model provider filtered the response',

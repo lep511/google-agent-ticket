@@ -11,8 +11,8 @@
  *  - `inputMode`, `outputRenderer` e `icon` se comparan de forma exacta contra
  *    sus valores permitidos y contra la lista blanca de iconos (2.2, 2.3, 16.4).
  *  - `id` debe coincidir carácter a carácter con el nombre de la carpeta (1.3).
- *  - `AGENTS.md`, el archivo de prompt y el de esquema deben existir, ser
- *    legibles y no estar vacíos, y el esquema debe contener JSON válido (2.4).
+ *  - `AGENTS.md` and the prompt file must exist, be readable and be non-empty
+ *    (2.4). The output schema is no longer a file: see `outputSchemas.ts`.
  *  - Los campos opcionales omitidos toman su valor por defecto, y los que
  *    llegan con un tipo incorrecto degradan a ese valor conservando la entrada
  *    y registrando una advertencia (2.6, 2.7).
@@ -68,7 +68,6 @@ export type AgentManifestWarningCode =
   | 'missing_required_file'
   | 'unreadable_required_file'
   | 'empty_required_file'
-  | 'invalid_schema_json'
   | 'invalid_optional_field'
   | 'order_out_of_range'
   | 'validation_exception';
@@ -120,7 +119,7 @@ export const REQUIRED_STRING_FIELDS = [
 
 export type RequiredStringField = (typeof REQUIRED_STRING_FIELDS)[number];
 
-/** Nombres de archivo admitidos en `promptFile` y `schemaFile`. */
+/** File names accepted in `promptFile`. */
 const SAFE_FILE_NAME_PATTERN = /^[A-Za-z0-9._-]+$/;
 
 /** Color hexadecimal con 3, 4, 6 u 8 dígitos. */
@@ -324,7 +323,6 @@ interface OptionalFields {
   isDefault: boolean;
   supportsInstruction: boolean;
   promptFile: string;
-  schemaFile: string;
   accentColor: string;
   modelProvider: ModelProviderType;
   modelName: string;
@@ -354,7 +352,7 @@ function readBooleanField(
 
 function readFileNameField(
   raw: Record<string, unknown>,
-  field: 'promptFile' | 'schemaFile',
+  field: 'promptFile',
   degrade: DegradeReporter,
 ): string {
   const fallback = MANIFEST_DEFAULTS[field];
@@ -484,7 +482,6 @@ function readOptionalFields(
     isDefault: readBooleanField(raw, 'isDefault', degrade),
     supportsInstruction: readBooleanField(raw, 'supportsInstruction', degrade),
     promptFile: readFileNameField(raw, 'promptFile', degrade),
-    schemaFile: readFileNameField(raw, 'schemaFile', degrade),
     accentColor: readAccentColor(raw, degrade),
     modelProvider,
     modelName,
@@ -542,30 +539,6 @@ function assertReadableNonEmptyFile(filePath: string, label: string): void {
   }
 }
 
-/** El esquema, además, debe contener JSON válido (). */
-function assertValidSchemaFile(filePath: string, label: string): void {
-  assertReadableNonEmptyFile(filePath, label);
-
-  let text: string;
-  try {
-    text = fs.readFileSync(filePath, 'utf-8');
-  } catch (error) {
-    throw new ManifestValidationError(
-      'unreadable_required_file',
-      `el archivo requerido "${label}" no se pudo leer: ${errorMessage(error)}.`,
-    );
-  }
-
-  try {
-    JSON.parse(text);
-  } catch (error) {
-    throw new ManifestValidationError(
-      'invalid_schema_json',
-      `el archivo de esquema "${label}" no contiene JSON válido: ${errorMessage(error)}.`,
-    );
-  }
-}
-
 /* ────────────────────────────────────────────────────────── */
 /*  Validación de una carpeta                                  */
 /* ────────────────────────────────────────────────────────── */
@@ -615,12 +588,12 @@ export function validateAgentFolder(folder: DiscoveredAgentFolder): ManifestVali
       manifestPath: folder.manifestPath,
       agentsFilePath: path.join(folder.dir, AGENTS_FILE_NAME),
       promptPath: path.join(folder.dir, optional.promptFile),
-      schemaPath: path.join(folder.dir, optional.schemaFile),
     };
 
     assertReadableNonEmptyFile(paths.agentsFilePath, AGENTS_FILE_NAME);
     assertReadableNonEmptyFile(paths.promptPath, optional.promptFile);
-    assertValidSchemaFile(paths.schemaPath, optional.schemaFile);
+    // The output schema used to be a required file here; it is now the Zod
+    // schema of the renderer in `outputSchemas.ts`, so nothing to check.
 
     const manifest: AgentManifest = {
       id: folder.agentId,
@@ -637,7 +610,6 @@ export function validateAgentFolder(folder: DiscoveredAgentFolder): ManifestVali
       supportsInstruction: optional.supportsInstruction,
       outputRenderer: required.outputRenderer as AgentManifest['outputRenderer'],
       promptFile: optional.promptFile,
-      schemaFile: optional.schemaFile,
       modelProvider: optional.modelProvider,
       modelName: optional.modelName,
       tools: optional.tools,

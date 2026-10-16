@@ -4,9 +4,12 @@
  * to the `complete` event, and the classification of a failed start.
  */
 
-import { ModelThrottledError } from '@strands-agents/sdk';
-import type { Agent, AgentStreamEvent } from '@strands-agents/sdk';
-import { describe, expect, it } from 'vitest';
+import fs from 'node:fs';
+import path from 'node:path';
+
+import { Message, ModelThrottledError, TextBlock } from '@strands-agents/sdk';
+import type { Agent, AgentStreamEvent, InvokeModelContext } from '@strands-agents/sdk';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
   MAX_AGENT_TURNS,
@@ -14,10 +17,14 @@ import {
   RetryStrategy,
   SALVAGE_PROMPT,
   SALVAGE_TURNS,
+  STRUCTURED_OUTPUT_REMINDER,
+  STRUCTURED_OUTPUT_TOOL_NAME,
   TURN_LIMIT_STOP_REASON,
   classifyAgentFailureStatus,
+  createStructuredOutputFilter,
   describeAgentFailure,
   mapStrandsEvent,
+  relaxForcedStructuredOutput,
   streamStrandsAgent,
 } from './strandsAgent.ts';
 
@@ -365,5 +372,165 @@ describe('RetryStrategy', () => {
     });
     expect(isRetryable(badRequest)).toBe(false);
     expect(isRetryable(new Error('socket hang up'))).toBe(false);
+  });
+});
+
+/* ────────────────────────────────────────────────────────── */
+/*  Structured output                                          */
+/* ────────────────────────────────────────────────────────── */
+
+function toolUse(name: string, toolUseId: string, input: unknown = {}): AgentStreamEvent {
+  return event({ type: 'contentBlockEvent', contentBlock: { type: 'toolUseBlock', name, toolUseId, input } });
+}
+
+function toolResult(
+  toolUseId: string,
+  status: 'success' | 'error',
+  content: unknown[],
+  error?: Error,
+): AgentStreamEvent {
+  return event({ type: 'toolResultEvent', result: { toolUseId, status, content, ...(error ? { error } : {}) } });
+}
+
+function structuredResult(structuredOutput: unknown, stopReason = 'toolUse'): AgentStreamEvent {
+  return event({ type: 'agentResultEvent', result: { stopReason, structuredOutput, metrics: {} } });
+}
+
+describe('STRUCTURED_OUTPUT_TOOL_NAME', () => {
+  it('matches the name the installed SDK registers for structured output', () => {
+    const sdkSource = fs.readFileSync(
+      path.join(process.cwd(), 'node_modules/@strands-agents/sdk/dist/src/tools/structured-output-tool.js'),
+      'utf8',
+    );
+    expect(sdkSource).toContain(`STRUCTURED_OUTPUT_TOOL_NAME = '${STRUCTURED_OUTPUT_TOOL_NAME}'`);
+  });
+});
+
+describe('createStructuredOutputFilter', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('hides the structured output call and its result while other tools stay visible', () => {
+    const isHidden = createStructuredOutputFilter();
+
+    expect(isHidden(toolUse('search_web', 'call-1'))).toBe(false);
+    expect(isHidden(toolResult('call-1', 'success', [{ type: 'textBlock', text: 'found' }]))).toBe(false);
+    expect(isHidden(toolUse(STRUCTURED_OUTPUT_TOOL_NAME, 'so-1', { summary: 'ok' }))).toBe(true);
+    expect(isHidden(toolResult('so-1', 'success', [{ type: 'jsonBlock', json: { summary: 'ok' } }]))).toBe(true);
+  });
+
+  it('hides a rejected submission and warns, since the retry costs a turn', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const isHidden = createStructuredOutputFilter();
+
+    expect(isHidden(toolUse(STRUCTURED_OUTPUT_TOOL_NAME, 'so-1'))).toBe(true);
+    expect(
+      isHidden(toolResult('so-1', 'error', [{ type: 'textBlock', text: 'summary: expected string' }], new Error('summary: expected string'))),
+    ).toBe(true);
+    expect(isHidden(toolUse(STRUCTURED_OUTPUT_TOOL_NAME, 'so-2'))).toBe(true);
+    expect(isHidden(toolResult('so-2', 'success', [{ type: 'jsonBlock', json: {} }]))).toBe(true);
+
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls[0][0]).toContain('summary: expected string');
+  });
+
+  it('lets a result whose call it never saw pass through', () => {
+    const isHidden = createStructuredOutputFilter();
+    expect(isHidden(toolResult('unknown', 'success', []))).toBe(false);
+  });
+});
+
+describe('relaxForcedStructuredOutput', () => {
+  function context(toolChoice: unknown, content: unknown[] = [new TextBlock('Analyze AMZN')]): InvokeModelContext {
+    return {
+      messages: [new Message({ role: 'user', content: content as never })],
+      toolChoice,
+    } as unknown as InvokeModelContext;
+  }
+
+  it('drops a forced structured output call and asks for it in the last user message instead', () => {
+    const relaxed = relaxForcedStructuredOutput(context({ tool: { name: STRUCTURED_OUTPUT_TOOL_NAME } }));
+
+    expect(relaxed.toolChoice).toBeUndefined();
+    const last = relaxed.messages[relaxed.messages.length - 1];
+    expect(last.role).toBe('user');
+    expect(last.content).toHaveLength(2);
+    expect(last.content[1]).toMatchObject({ type: 'textBlock', text: STRUCTURED_OUTPUT_REMINDER });
+    expect(STRUCTURED_OUTPUT_REMINDER).toContain(STRUCTURED_OUTPUT_TOOL_NAME);
+  });
+
+  it('leaves any other tool choice, and no tool choice, untouched', () => {
+    const forcedOther = context({ tool: { name: 'search_web' } });
+    expect(relaxForcedStructuredOutput(forcedOther)).toBe(forcedOther);
+    const auto = context({ auto: {} });
+    expect(relaxForcedStructuredOutput(auto)).toBe(auto);
+    const none = context(undefined);
+    expect(relaxForcedStructuredOutput(none)).toBe(none);
+  });
+});
+
+describe('streamStrandsAgent with structured output', () => {
+  function fakeAgentPasses(passes: AgentStreamEvent[][]) {
+    const calls: Array<{ prompt: string; turns: unknown }> = [];
+    const agent = {
+      async *stream(prompt: string, options?: { limits?: { turns?: number } }) {
+        calls.push({ prompt, turns: options?.limits?.turns });
+        for (const value of passes[calls.length - 1] ?? []) yield value;
+      },
+    } as unknown as Agent;
+    return { agent, calls };
+  }
+
+  async function collect(stream: AsyncGenerator<unknown>): Promise<unknown[]> {
+    const collected: unknown[] = [];
+    for await (const emitted of stream) collected.push(emitted);
+    return collected;
+  }
+
+  it('keeps the agent tools in the stream and hides the structured output tool', async () => {
+    const report = { summary: 'ok', key_points: [], sections: [], sources: [] };
+    const { agent } = fakeAgentPasses([
+      [
+        toolUse('search_web', 'call-1', { query: 'AMZN' }),
+        toolResult('call-1', 'success', [{ type: 'textBlock', text: 'found' }]),
+        toolUse(STRUCTURED_OUTPUT_TOOL_NAME, 'so-1', report),
+        toolResult('so-1', 'success', [{ type: 'jsonBlock', json: report }]),
+        structuredResult(report),
+      ],
+    ]);
+
+    expect(await collect(streamStrandsAgent(agent, 'prompt'))).toEqual([
+      { type: 'tool_call', name: 'search_web', arguments: { query: 'AMZN' }, callId: 'call-1' },
+      { type: 'tool_result', callId: 'call-1', result: 'found' },
+      { type: 'complete', interaction: { stopReason: 'toolUse', structuredOutput: report } },
+      { type: 'done' },
+    ]);
+  });
+
+  it('keeps hiding the tool across the salvage pass and still reports one run', async () => {
+    const report = { summary: 'salvaged', key_points: [], sections: [], sources: [] };
+    const { agent, calls } = fakeAgentPasses([
+      [event({ type: 'agentResultEvent', result: { stopReason: TURN_LIMIT_STOP_REASON, metrics: {} } })],
+      [
+        toolUse(STRUCTURED_OUTPUT_TOOL_NAME, 'so-1', report),
+        toolResult('so-1', 'success', [{ type: 'jsonBlock', json: report }]),
+        structuredResult(report),
+      ],
+    ]);
+
+    expect(await collect(streamStrandsAgent(agent, 'prompt'))).toEqual([
+      {
+        type: 'complete',
+        interaction: { stopReason: 'toolUse', structuredOutput: report, turnLimitReached: true },
+      },
+      { type: 'done' },
+    ]);
+    expect(calls[1]).toEqual({ prompt: SALVAGE_PROMPT, turns: SALVAGE_TURNS });
+  });
+
+  it('asks the salvage pass for the structured output tool instead of forbidding every tool', () => {
+    expect(SALVAGE_PROMPT).not.toMatch(/do not call any tool/i);
+    expect(SALVAGE_PROMPT).toMatch(/structured output tool/);
   });
 });

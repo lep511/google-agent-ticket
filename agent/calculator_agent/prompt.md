@@ -2,6 +2,3 @@ Solve the following math problem step by step using the calculate tool for every
 
 PROBLEM:
 {{input}}
-
-Output your solution as a JSON object matching this schema:
-{{schema}}

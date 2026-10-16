@@ -12,6 +12,7 @@ import { buildAgentCatalogHttpResult } from "./server/lib/agent/agentCatalog.ts"
 import { subAgentsDebugFileName, writeDebugFile } from "./server/lib/debugFiles.ts";
 import { agentRegistry } from "./server/lib/agent/agentRegistry.ts";
 import { resolveAgentTools } from "./server/lib/tools/toolRegistry.ts";
+import { outputSchemaFor } from "./server/lib/agent/outputSchemas.ts";
 import {
   classifyAgentFailureStatus,
   createStrandsAgent,
@@ -264,11 +265,14 @@ async function startServer() {
 
       const mcpClients = await loadMcpClients();
       const agentTools = resolveAgentTools(agent.manifest.tools);
+      // The report shape is the renderer's Zod schema: the SDK hands it to the
+      // model as a tool and the validated object arrives on the `complete` event.
       const strandsAgent = createStrandsAgent({
         systemPrompt,
         modelId: effectiveModel,
         tools: agentTools.length > 0 ? agentTools : undefined,
         mcpClients: mcpClients.length > 0 ? mcpClients : undefined,
+        structuredOutputSchema: outputSchemaFor(agent.manifest.outputRenderer),
       });
 
       /*
@@ -352,6 +356,13 @@ async function startServer() {
               const usage = (event.interaction.usage || event.interaction.usage_metadata) as any;
               if (usage) {
                   totalTokens = usage.total_tokens || usage.totalTokenCount || usage.total_token_count || 0;
+              }
+              if (event.interaction.structuredOutput !== undefined) {
+                  if (accumulatedLogText) {
+                      debugLog += `[TEXT OUTPUT]\n${accumulatedLogText}\n\n`;
+                      accumulatedLogText = '';
+                  }
+                  debugLog += `[STRUCTURED OUTPUT]\n${JSON.stringify(event.interaction.structuredOutput, null, 2)}\n\n`;
               }
           }
 

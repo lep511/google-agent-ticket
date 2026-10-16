@@ -22,6 +22,7 @@ Vercel Routing Middleware (`middleware.ts`) proxies all `/api/*` requests to the
 - **Agent SDK**: `@strands-agents/sdk` with the `AnthropicModel` or `BedrockModel` adapter
 - **Model**: Claude Opus 5.5 (`claude-opus-5-5`). The Anthropic API is used when `ANTHROPIC_API_KEY` is set; otherwise Amazon Bedrock with the default AWS credential chain (`us.anthropic.claude-opus-5-5`)
 - **Tools**: `search_web` (Brave Search), `calculate` (arithmetic)
+- **Output contract**: one Zod schema per `outputRenderer` (`server/lib/agent/outputSchemas.ts`), passed to the SDK as `structuredOutputSchema`. The model submits the report through the SDK's structured output tool and the validated object arrives on the `complete` event
 - **Frontend**: React 19, Tailwind CSS 4, Recharts, motion, lucide-react
 - **Auth**: Amazon Cognito (Hosted UI, authorization code grant)
 
@@ -159,12 +160,13 @@ Every agent lives in its own folder under `agent/` and is discovered from the fi
 ```
 agent/<agent_id>/
 ├── manifest.json        # catalog + UI metadata
-├── prompt.md            # prompt template with {{input}}, {{instruction}}, {{schema}}
-├── output.schema.json   # JSON shape the model must return
+├── prompt.md            # prompt template with {{input}}, {{instruction}}
 └── AGENTS.md            # system prompt
 ```
 
 The folder name is the `agentId`: snake_case (`a-z`, `0-9`, single `_` separators), matching the `id` field in the manifest.
+
+The report shape is not a file of the folder. The manifest's `outputRenderer` selects both the React view and the Zod schema in `server/lib/agent/outputSchemas.ts`; the SDK gives that schema to the model as a tool, so the agent files only describe what to research, not how to format the answer.
 
 ### Manifest fields
 
@@ -195,7 +197,7 @@ Optional:
 ### Adding a new agent
 
 1. Create `agent/<agent_id>/` with snake_case name
-2. Add `manifest.json`, `prompt.md`, `output.schema.json`, `AGENTS.md`
+2. Add `manifest.json`, `prompt.md`, `AGENTS.md`; pick the `outputRenderer` whose schema fits (a new report shape means a new renderer, a new Zod schema and a new view)
 3. Restart or touch `agent/` — catalog rebuilds on mtime change
 4. Verify: `curl http://localhost:3000/api/agents`
 
@@ -209,6 +211,7 @@ Agents run in-process with the Strands SDK. One run is assembled from:
 | User prompt | `prompt.md` with placeholders replaced |
 | Model | request `model` field → `CLAUDE_MODEL_ID` env → `claude-opus-5-5` |
 | Tools | per-agent (`search_web`, `calculate`, or none) |
+| Report shape | Zod schema of the agent's `outputRenderer` (`server/lib/agent/outputSchemas.ts`), enforced by the SDK's structured output tool; the internal `strands_structured_output` call is not streamed |
 
 `search_web` serializes its requests and keeps ~1.1 s between them, because Brave's free tier allows about one per second. A failed search returns an `error` field with empty results instead of throwing: a thrown tool error comes back to the model with nothing to act on, and the retries it triggers each cost a turn.
 
@@ -222,7 +225,7 @@ It exists to stop runaway loops — a model that keeps calling tools and never w
 
 Sizing it matters, because the budget has to cover **every research turn plus the turn that writes the final answer**. Agents spend roughly one turn per tool call, and research-heavy ones spend many: `financial_analyst_agent` looks for several filings and then searches separately for monthly closing prices and quarterly figures.
 
-**When the budget trips**, the SDK cuts the loop at the top of the next iteration and returns `stopReason: 'limitTurns'` without ever asking the model for an answer. The runner does not accept that outcome: it runs a **salvage pass** (`SALVAGE_PROMPT`, `SALVAGE_TURNS`) that reuses the agent's conversation and asks it to write the report from what it already gathered, with no further tool calls. The run reports a single `complete` event carrying the tokens of both passes plus `turnLimitReached: true`, and the browser notes in the timeline that the research was cut short. Without it, a run that spent its budget ended with tool traces and nothing to render.
+**When the budget trips**, the SDK cuts the loop at the top of the next iteration and returns `stopReason: 'limitTurns'` without ever asking the model for an answer. The runner does not accept that outcome: it runs a **salvage pass** (`SALVAGE_PROMPT`, `SALVAGE_TURNS`) that reuses the agent's conversation and asks it to submit the report through the structured output tool from what it already gathered, with no further research calls. The run reports a single `complete` event carrying the tokens of both passes plus `turnLimitReached: true`, and the browser notes in the timeline that the research was cut short. Without it, a run that spent its budget ended with tool traces and nothing to render.
 
 A run that keeps tripping the budget is usually looping on a failing tool rather than genuinely needing more turns — check the run log before raising the ceiling.
 
@@ -237,7 +240,7 @@ Related limits, all in the same file:
 ## API
 
 - `GET /api/agents` — ordered catalog + `defaultAgentId` (public)
-- `POST /api/analyze` — SSE stream: `agent_info` → `thinking`/`text`/`tool_call`/`tool_result` → `complete` → `final_stats` → `done` (**requires auth**)
+- `POST /api/analyze` — SSE stream: `agent_info` → `thinking`/`text`/`tool_call`/`tool_result` → `complete` → `final_stats` → `done` (**requires auth**). `complete.interaction.structuredOutput` carries the validated report; a JSON block in the streamed text is only a fallback
 - `GET /api/download_jsonl?ticker=<input>[&agent=<agentId>]` — download run log
 
 ### Authentication

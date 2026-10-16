@@ -49,7 +49,6 @@ import {
   MAX_AGENT_FOLDERS,
   MAX_MANIFEST_BYTES,
   MAX_PROMPT_BYTES,
-  MAX_SCHEMA_BYTES,
   type ResolvedAgentDefinition,
 } from './agentTypes.ts';
 
@@ -677,8 +676,7 @@ export type AgentSourceErrorCode =
   | 'missing_source_file'
   | 'unreadable_source_file'
   | 'empty_source_file'
-  | 'source_file_too_large'
-  | 'invalid_schema_json';
+  | 'source_file_too_large';
 
 /**
  * Error explícito de lectura de una fuente del agente: nombra el agentId y el
@@ -700,17 +698,12 @@ export class AgentSourceError extends Error {
 /** Contenido de un archivo de fuente del agente, con su identidad. */
 export interface AgentSourceFile {
   agentId: string;
-  /** Nombre declarado en el manifiesto, `promptFile` o `schemaFile`. */
+  /** File name, `promptFile` from the manifest or `AGENTS.md`. */
   fileName: string;
   /** Ruta relativa para mensajes, `agent/<agentId>/<fileName>`. */
   relativePath: string;
   /** Contenido del archivo, con los saltos de línea normalizados a `\n`. */
   text: string;
-}
-
-/** Esquema de salida, con su texto literal y su forma analizada. */
-export interface AgentSchemaSource extends AgentSourceFile {
-  json: unknown;
 }
 
 /**
@@ -819,33 +812,9 @@ export function readAgentInstructions(definition: ResolvedAgentDefinition): Agen
   );
 }
 
-/**
- * Esquema de salida del agente, leído desde `definition.paths.schemaPath`. Se
- * devuelve el texto literal, que es lo que sustituye a `{{schema}}`, junto con
- * su forma analizada (Requirements 7.1, 7.9, 7.10, 16.1).
- */
-export function readAgentSchema(definition: ResolvedAgentDefinition): AgentSchemaSource {
-  const source = readAgentSourceFile(
-    definition,
-    definition.paths.schemaPath,
-    definition.manifest.schemaFile,
-    MAX_SCHEMA_BYTES,
-  );
-
-  let json: unknown;
-  try {
-    json = JSON.parse(source.text);
-  } catch (error) {
-    throw new AgentSourceError(
-      'invalid_schema_json',
-      source.agentId,
-      source.relativePath,
-      `Schema file "${source.relativePath}" of agent "${source.agentId}" does not contain valid JSON: ${errorMessage(error)}.`,
-    );
-  }
-
-  return { ...source, json };
-}
+// The output schema used to be read here from `output.schema.json`
+// (Requirements 7.1, 7.9, 7.10 for that file). It is now the per-renderer Zod
+// schema in `outputSchemas.ts`, enforced by the SDK's structured output tool.
 
 /* ────────────────────────────────────────────────────────── */
 /*  Fuentes inline del agente                                  */
@@ -954,12 +923,6 @@ export interface AgentRegistry {
    * se puede entregar (Requirements 7.9, 7.10, 16.1).
    */
   getPromptTemplate(agentId: string): AgentSourceFile;
-  /**
-   * Esquema de salida del agente indicado, con su texto literal y su forma
-   * analizada. Lanza `AgentSourceError` en las mismas condiciones (7.1, 7.10).
-   */
-  getSchema(agentId: string): AgentSchemaSource;
-
   /**
    * Instructions of the given agent, the `AGENTS.md` its system prompt is built
    * from. Throws `AgentSourceError` under the same conditions (7.10).
@@ -1092,7 +1055,6 @@ export function createAgentRegistry(options: AgentRegistryOptions = {}): AgentRe
       );
     },
     getPromptTemplate: (agentId) => readAgentPromptTemplate(requireDefinition(agentId)),
-    getSchema: (agentId) => readAgentSchema(requireDefinition(agentId)),
     getInstructions: (agentId) => readAgentInstructions(requireDefinition(agentId)),
     //  el contenido de los archivos de ejecución se lee solo
     // aquí, cuando una ejecución resuelve su agente.

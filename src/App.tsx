@@ -34,7 +34,7 @@ import {
   inputBarConfig,
   inputMaxLength,
 } from './agentInput';
-import { FALLBACK_OUTPUT_RENDERER, extractReport } from './resultExtraction';
+import { FALLBACK_OUTPUT_RENDERER, extractReport, matchesRenderer } from './resultExtraction';
 import { describeStopReason, explainMissingReport } from './runDiagnostics';
 import { HistoryPanel } from './components/HistoryPanel';
 import { CookieConsent } from './components/CookieConsent';
@@ -513,6 +513,9 @@ export default function App() {
     // would snapshot stale values; these mirrors always carry the numbers this
     // run produced.
     let promotedReport: Record<string, unknown> | null = null;
+    // Report validated server-side by the SDK against the renderer's schema and
+    // delivered on the `complete` event. Takes precedence over text parsing.
+    let structuredReport: Record<string, unknown> | null = null;
     let currentTokenCount = 0;
     let currentDuration = 0;
     // Identity of the agent that produced the report. Frozen here and only
@@ -666,6 +669,9 @@ export default function App() {
               } else if (evt.type === 'complete') {
                   if (evt.interaction) {
                       const interaction = evt.interaction;
+                      if (matchesRenderer(interaction.structuredOutput, runRenderer)) {
+                          structuredReport = interaction.structuredOutput;
+                      }
                       if (interaction.stopReason !== undefined && interaction.stopReason !== null) {
                           runStopReason = interaction.stopReason;
                       }
@@ -749,15 +755,15 @@ export default function App() {
           }
       }
 
-      // The stream is closed and the buffer drained: this is the run's complete
-      // text, and the only text the extractor is asked about.
-      if (accumulatedText) {
-          const finalData = parseFinalText(accumulatedText, runRenderer);
-          if (finalData) {
-              promotedReport = finalData;
-              setRep(finalData);
-              reportPromoted = true;
-          }
+      // The stream is closed and the buffer drained. The report the server
+      // validated wins; parsing the run's complete text is the fallback for a
+      // model that answered in prose with a JSON block inside.
+      const finalData =
+        structuredReport ?? (accumulatedText ? parseFinalText(accumulatedText, runRenderer) : null);
+      if (finalData) {
+          promotedReport = finalData;
+          setRep(finalData);
+          reportPromoted = true;
       }
 
       /*

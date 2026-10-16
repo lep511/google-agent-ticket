@@ -38,7 +38,6 @@ function definition(
       supportsInstruction: false,
       outputRenderer: 'simple_report',
       promptFile: 'prompt.md',
-      schemaFile: 'output.schema.json',
       modelProvider: 'anthropic',
       modelName: 'claude-opus-5-5',
       tools: [],
@@ -50,7 +49,6 @@ function definition(
       manifestPath: '/tmp/agent/market_news_agent/manifest.json',
       agentsFilePath: '/tmp/agent/market_news_agent/AGENTS.md',
       promptPath: '/tmp/agent/market_news_agent/prompt.md',
-      schemaPath: '/tmp/agent/market_news_agent/output.schema.json',
     },
   };
 }

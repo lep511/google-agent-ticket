@@ -18,10 +18,12 @@ const isNumber = (value: unknown): value is number =>
  * True when the quarterly series should be drawn as fund distributions rather
  * than revenue and net income.
  *
- * The schema example lists every key, and the prompt forbids omitting keys, so
- * models routinely fill `distributions: 0` for a corporate stock. Checking that
- * key alone turned Amazon into an ETF with $0 bars. A series is a distributions
- * series only when it carries distributions and no revenue figure at all.
+ * The old schema example listed every key and the prompt forbade omitting any,
+ * so models filled `distributions: 0` for a corporate stock, and checking that
+ * key alone turned Amazon into an ETF with $0 bars. The output schema now marks
+ * the field optional and forbids the placeholder; this check stays for reports
+ * recorded before that change. A series is a distributions series only when it
+ * carries distributions and no revenue figure at all.
  */
 export function isDistributionsSeries(quarters: readonly QuarterPoint[] | null | undefined): boolean {
   if (!Array.isArray(quarters) || quarters.length === 0) return false;

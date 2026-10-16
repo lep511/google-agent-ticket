@@ -130,7 +130,7 @@ registers the cleanup; nothing else is required.
 import { createTempCatalog, validManifest } from '../../tests/helpers/tempCatalog.ts';
 
 const catalog = createTempCatalog({
-  // A valid folder: manifest.json, AGENTS.md, prompt.md, output.schema.json.
+  // A valid folder: manifest.json, AGENTS.md, prompt.md.
   financial_analyst_agent: {},
   // A manifest string is written verbatim, so malformed JSON is expressible.
   broken_agent: { manifest: '{ not json' },
@@ -209,7 +209,7 @@ in a single constant. Switching model providers in `App.tsx` means updating it.
   names, so the test breaks when the interface stops being usable, not when the
   markup is reshuffled.
 - Inject dependencies instead of mocking modules where the production code allows
-  it: `buildAgentPrompt` accepts a template and a schema, `resolveRunLogDownload`
+  it: `buildAgentPrompt` accepts a template, `resolveRunLogDownload`
   accepts a directory listing, `resolveArtifactPath` accepts a path module.
 - Property tests state the invariant in the name and let the generators cover the
   input space; do not lower the iteration count to make one faster.
@@ -219,8 +219,7 @@ in a single constant. Switching model providers in `App.tsx` means updating it.
 A snapshot, accurate as of the last update to this file. Modules with no test of
 their own:
 
-- Server: `promptBuilder.ts`, `runLogNaming.ts`, `runLogDownload.ts`,
-  `jsonExtractor.ts`, `debugFiles.ts`, `cognitoAuth.ts`,
+- Server: `runLogNaming.ts`, `runLogDownload.ts`, `debugFiles.ts`, `cognitoAuth.ts`,
   `agent/agentCatalog.ts`, `agent/agentInlineSources.ts`, `agent/agentEvents.ts`,
   `tools/*`
 - Web: `src/data.ts`, `src/types.ts`, `src/cognito.ts`, `ReportTemplate.tsx`,
@@ -228,5 +227,4 @@ their own:
   `FormattedMarkdown` and `PulsatingDots` components
 
 Most of the server modules in that list are pure and take injected dependencies,
-so they are cheap to cover. `promptBuilder.ts` is the highest-value one: it
-assembles what actually gets sent to the model.
+so they are cheap to cover.

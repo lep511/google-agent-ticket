@@ -21,11 +21,13 @@ fast-check property tests run at least 100 iterations. Override with `FC_NUM_RUN
 
 ### Agent system
 
-Agents are filesystem-discovered from `agent/<agent_id>/`. The registry (`server/lib/agent/agentRegistry.ts`) caches the catalog in memory and rebuilds when the mtime of `agent/` changes. Adding a new agent requires no TypeScript changes.
+Agents are filesystem-discovered from `agent/<agent_id>/` (`manifest.json`, `prompt.md`, `AGENTS.md`). The registry (`server/lib/agent/agentRegistry.ts`) caches the catalog in memory and rebuilds when the mtime of `agent/` changes. Adding a new agent requires no TypeScript changes.
+
+The report shape is not in the agent folder: `server/lib/agent/outputSchemas.ts` holds one Zod schema per `outputRenderer`, passed to the Strands agent as `structuredOutputSchema`. Prompts must not describe the JSON shape or ask for a ```json block.
 
 ### Request flow
 
-SSE event order from `POST /api/analyze`: `agent_info` → `thinking`/`text`/`tool_call`/`tool_result` → `complete` → `final_stats` → `done`.
+SSE event order from `POST /api/analyze`: `agent_info` → `thinking`/`text`/`tool_call`/`tool_result` → `complete` → `final_stats` → `done`. `complete.interaction.structuredOutput` carries the validated report; the SDK's internal `strands_structured_output` tool call is filtered out of the stream (`server/lib/model/strandsAgent.ts`).
 
 ### Test structure
 

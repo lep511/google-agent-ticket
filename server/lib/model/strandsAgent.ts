@@ -8,15 +8,25 @@
  * set and through Amazon Bedrock otherwise. See `claudeProvider.ts` for the
  * transport choice and the request fields the model needs.
  *
+ * Final answer: the agent is given `structuredOutputSchema`, so the SDK
+ * registers an internal tool the model calls with the finished report and the
+ * validated object surfaces on `complete.interaction.structuredOutput`. That
+ * tool's call and result are filtered out of the event stream here, so the
+ * timeline shows only the agent's own tools.
+ *
  * Docs: https://strandsagents.com/docs/user-guide/quickstart/typescript/
  */
 
 import {
   Agent,
   DefaultModelRetryStrategy,
+  InvokeModelStage,
   McpClient,
+  Message,
   ModelThrottledError,
+  TextBlock,
   type AgentStreamEvent,
+  type InvokeModelContext,
   type ToolList,
 } from '@strands-agents/sdk';
 import type { ZodType } from 'zod';
@@ -46,6 +56,24 @@ export interface StrandsAgentOptions {
 /** Model attempts before a run gives up, counting the first one. */
 export const MAX_MODEL_ATTEMPTS = 4;
 
+/**
+ * Name of the tool the SDK registers for `structuredOutputSchema`. Declared in
+ * `node_modules/@strands-agents/sdk/dist/src/tools/structured-output-tool.js`
+ * but not re-exported from the package root, and the package `exports` block
+ * the deep path, so it is mirrored here. `strandsAgent.test.ts` checks the
+ * literal against the SDK source.
+ */
+export const STRUCTURED_OUTPUT_TOOL_NAME = 'strands_structured_output';
+
+/**
+ * Appended to the last user message when the SDK wants to force the structured
+ * output tool. Claude Opus 5.5 rejects a forced `toolChoice` (`tool` and `any`
+ * both return a 400, on the Anthropic API and on Bedrock), so the force becomes
+ * `auto` plus this instruction.
+ */
+export const STRUCTURED_OUTPUT_REMINDER =
+  `Submit the final report now by calling the ${STRUCTURED_OUTPUT_TOOL_NAME} tool. Do not answer in text.`;
+
 /** True when a Claude model can be built with the current environment. */
 export function isStrandsConfigured(): boolean {
   return isClaudeConfigured();
@@ -74,7 +102,7 @@ export function createStrandsAgent(options: StrandsAgentOptions = {}): Agent {
 
   const tools: ToolList = [...(options.tools ?? [])];
 
-  return new Agent({
+  const agent = new Agent({
     model,
     printer: false,
     retryStrategy: new RetryStrategy({ maxAttempts: MAX_MODEL_ATTEMPTS }),
@@ -85,6 +113,72 @@ export function createStrandsAgent(options: StrandsAgentOptions = {}): Agent {
       ? {}
       : { structuredOutputSchema: options.structuredOutputSchema }),
   });
+
+  if (options.structuredOutputSchema !== undefined) {
+    agent.addMiddleware(InvokeModelStage.Input, relaxForcedStructuredOutput);
+  }
+
+  return agent;
+}
+
+/**
+ * Model-call middleware: turns the SDK's forced structured output call into a
+ * plain request.
+ *
+ * When the model ends a turn in prose instead of calling the structured output
+ * tool, the SDK drops that answer and retries with `toolChoice` pinned to the
+ * tool. Claude Opus 5.5 answers that pin with a 400, which would end the run
+ * with the report one call away. The pin is removed and the same demand is made
+ * in words, appended to the last user message the model is about to read. Any
+ * other `toolChoice` passes through untouched.
+ */
+export function relaxForcedStructuredOutput(context: InvokeModelContext): InvokeModelContext {
+  const forced = (context.toolChoice as { tool?: { name?: string } } | undefined)?.tool?.name;
+  if (forced !== STRUCTURED_OUTPUT_TOOL_NAME) return context;
+
+  const messages = [...context.messages];
+  const last = messages[messages.length - 1];
+  if (last !== undefined && last.role === 'user') {
+    messages[messages.length - 1] = new Message({
+      role: 'user',
+      content: [...last.content, new TextBlock(STRUCTURED_OUTPUT_REMINDER)],
+    });
+  }
+
+  return { ...context, toolChoice: undefined, messages };
+}
+
+/**
+ * Decides which SDK events belong to the structured output tool, so the stream
+ * can drop them. The tool use block carries the name but its result carries
+ * only the `toolUseId`, so the ids seen on the way in are remembered until the
+ * matching result goes by. A rejected submission is logged: the model retries
+ * it at the cost of a turn, and nothing else makes that visible.
+ */
+export function createStructuredOutputFilter(): (event: AgentStreamEvent) => boolean {
+  const pending = new Set<string>();
+
+  return (event) => {
+    if (event.type === 'contentBlockEvent') {
+      const block = event.contentBlock;
+      if (block.type === 'toolUseBlock' && block.name === STRUCTURED_OUTPUT_TOOL_NAME) {
+        pending.add(block.toolUseId);
+        return true;
+      }
+      return false;
+    }
+
+    if (event.type === 'toolResultEvent' && pending.delete(event.result.toolUseId)) {
+      if (event.result.status === 'error') {
+        console.warn(
+          `[agent] Structured output rejected, the model will retry: ${event.result.error?.message ?? extractToolResultText(event.result.content)}`,
+        );
+      }
+      return true;
+    }
+
+    return false;
+  };
 }
 
 /* ────────────────────────────────────────────────────────── */
@@ -198,21 +292,23 @@ export const MAX_AGENT_TURNS = 50;
 export const TURN_LIMIT_STOP_REASON = 'limitTurns';
 
 /**
- * Turn budget of the salvage pass. Two turns, so a model that answers with one
- * last tool call still gets a turn to write the report from its result.
+ * Turn budget of the salvage pass. Three turns: one call to the structured
+ * output tool, one retry if that submission fails validation, and one more in
+ * case the model answers in prose first and has to be asked again.
  */
-export const SALVAGE_TURNS = 2;
+export const SALVAGE_TURNS = 3;
 
 /**
  * Prompt of the salvage pass. Nothing new is researched: the point is to spend
- * what was already gathered instead of throwing the whole run away.
+ * what was already gathered instead of throwing the whole run away. The report
+ * still has to go through the structured output tool, so research tools are
+ * what is forbidden, not tools as such.
  */
 export const SALVAGE_PROMPT = [
   'You have run out of research turns. Stop searching now.',
-  'Do NOT call any tool again.',
-  'Write the final report from the information you have already gathered, following the',
-  'output format you were given, and leave out or mark as unavailable whatever you could',
-  'not confirm.',
+  'Do not call any research tool again.',
+  'Submit the final report through the structured output tool, built from the information you',
+  'have already gathered, and leave out or mark as unavailable whatever you could not confirm.',
 ].join(' ');
 
 /** Adds up the token accounting of the passes a run went through. */
@@ -234,7 +330,7 @@ function mergeUsage(first: AgentUsage | null, second: AgentUsage | null): AgentU
  * for an answer, so everything the agent had researched was lost and the run
  * ended with tool traces and no report. This runs a salvage pass in that case:
  * the agent keeps its conversation, so one more invocation asking it to write the
- * report with no further tool calls turns a wasted run into a report built from
+ * report with no further research turns a wasted run into a report built from
  * partial research.
  *
  * Exactly one `complete` event reaches the caller, because that is the event the
@@ -256,6 +352,11 @@ export async function* streamStrandsAgent(
     limits: { turns },
   });
 
+  // One filter for the whole run: a structured output call started in the
+  // first pass is never answered in the salvage pass, but sharing it costs
+  // nothing and keeps the two passes indistinguishable to the caller.
+  const isStructuredOutputEvent = createStructuredOutputFilter();
+
   /**
    * Consumes one pass, yielding everything but its result event, and returns
    * that result so the caller decides when — and as what — it is emitted.
@@ -267,6 +368,7 @@ export async function* streamStrandsAgent(
     let result: AgentEvent | null = null;
 
     for await (const event of agent.stream(passPrompt, options(turns))) {
+      if (isStructuredOutputEvent(event)) continue;
       const mapped = mapStrandsEvent(event);
       if (mapped === null) continue;
       if (mapped.type === 'complete') {
