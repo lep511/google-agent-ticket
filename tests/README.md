@@ -221,7 +221,7 @@ their own:
 
 - Server: `runLogNaming.ts`, `runLogDownload.ts`, `debugFiles.ts`, `cognitoAuth.ts`,
   `agent/agentCatalog.ts`, `agent/agentInlineSources.ts`, `agent/agentEvents.ts`,
-  `tools/*`
+  `tools/braveSearchTool.ts`, `tools/calculatorTool.ts`
 - Web: `src/data.ts`, `src/types.ts`, `src/cognito.ts`, `ReportTemplate.tsx`,
   and the `AgentSelector`, `AgentTimeline`, `CookieConsent`, `DebugPanel`,
   `FormattedMarkdown` and `PulsatingDots` components

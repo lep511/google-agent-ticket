@@ -11,12 +11,14 @@ import type { ToolList } from '@strands-agents/sdk';
 
 import { createBraveSearchTool } from './braveSearchTool.ts';
 import { createCalculatorTool } from './calculatorTool.ts';
+import { createPriceHistoryTool } from './priceHistoryTool.ts';
 
 export type ToolFactory = () => ToolList[number];
 
 const TOOL_FACTORIES: Record<string, ToolFactory> = {
   search_web: createBraveSearchTool,
   calculate: createCalculatorTool,
+  get_price_history: () => createPriceHistoryTool(),
 };
 
 export const KNOWN_TOOL_NAMES = Object.keys(TOOL_FACTORIES);

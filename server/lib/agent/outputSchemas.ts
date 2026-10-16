@@ -155,7 +155,10 @@ export const financialReportSchema = z
       .object({
         stock_price_4m: z
           .array(stockPricePointSchema)
-          .describe('Up to 4 points for the most recent months of 2026, oldest to newest. Empty when not found.'),
+          .describe(
+            'Month-end closes from the get_price_history tool, oldest to newest, 2026 months only (up to 4). ' +
+              'Empty only when the tool reported an error.',
+          ),
         financial_performance_4q: z
           .array(quarterPointSchema)
           .describe(
@@ -164,7 +167,7 @@ export const financialReportSchema = z
               'distributions only.',
           ),
       })
-      .describe('Quantitative data from Yahoo Finance, Google Finance or MarketWatch searches.'),
+      .describe('Quantitative data: prices from the get_price_history tool, quarterly figures from web searches.'),
   })
   .describe(
     'The final financial report. Call this tool exactly once, as your last action, after the ' +

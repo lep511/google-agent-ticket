@@ -11,7 +11,7 @@
   "inputPlaceholder": "TICKER",
   "actionLabel": "Analyze",
   "supportsInstruction": true,
-  "tools": ["search_web"],
+  "tools": ["search_web", "get_price_history"],
   "outputRenderer": "financial_report",
   "landing": {
     "title": "Tickr, your intelligent financial document analyzer",
