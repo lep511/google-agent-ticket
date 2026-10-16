@@ -5,10 +5,14 @@ import {
 import { DeepInsight, DocumentFinding, ReportData } from './App';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from 'recharts';
 import { FormattedMarkdown } from './components/FormattedMarkdown';
+import { buildReportFileName, printWithFileName } from './printReport';
+import { hasChartData, isDistributionsSeries } from './reportCharts';
 
 interface Props {
   data: ReportData;
   ticker: string;
+  /** Agent that produced the report; names the PDF when printing. */
+  agentName?: string;
   onClose: () => void;
   durationSecs?: number;
   toolRuns?: number;
@@ -32,7 +36,18 @@ const AnalysisCard = ({ title, subtext, children, className = "" }: any) => (
   </div>
 );
 
-export default function ReportTemplate({ data, ticker, onClose, durationSecs = 0, toolRuns = 0, tokenCount = 0, documentCount = 0 }: Props) {
+/**
+ * Chart area with no data points. The agent leaves a series empty when its
+ * research found no verified figures, and an empty frame looked like a
+ * rendering bug; the message says what happened instead.
+ */
+const EmptyChart = ({ message }: { message: string }) => (
+  <div className="h-full w-full flex items-center justify-center text-sm text-stone-500 border border-dashed border-stone-200 rounded-lg print:border-stone-300">
+    {message}
+  </div>
+);
+
+export default function ReportTemplate({ data, ticker, agentName, onClose, durationSecs = 0, toolRuns = 0, tokenCount = 0, documentCount = 0 }: Props) {
   const scoreColor = (score: number) => {
     if (score >= 80) return 'text-[#0b5a4b]';
     if (score >= 60) return 'text-blue-600';
@@ -48,6 +63,9 @@ export default function ReportTemplate({ data, ticker, onClose, durationSecs = 0
   */
   const findings: DocumentFinding[] = Array.isArray(data.findings) ? data.findings : [];
   const deepInsights: DeepInsight[] = Array.isArray(data.deep_insights) ? data.deep_insights : [];
+  const stockPrices = data.financial_charts?.stock_price_4m;
+  const quarters = data.financial_charts?.financial_performance_4q;
+  const distributionsChart = isDistributionsSeries(quarters);
   
   return (
     <div className="min-h-full bg-[#F6F4F0] text-stone-900 font-sans w-full flex flex-col h-full overflow-y-auto print:h-auto print:overflow-visible print:bg-white print:p-0">
@@ -57,7 +75,7 @@ export default function ReportTemplate({ data, ticker, onClose, durationSecs = 0
         </div>
         <div className="flex items-center gap-3">
           <button 
-            onClick={() => window.print()}
+            onClick={() => printWithFileName(buildReportFileName(agentName))}
             className="flex items-center gap-2 px-3.5 py-2 bg-stone-900 hover:bg-stone-800 text-white rounded-lg font-medium text-xs tracking-wide transition-all shadow-sm cursor-pointer active:scale-95"
             title="Save report as PDF or Print"
           >
@@ -159,8 +177,11 @@ export default function ReportTemplate({ data, ticker, onClose, durationSecs = 0
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 print:mt-8 print:block print:w-full print:clear-both print:break-before-auto">
             <AnalysisCard title="Stock Price" subtext="This chart shows the closing price on the last trading date for the most recent months of 2026." className="print:break-inside-avoid print:w-full print:mb-6">
               <div className="h-64 mt-4 print:h-64 print:w-full">
+                {!hasChartData(stockPrices) ? (
+                  <EmptyChart message="No verified closing prices were found for this period." />
+                ) : (
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={data.financial_charts.stock_price_4m ? [...data.financial_charts.stock_price_4m] : []}>
+                  <LineChart data={[...stockPrices!]}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e5e4" />
                     <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#78716c' }} dy={10} />
                     <YAxis domain={['auto', 'auto']} axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#78716c' }} dx={-10} />
@@ -168,38 +189,44 @@ export default function ReportTemplate({ data, ticker, onClose, durationSecs = 0
                       contentStyle={{ borderRadius: '8px', border: '1px solid #e5e5e4', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                       formatter={(value: number) => [`$${value}`, 'Price']}
                     />
-                    <Line type="linear" dataKey="price" stroke="#0b5a4b" strokeWidth={2} dot={{ r: 4, fill: '#0b5a4b', strokeWidth: 0 }} activeDot={{ r: 6 }} />
+                    {/* Animations start from an empty chart, and printing captures that frame: a PDF with axes and no line. */}
+                    <Line type="linear" dataKey="price" stroke="#0b5a4b" strokeWidth={2} dot={{ r: 4, fill: '#0b5a4b', strokeWidth: 0 }} activeDot={{ r: 6 }} isAnimationActive={false} />
                   </LineChart>
                 </ResponsiveContainer>
+                )}
               </div>
             </AnalysisCard>
             
             <AnalysisCard 
               title="Financial Performance"
-              subtext={data.financial_charts.financial_performance_4q && data.financial_charts.financial_performance_4q.length > 0 && data.financial_charts.financial_performance_4q[0].distributions !== undefined ? "This chart shows the quarterly distributions (dividends/yield per share) for the completed quarters of 2026." : "This chart shows the revenue and net income for the completed quarters of 2026."}
+              subtext={distributionsChart ? "This chart shows the quarterly distributions (dividends/yield per share) for the completed quarters of 2026." : "This chart shows the revenue and net income for the completed quarters of 2026."}
               className="print:break-inside-avoid print:w-full print:mb-6"
             >
               <div className="h-64 mt-4 print:h-64 print:w-full">
+                {!hasChartData(quarters) ? (
+                  <EmptyChart message="No completed quarters with verified figures were found." />
+                ) : (
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={data.financial_charts.financial_performance_4q ? [...data.financial_charts.financial_performance_4q] : []}>
+                  <BarChart data={[...quarters!]}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e5e4" />
                     <XAxis dataKey="quarter" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#78716c' }} dy={10} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#78716c' }} dx={-10} tickFormatter={(value) => data.financial_charts?.financial_performance_4q?.[0]?.distributions !== undefined ? `$${value}` : `${value}B`} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#78716c' }} dx={-10} tickFormatter={(value) => distributionsChart ? `$${value}` : `${value}B`} />
                     <RechartsTooltip 
                       contentStyle={{ borderRadius: '8px', border: '1px solid #e5e5e4', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                       formatter={(value: number, name: string) => name === 'Distributions' ? [`$${value}`, name] : [`$${value}B`, name]}
                     />
                     <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '20px' }} />
-                    {data.financial_charts.financial_performance_4q && data.financial_charts.financial_performance_4q.length > 0 && data.financial_charts.financial_performance_4q[0].distributions !== undefined ? (
-                      <Bar dataKey="distributions" name="Distributions" fill="#10b981" radius={[4, 4, 0, 0]} barSize={48} />
+                    {distributionsChart ? (
+                      <Bar dataKey="distributions" name="Distributions" fill="#10b981" radius={[4, 4, 0, 0]} barSize={48} isAnimationActive={false} />
                     ) : (
                       <>
-                        <Bar dataKey="revenue" name="Revenue" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={32} />
-                        <Bar dataKey="net_income" name="Net Income" fill="#1e3a8a" radius={[4, 4, 0, 0]} barSize={32} />
+                        <Bar dataKey="revenue" name="Revenue" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={32} isAnimationActive={false} />
+                        <Bar dataKey="net_income" name="Net Income" fill="#1e3a8a" radius={[4, 4, 0, 0]} barSize={32} isAnimationActive={false} />
                       </>
                     )}
                   </BarChart>
                 </ResponsiveContainer>
+                )}
               </div>
             </AnalysisCard>
           </div>

@@ -893,6 +893,7 @@ export default function App() {
           <ReportTemplate
             data={restoredReport.report as unknown as ReportData}
             ticker={restoredReport.query}
+            agentName={restoredReport.agentName}
             onClose={() => setRestoredReport(null)}
             durationSecs={restoredDuration}
             toolRuns={restoredToolRuns}
@@ -923,6 +924,7 @@ export default function App() {
            <ReportTemplate
              data={reportData}
              ticker={runQuery}
+             agentName={runAgent?.agentName}
              onClose={() => setIsReportOpen(false)}
              durationSecs={durationSecs}
              toolRuns={toolRuns}

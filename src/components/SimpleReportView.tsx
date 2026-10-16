@@ -17,6 +17,7 @@
 
 import type { ReactNode } from 'react';
 import { Calendar, CheckCircle2, FileText, Link as LinkIcon, Printer, X } from 'lucide-react';
+import { buildReportFileName, printWithFileName } from '../printReport';
 
 import { FormattedMarkdown } from './FormattedMarkdown';
 import type { RawSimpleReport, SimpleReportSection, SimpleReportSource } from '../types';
@@ -173,7 +174,7 @@ export default function SimpleReportView({
         </div>
         <div className="flex items-center gap-3">
           <button
-            onClick={() => window.print()}
+            onClick={() => printWithFileName(buildReportFileName(title))}
             className="flex items-center gap-2 px-3.5 py-2 bg-stone-900 hover:bg-stone-800 text-white rounded-lg font-medium text-xs tracking-wide transition-all shadow-sm cursor-pointer active:scale-95"
             title="Save report as PDF or Print"
           >
