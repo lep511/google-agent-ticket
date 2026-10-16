@@ -2205,3 +2205,56 @@ describe('Recording a run under React StrictMode', () => {
     expect(renderedRowQueries(panel)).toEqual(['AMZN', PRE_EXISTING_ENTRY.query]);
   }, PROPERTY_TEST_TIMEOUT_MS);
 });
+
+/* ── Thinking deltas in the timeline ─────────────────────────── */
+
+/**
+ * Reasoning reaches the browser as small deltas. The timeline must show one
+ * card per thought, with the whole thought as its text, instead of one card per
+ * fragment ("Analyzing Am", "Analyzing azon is a", ...). Any other event closes
+ * the open thought, so a thought after a tool call gets a card of its own.
+ */
+describe('Thinking deltas in the timeline', () => {
+  it('merges consecutive thinking deltas into one card and starts a new card after another event', async () => {
+    const frames = [
+      sseFrame({ type: 'thinking', text: 'Am' }),
+      sseFrame({ type: 'thinking', text: 'azon is a' }),
+      sseFrame({ type: 'thinking', text: ' corporate stock.' }),
+      sseFrame({ type: 'tool_call', name: 'search_web', arguments: { query: 'AMZN 10-K' }, callId: 'call-1' }),
+      sseFrame({ type: 'tool_result', callId: 'call-1', result: '{"web_results":[]}' }),
+      sseFrame({ type: 'thinking', text: 'Now the' }),
+      sseFrame({ type: 'thinking', text: ' quarterly figures.' }),
+      sseFrame({ type: 'text', text: UNSTRUCTURED_RUN_TEXT }),
+      'data: [DONE]\n\n',
+    ];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
+        if (url.includes('/api/agents')) {
+          return new Response(JSON.stringify(CATALOG_RESPONSE), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+          });
+        }
+        if (url.includes('/api/analyze')) return makeSseResponse(frames, null);
+        throw new Error(`Unexpected request to ${url}`);
+      }),
+    );
+
+    render(<App />);
+    await screen.findByLabelText('Agent input');
+    const user = userEvent.setup();
+    await driveRun(user, 'AMZN', 'not-promoted');
+
+    const thinkingHeadings = screen
+      .getAllByRole('heading', { level: 3 })
+      .map((heading) => heading.textContent ?? '')
+      .filter((text) => text.startsWith('Analyzing'));
+
+    expect(thinkingHeadings).toEqual([
+      'Analyzing Amazon is a corporate stock.',
+      'Analyzing Now the quarterly figures.',
+    ]);
+  });
+});

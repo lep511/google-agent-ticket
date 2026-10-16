@@ -541,6 +541,34 @@ export default function App() {
       pushEvt(...args);
     };
 
+    /*
+      Reasoning streams as small deltas ("Am", "azon is a", "cor", ...). The
+      timeline renders one card per thought and titles it from the first line,
+      so each delta on its own became an "Analyzing Am" card. Consecutive
+      thinking deltas are merged into the card that is already open, and any
+      other event closes it, so the next thought gets a card of its own.
+    */
+    let openThought: string | null = null;
+    const appendThinking = (delta: string) => {
+      if (openThought === null) {
+        openThought = delta;
+        emit('thinking', extractThinkingTitle(openThought), openThought);
+        return;
+      }
+      openThought += delta;
+      const label = extractThinkingTitle(openThought);
+      const detail = openThought;
+      setEvts((prev: TimelineEvent[]) => {
+        if (prev.length === 0) return prev;
+        const last = prev[prev.length - 1];
+        if (last.kind !== 'thinking') return prev;
+        return [...prev.slice(0, -1), { ...last, label, detail }];
+      });
+    };
+    const closeThought = () => {
+      openThought = null;
+    };
+
     try {
       const idToken = await getIdToken();
       const resp = await fetch('/api/analyze', {
@@ -611,7 +639,12 @@ export default function App() {
                       storeSelectedAgentId(informedAgentId);
                     }
                   }
-              } else if (evt.type === 'text' && evt.text) {
+              } else if (evt.type === 'thinking' && evt.text) {
+                  appendThinking(evt.text);
+                  continue;
+              }
+              closeThought();
+              if (evt.type === 'text' && evt.text) {
                   accumulatedText += evt.text;
               } else if (evt.type === 'tool_call') {
                   currentToolRuns += 1;
@@ -620,9 +653,6 @@ export default function App() {
                   emit('tool_call', label, JSON.stringify(evt.arguments, null, 2), evt.name, evt.callId);
               } else if (evt.type === 'tool_result') {
                   emit('tool_result', `Analysis retrieved`, evt.result, undefined, evt.callId);
-              } else if (evt.type === 'thinking') {
-                  const label = extractThinkingTitle(evt.text);
-                  emit('thinking', label, evt.text);
               } else if (evt.type === 'error') {
                   // The server closes the stream with `error` + `done` when the
                   // remote agent fails. Without this the failure was discarded silently.
